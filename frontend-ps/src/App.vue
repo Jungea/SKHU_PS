@@ -1,8 +1,12 @@
 <template>
   <b-container id="app" fluid>
     <b-row class="h-100">
-      <b-col class="myNav h-100 overflow-auto" cols="2"><Sidebar/></b-col>
-      <b-col clos="10"><router-view/></b-col>
+      <b-col class="myNav h-100 overflow-auto" cols="200px">
+        <Sidebar/>
+      </b-col>
+      <b-col>
+        <router-view/>
+      </b-col>
     </b-row>
   </b-container>
 </template>
@@ -23,6 +27,6 @@ html, body, #app {
 }
 
 .myNav{
-    border-right: 2px solid gray;
+    border-right: 1px solid lightgray;
 }
 </style>
