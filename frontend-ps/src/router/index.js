@@ -6,6 +6,8 @@ import FindPass from '../views/FindPass.vue';
 import Home from '../views/Home.vue';
 import FindPassAlert from '../views/FindPassAlert.vue'; 
 import ProjectBoard from '../views/ProjectBoard.vue'; 
+import MyProjectManager from '../views/MyProjectManager.vue'; 
+
 
 Vue.use(VueRouter)
 
@@ -40,6 +42,11 @@ Vue.use(VueRouter)
     name: 'ProjectBoard',
     component: ProjectBoard
   },
+  {
+    path: '/myProjectManager',
+    name: 'MyProjectManager',
+    component: MyProjectManager
+  }
 ]
 
 const router = new VueRouter({
