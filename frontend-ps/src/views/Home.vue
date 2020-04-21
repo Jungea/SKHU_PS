@@ -5,7 +5,7 @@
         <Sidebar/>
       </b-col>
       <b-col>
-        내용 들어갈 자리
+        <CompoMyProjectList/>
       </b-col>
     </b-row>
   </div>
@@ -13,11 +13,11 @@
 
 <script>
 import Sidebar from '@/components/Sidebar.vue'
-
+import CompoMyProjectList from '@/components/CompoMyProjectList.vue'
 export default {
   name: 'Home',
   components: {
-    Sidebar
+    Sidebar, CompoMyProjectList
   }
 }
 </script>

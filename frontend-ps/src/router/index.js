@@ -5,8 +5,12 @@ import SignUp from '../views/SignUp.vue';
 import FindPass from '../views/FindPass.vue';
 import Home from '../views/Home.vue';
 import FindPassAlert from '../views/FindPassAlert.vue'; 
+<<<<<<< HEAD
 import Profile from '../views/Profile.vue';
 import EditProfile from '../views/EditProfile.vue'; 
+=======
+import ProjectBoard from '../views/ProjectBoard.vue'; 
+>>>>>>> 59266ebd0106c018b90477cbd9449500bb5d6101
 
 Vue.use(VueRouter)
 
@@ -45,7 +49,12 @@ Vue.use(VueRouter)
     path: '/editProfile',
     name: 'EditProfile',
     component: EditProfile
-  }
+  },
+  {
+    path: '/projectBoard',
+    name: 'ProjectBoard',
+    component: ProjectBoard
+  },
 ]
 
 const router = new VueRouter({
