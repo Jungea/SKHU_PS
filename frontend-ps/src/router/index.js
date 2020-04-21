@@ -8,7 +8,7 @@ import FindPassAlert from '../views/FindPassAlert.vue';
 import Profile from '../views/Profile.vue';
 import EditProfile from '../views/EditProfile.vue'; 
 import ProjectBoard from '../views/ProjectBoard.vue'; 
-import MyProjectManager from '../views/MyProjectManager.vue'; 
+import MyProjectManager from '../views/MyProjectManager.vue';
 
 Vue.use(VueRouter)
 
