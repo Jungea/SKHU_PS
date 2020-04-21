@@ -40,6 +40,12 @@
           </b-form-group>
 
           <b-button style="width:100%; margin-top:15px;" type="submit">Login</b-button>
+
+          <a href="signUp">회원가입</a> 
+          <a href="findPass">비밀번호 찾기</a> 
+
+          <button @click="signUp">회원가입</button> 
+          <button @click="findPass">비밀번호 찾기</button> 
         </b-form>
       </div>
     </b-jumbotron>
@@ -62,7 +68,22 @@
         evt.preventDefault()
         alert(JSON.stringify(this.form))//나중에 삭제ㄱㄱ
         location.href="/home"
-      }
+      },
+      login() {
+            this.$router.push({
+                path: 'home'
+            })
+        },
+        signUp() {
+            this.$router.push({
+                path: 'signUp'
+            })
+        },
+        findPass() {
+            this.$router.push({
+                path: 'findPass'
+            })
+        }
     }
   }
 </script>
