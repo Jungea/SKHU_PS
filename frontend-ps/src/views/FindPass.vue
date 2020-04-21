@@ -45,6 +45,13 @@ export default {
             evt.preventDefault()
             location.href="/findPassAlert"
         },
-    },
+        /*
+        findPassalert() {
+            this.$router.push({
+                path: '/findPassAlert'
+            })
+        }
+        */
+    }
 }
 </script>
