@@ -61,7 +61,7 @@
       onSubmit(evt) {
         evt.preventDefault()
         alert(JSON.stringify(this.form))//나중에 삭제ㄱㄱ
-        location.href="/"
+        location.href="/home"
       }
     }
   }
