@@ -4,6 +4,7 @@ import Login from '../views/Login.vue';
 import SignUp from '../views/SignUp.vue';
 import FindPass from '../views/FindPass.vue';
 import Home from '../views/Home.vue';
+import FindPassAlert from '../views/FindPassAlert.vue'; 
 
 
 Vue.use(VueRouter)
@@ -28,6 +29,11 @@ Vue.use(VueRouter)
     path: '/home',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/findPassAlert',
+    name: 'FindPassAlert',
+    component: FindPassAlert
   }
 ]
 
