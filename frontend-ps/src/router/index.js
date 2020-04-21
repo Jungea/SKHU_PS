@@ -5,6 +5,7 @@ import SignUp from '../views/SignUp.vue';
 import FindPass from '../views/FindPass.vue';
 import Home from '../views/Home.vue';
 
+
 Vue.use(VueRouter)
 
   const routes = [

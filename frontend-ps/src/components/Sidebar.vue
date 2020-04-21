@@ -11,7 +11,7 @@
        <strong>{{ selected }}</strong>
        <div>프로젝트 정보</div>
        <div>캘린더</div>
-       <div>주차별 목포(to-do-list)</div>
+       <div>주차별 목표(to-do-list)</div>
        <div>토론 게시판</div>
        <div>자유 게시판</div>
        <div>관리</div>
