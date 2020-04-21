@@ -5,7 +5,7 @@ import SignUp from '../views/SignUp.vue';
 import FindPass from '../views/FindPass.vue';
 import Home from '../views/Home.vue';
 import FindPassAlert from '../views/FindPassAlert.vue'; 
-
+import ProjectBoard from '../views/ProjectBoard.vue'; 
 
 Vue.use(VueRouter)
 
@@ -34,7 +34,12 @@ Vue.use(VueRouter)
     path: '/findPassAlert',
     name: 'FindPassAlert',
     component: FindPassAlert
-  }
+  }, 
+  {
+    path: '/projectBoard',
+    name: 'ProjectBoard',
+    component: ProjectBoard
+  },
 ]
 
 const router = new VueRouter({
