@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `sps_ver3` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `sps_ver3`;
 -- MySQL dump 10.13  Distrib 8.0.17, for Win64 (x86_64)
 --
 -- Host: localhost    Database: sps
