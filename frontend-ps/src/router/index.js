@@ -9,6 +9,8 @@ import Profile from '../views/Profile.vue';
 import EditProfile from '../views/EditProfile.vue'; 
 import ProjectBoard from '../views/ProjectBoard.vue'; 
 import MyProjectManager from '../views/MyProjectManager.vue';
+import ProfessorAuth from '../views/ProfessorAuth.vue';
+import UserSelect from '../views/UserSelect.vue';
 
 Vue.use(VueRouter)
 
@@ -57,7 +59,17 @@ Vue.use(VueRouter)
     path: '/myProjectManager',
     name: 'MyProjectManager',
     component: MyProjectManager
-  }
+  },
+  {
+    path: '/professorAuth',
+    name: 'ProfessorAuth',
+    component: ProfessorAuth
+  },
+  {
+    path: '/userSelect',
+    name: 'UserSelect',
+    component: UserSelect
+  },
 ]
 
 const router = new VueRouter({
