@@ -2,7 +2,7 @@
   <div class="sign-up">    
     <div class="inputbox">
       <center>
-        <h5>회원가입(학생)</h5>
+        <h5>회원가입</h5>
         <hr>
         <b-form @submit="signUp">
           <table>
