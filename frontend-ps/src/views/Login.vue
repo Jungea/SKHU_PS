@@ -8,17 +8,17 @@
         <!--아디-->
           <b-form-group style="text-align:left"
             id="input-group-1"
-            label="E-mail"
-            label-for="email"
+            label="Number"
+            label-for="number"
           >
             <b-form-input 
-              id="email" 
-              v-model="form.email" 
+              id="number" 
+              v-model="form.number" 
               :state="state" 
-              type="email"
+              type="text"
               required
               trim
-              placeholder="Enter Email"
+              placeholder="Enter your number"
               ></b-form-input>
           </b-form-group>
 
@@ -56,7 +56,7 @@
     data() {
       return {
         form: {
-          email: '',
+          number: '',
           password: ''
         },
         show: true
@@ -69,7 +69,7 @@
       },
       signUp() {
         this.$router.push({
-        path: 'signUp'
+        path: 'userSelect'
         })
       },
       findPass() {
