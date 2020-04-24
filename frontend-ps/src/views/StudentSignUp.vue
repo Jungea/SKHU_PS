@@ -50,6 +50,7 @@
 </template>
  
 <script>
+import axios from 'axios';
   export default {
     name: 'StudentSignUp',
     data() {
@@ -67,7 +68,8 @@
     methods: {
       signUp(evt) {
         evt.preventDefault()
-        alert(JSON.stringify(this.form))
+        const url='/studentSignUp'
+        alert(JSON.stringify(this.form.id))
         alert("회원가입 완료")
         this.$router.push({
         path: '/'

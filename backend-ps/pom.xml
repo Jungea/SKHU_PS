@@ -65,7 +65,20 @@
 	      <groupId>org.apache.tomcat.embed</groupId>
 	      <artifactId>tomcat-embed-jasper</artifactId>
 	    </dependency>
-		    
+		    <dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+			<version>1.4.3.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>servlets.com</groupId>
+			<artifactId>cos</artifactId>
+			<version>05Nov2002</version>
+		</dependency>
 			
 	</dependencies>
 
