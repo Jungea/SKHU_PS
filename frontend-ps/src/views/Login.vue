@@ -14,9 +14,7 @@
             <b-form-input 
               id="number" 
               v-model="form.number" 
-              :state="state" 
               type="text"
-              required
               trim
               placeholder="Enter your number"
               ></b-form-input>
@@ -31,7 +29,6 @@
             <b-form-input 
               id="password" 
               v-model="form.password" 
-              :state="state2" 
               type="password" 
               required
               trim
@@ -42,7 +39,6 @@
           <b-button style="width:100%; margin-top:15px;" type="submit">Login</b-button>
 
           <br><br>
-
         </b-form>
         <span style="margin-right: 40px"><a style="text-decoration:none; color:black" href="" @click="signUp">회원가입</a></span> 
         <span><a style="text-decoration:none; color:black;" href="" @click="findPass">비밀번호 찾기</a></span> 
@@ -52,6 +48,7 @@
 </template>
 
 <script>
+import axios from 'axios';
   export default {
     data() {
       return {
@@ -59,13 +56,29 @@
           number: '',
           password: ''
         },
-        show: true
+        show: true,
+        user: null
       }
     },
     methods: {
       onSubmit(evt) {
         evt.preventDefault()
-        location.href="/home"
+        
+        axios.post('/api/user/login', 
+        {
+          userNum: this.form.number,
+          password: this.form.password
+        }).then(response => this.user = response.data);
+
+        if(this.user == null) {
+          alert("잘못된 입력입니다.");
+          this.form.number='';
+          this.form.password='';
+        }
+        else{
+            location.href="/home"
+        }
+
       },
       signUp() {
         this.$router.push({

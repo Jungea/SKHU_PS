@@ -44,7 +44,7 @@ public class User {
 	Detail det_dept_id;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "language")
+	@JoinColumn(name = "detLanguageId")
 	Detail det_detLanguage_id;
 
 	@JsonIgnore
