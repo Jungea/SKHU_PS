@@ -36,7 +36,8 @@ public class User {
 	Boolean userType;
 	String github;
 	String intro;
-	boolean email_check;
+	boolean emailCheck;
+	String authKey;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "detDeptId")
