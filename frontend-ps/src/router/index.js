@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../views/Login.vue';
-import SignUp from '../views/SignUp.vue';
+import StudentSignUp from '../views/StudentSignUp.vue';
 import FindPass from '../views/FindPass.vue';
 import Home from '../views/Home.vue';
 import FindPassAlert from '../views/FindPassAlert.vue'; 
@@ -11,6 +11,7 @@ import ProjectBoard from '../views/ProjectBoard.vue';
 import MyProjectManager from '../views/MyProjectManager.vue';
 import ProfessorAuth from '../views/ProfessorAuth.vue';
 import UserSelect from '../views/UserSelect.vue';
+import ProfessorSignUp from '../views/ProfessorSignUp.vue';
 
 Vue.use(VueRouter)
 
@@ -21,9 +22,14 @@ Vue.use(VueRouter)
     component: Login
   },
   {
-    path: '/signUp',
-    name: 'SignUp',
-    component: SignUp
+    path: '/professorSignUp',
+    name: 'ProfessorSignUp',
+    component: ProfessorSignUp
+  },
+  {
+    path: '/studentSignUp',
+    name: 'studentSignUp',
+    component: StudentSignUp
   },
   {
     path: '/findPass',

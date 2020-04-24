@@ -42,10 +42,10 @@ public class Detail {
 	List<Project> subjectProjects;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "detDepartment", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "det_dept_id", fetch = FetchType.LAZY)
 	List<User> departmentUsers;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "detLanguage", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "det_detLanguage_id", fetch = FetchType.LAZY)
 	List<User> languageUsers;
 }

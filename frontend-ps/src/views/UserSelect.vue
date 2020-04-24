@@ -47,7 +47,7 @@
 
       signUp() {
         this.$router.push({
-        path: 'signUp'
+        path: 'studentSignUp'
         })
       },
       proAuth() {

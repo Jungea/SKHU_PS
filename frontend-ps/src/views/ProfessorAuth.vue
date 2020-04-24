@@ -16,7 +16,6 @@
                         v-model="form.password" 
                         :state="state" 
                         type="password"
-                        required
                         trim
                         placeholder="Enter Password"
                         ></b-form-input>
@@ -42,7 +41,7 @@ export default {
     methods: {
         onSubmit(evt) {
             evt.preventDefault()
-            location.href="/SignUp"
+            location.href="/professorSignUp"
         },
         /*
         findPassalert() {

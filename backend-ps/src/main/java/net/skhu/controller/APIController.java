@@ -15,7 +15,7 @@ public class APIController {
 	@Autowired
 	CommonRepository commonRepository;
 	
-	@RequestMapping("commons")
+	@RequestMapping("studentSignUp")
 	public List<Common> commons() {
 		return commonRepository.findAll();
 	}

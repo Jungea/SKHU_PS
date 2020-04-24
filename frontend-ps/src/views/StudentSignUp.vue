@@ -51,7 +51,7 @@
  
 <script>
   export default {
-    name: 'SignUp',
+    name: 'StudentSignUp',
     data() {
     return {
         form: {
