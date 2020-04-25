@@ -26,6 +26,7 @@ public class ProjectJoin {
 	LocalDateTime joinTime;
 	int state;
 	String color;
+	Boolean pin;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userId")

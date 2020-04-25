@@ -29,7 +29,7 @@ public class User {
 
 	int userNum;
 	String name;
-	int grade;
+	Integer grade;
 	String email;
 	String password;
 	LocalDateTime timelineTime;
@@ -54,16 +54,20 @@ public class User {
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	List<ProjectJoin> projectJoins;
-	
-	public User(int userNum,String name,String email,String password,LocalDateTime timelineTime,boolean userType,boolean emailCheck,String authKey) {
-		this.userNum=userNum;
-		this.name=name;
-		this.email=email;
-		this.password=password;
-		this.timelineTime=timelineTime;
-		this.userType=userType;
-		this.emailCheck=emailCheck;
-		this.authKey=authKey;
+
+	public User() {
+	}
+
+	public User(int userNum, String name, String email, String password, LocalDateTime timelineTime, boolean userType,
+			boolean emailCheck, String authKey) {
+		this.userNum = userNum;
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.timelineTime = timelineTime;
+		this.userType = userType;
+		this.emailCheck = emailCheck;
+		this.authKey = authKey;
 	}
 
 }

@@ -28,11 +28,12 @@ public class Project {
 	int projectId;
 
 	String projectName;
+	String theme;
+	String content;
 	LocalDateTime startDate;
-	int progState;
-	int rcrtState;
+	Boolean progState;
+	Boolean rcrtState;
 	Boolean contest;
-	Boolean pin;
 	String github;
 	Integer year; // null 허용
 	Integer semester; // null 허용
