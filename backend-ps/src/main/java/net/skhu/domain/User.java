@@ -23,13 +23,14 @@ import lombok.ToString;
 @EqualsAndHashCode(exclude = { "projects", "projectJoins" })
 @Entity
 public class User {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	int userId;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   int userId;
+
 
 	int userNum;
 	String name;
-	Integer grade;
+	int grade;
 	String email;
 	String password;
 	LocalDateTime timelineTime;
@@ -40,9 +41,9 @@ public class User {
 	boolean emailCheck;
 	String authKey;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "detDeptId")
-	Detail det_dept_id;
+   @ManyToOne(fetch = FetchType.EAGER)
+   @JoinColumn(name = "detDeptId")
+   Detail det_dept_id;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -52,19 +53,20 @@ public class User {
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	List<ProjectJoin> projectJoins;
 
-	public User() {
-	}
+   public User() {
+   }
 
-	public User(int userNum, String name, String email, String password, LocalDateTime timelineTime, boolean userType,
-			boolean emailCheck, String authKey) {
-		this.userNum = userNum;
-		this.name = name;
-		this.email = email;
-		this.password = password;
-		this.timelineTime = timelineTime;
-		this.userType = userType;
-		this.emailCheck = emailCheck;
-		this.authKey = authKey;
-	}
+   public User(int userNum, String name, String email, String password, LocalDateTime timelineTime, boolean userType,
+         boolean emailCheck, String authKey) {
+      this.userNum = userNum;
+      this.name = name;
+      this.email = email;
+      this.password = password;
+      this.timelineTime = timelineTime;
+      this.userType = userType;
+      this.emailCheck = emailCheck;
+      this.authKey = authKey;
+      this.grade=1;
+   }
 
 }
