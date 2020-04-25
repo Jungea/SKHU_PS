@@ -40,9 +40,9 @@ public class SendEmail { // 이메일 보내기 위해 만든 클래스
 					Message.RecipientType.TO,
 					InternetAddress.parse(toEmail) // 받는 사람 email
 					);
-			message.setSubject("이메일 인증");
+			message.setSubject("SKHU-PS 이메일 인증");
 			message.setText(new StringBuffer().append("아래의 링크를 눌러 회원가입 인증을 완료하세요.\n")
-					.append("http://localhost:8080/page/join_success?auth_key=ss")
+					.append("http://localhost:8080/api/join_success?auth_key=ss")
 //					.append(auth_key)
 					.toString());
 			Transport.send(message);
@@ -71,7 +71,7 @@ public class SendEmail { // 이메일 보내기 위해 만든 클래스
 					Message.RecipientType.TO,
 					InternetAddress.parse(toEmail) // 받는 사람 email
 					);
-			message.setSubject("비밀번호 변경");
+			message.setSubject("SKHU-PS 비밀번호 변경");
 			message.setText(new StringBuffer().append("아래의 링크를 눌러 비밀번호를 바꾸세요.\n")
 					.append("http://localhost:8080/page/changePw?auth_key=")
 					.append(auth_key)

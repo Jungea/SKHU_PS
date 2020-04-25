@@ -12,6 +12,7 @@ import MyProjectManager from '../views/MyProjectManager.vue';
 import ProfessorAuth from '../views/ProfessorAuth.vue';
 import UserSelect from '../views/UserSelect.vue';
 import ProfessorSignUp from '../views/ProfessorSignUp.vue';
+import SignUpAlert from '../views/SignUpAlert.vue';
 
 Vue.use(VueRouter)
 
@@ -75,6 +76,11 @@ Vue.use(VueRouter)
     path: '/userSelect',
     name: 'UserSelect',
     component: UserSelect
+  },
+  {
+    path: '/signUpAlert',
+    name: 'SignUpAlert',
+    component: SignUpAlert
   },
 ]
 

@@ -8,7 +8,7 @@
           <b-form @submit="signUp">
             <table>
               <tr>
-                <b-form-group id="input-group-1" label="아이디" label-for="input-1">
+                <b-form-group id="input-group-1" label="학번" label-for="input-1">
                   <b-form-input id="input-1" v-model="form.id" type="text" required placeholder="Enter Id"></b-form-input>
                 </b-form-group>
               </tr>
@@ -39,14 +39,10 @@
           </b-form>
         </center>
       </b-jumbotron>
+      {{form.id}}
     </div>
   </div>
 
-<!--
-    <b-card class="mt-3" header="Form Data Result">
-      <pre class="m-0">{{ form }}</pre>
-    </b-card>
--->
 </template>
  
 <script>
@@ -62,18 +58,33 @@ import axios from 'axios';
           email: '',
           name: ''
         },
-        show: true
+        show: true,
+        user:null,
       }
     },
     methods: {
       signUp(evt) {
-        evt.preventDefault()
-        const url='/studentSignUp'
-        alert(JSON.stringify(this.form.id))
-        alert("회원가입 완료")
-        this.$router.push({
-        path: '/'
-        })
+        evt.preventDefault();
+        axios.post('/api/studentSignUp', 
+        {
+          userNum: this.form.id,
+          email:this.form.email,
+          name:this.form.name,
+          password:this.form.pass1,
+        }).then(response => { 
+          this.user = response.data;
+          if(this.user=='userNum 중복입니다.') {
+            alert('userNum 중복입니다.');
+          } else if(this.user=='email 중복입니다.') {
+            alert('email 중복입니다.');
+          } else if(this.user=='userNum과 email 둘 다 중복입니다.') {
+            alert('userNum과 email 둘 다 중복입니다.');
+          } else {
+            this.$router.push({
+            path: '/signUpAlert'
+            }) 
+          }
+        });
       },
     }
   }
