@@ -36,16 +36,13 @@ public class User {
 	Boolean userType;
 	String github;
 	String intro;
+	String language;
 	boolean emailCheck;
 	String authKey;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "detDeptId")
 	Detail det_dept_id;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "detLanguageId")
-	Detail det_detLanguage_id;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
