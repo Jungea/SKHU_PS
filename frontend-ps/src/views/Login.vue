@@ -64,21 +64,25 @@ import axios from 'axios';
       onSubmit(evt) {
         evt.preventDefault()
         
-        axios.post('/api/user/login', 
-        {
+        axios.post('/api/user/login', {
           userNum: this.form.number,
           password: this.form.password
-        }).then(response => this.user = response.data);
+        }).then(response => {
 
-        if(this.user == null) {
-          alert("잘못된 입력입니다.");
-          this.form.number='';
-          this.form.password='';
-        }
-        else{
-            location.href="/home"
-        }
-
+            this.user = response.data;
+            if(typeof this.user == 'object') {
+              alert("로그인")
+              location.href="/home" 
+            }else {        
+              alert("잘못된 입력입니다.");
+              this.form.number='';
+              this.form.password='';
+            }
+        
+        }).catch((erro)=> {
+          console.error(erro);
+        });
+        
       },
       signUp() {
         this.$router.push({
