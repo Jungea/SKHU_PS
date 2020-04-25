@@ -39,4 +39,9 @@ public class UserService {
 		es.sendEmail(studentSignUpModel.getEmail(), auth_key);
 		 userRepository.save(user);
 	 }
+
+	public User findById(int userId) {
+		return userRepository.findById(userId).get();
+	}
+
 }

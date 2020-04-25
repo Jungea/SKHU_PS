@@ -64,7 +64,7 @@ import axios from 'axios';
       onSubmit(evt) {
         evt.preventDefault()
         
-                axios.post('/api/user/login', {
+        axios.post('/api/user/login', {
           userNum: this.form.number,
           password: this.form.password
         }).then(response => {

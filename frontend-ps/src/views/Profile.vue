@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import Sidebar from '@/components/Sidebar.vue'
 
 export default {
@@ -54,16 +55,17 @@ export default {
   data() {
       return {
         fields:['name', 'major','grade','github','language'],
-        items: [
-            { 
-            name: 'ㅇㅇ', 
-            major: 'ㅇㅇ', 
-            grade: 'ㅇㅇㅇ',
-            github: 'ㅇㅇㅇ',
-            language:'ㅇㅇ'
-            },
-        ],
+        items: [],
       }
+   },
+   mounted() {
+        axios.get('/api/user')
+        .then(response => {
+            this.items.push(response.data);
+        }).catch((erro)=> {
+          console.error(erro);
+        });
+
    },
    methods:{
        editProfile() {
