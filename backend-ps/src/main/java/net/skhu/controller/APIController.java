@@ -3,7 +3,6 @@ package net.skhu.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +21,7 @@ public class APIController {
 	CommonRepository commonRepository;
 	@Autowired
 	UserService userService;
-	
+
 	@RequestMapping("studentSignUp")
 	public List<Common> commons() {
 		return commonRepository.findAll();
@@ -34,4 +33,11 @@ public class APIController {
 		return userService.login(Integer.parseInt(userLoginModel.getUserNum()), userLoginModel.getPassword());
 	}
 
+	// ** 1을 로그인한 유저 값으로 변경(session, cache) 
+	@RequestMapping(value = "user", method = RequestMethod.GET)
+	public User user() {
+		return userService.findById(1);
+	}
+
+	//PathVariable
 }

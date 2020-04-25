@@ -15,5 +15,9 @@ public class UserService {
 	public User login(int userNum, String password) {
 		return userRepository.findByUserNumAndPasswordAndEmailCheckTrue(userNum, password);
 	}
+	
+	public User findById(int userId) {
+		return userRepository.findById(userId).get();
+	}
 
 }
