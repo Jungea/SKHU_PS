@@ -34,19 +34,19 @@ public class Project {
 	Boolean contest;
 	Boolean pin;
 	String github;
-	int year;
-	int semester;
+	Integer year; // null 허용
+	Integer semester; // null 허용
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "catId")
+	@JoinColumn(name = "capId")
 	User user;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "language")
+	@JoinColumn(name = "detLanguageId")
 	Detail detLanguage;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "subject")
+	@JoinColumn(name = "detSubjectId")
 	Detail detSubject;
 
 	@JsonIgnore
