@@ -5,7 +5,10 @@
         <Sidebar/>
       </b-col>
       <b-col>
-        프로필수정
+        <div class="profileContainer">
+            <h3>정보 수정</h3>
+            <hr style="margin:30px 0;">
+        </div>
       </b-col>
     </b-row>
   </div>
@@ -21,3 +24,8 @@ export default {
   }
 }
 </script>
+<style>
+    .profileContainer {
+        margin:100px;
+    }
+</style>

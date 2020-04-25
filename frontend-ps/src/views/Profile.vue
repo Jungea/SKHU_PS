@@ -10,32 +10,45 @@
             <hr style="margin:30px 0;">
             <div class="infoContainer">
                 <h5>내 정보</h5>
-                <b-button variant="dark" size="sm" @click="editProfile">정보 수정</b-button>                
-                <div class="profileTable">
-                    <b-table stacked="stacked" 
-                    :fields="fields" 
-                    :items="items" 
-                    responsive="sm"
-                    fixed="true"
-                    table-class="table1"
-                    >
-                        <template v-slot:cell(name)="data">
-                            {{ data.value}}
-                        </template>
-                        <template v-slot:cell(major)="data">
-                            {{ data.value}}
-                        </template>
-                        <template v-slot:cell(grade)="data">
-                            {{ data.value}}
-                        </template>
-                        <template v-slot:cell(github)="data">
-                            {{ data.value}}
-                        </template>
-                        <template v-slot:cell(language)="data">
-                            {{ data.value}}
-                        </template>
-                    </b-table>
+                <div style="margin-top:30px; min-width:900px; padding: 30px; padding-right:120px">
+                    <b-row>
+                        <b-col cols="4">
+                            <b-card class="profileCard" img-src="https://image.flaticon.com/icons/svg/2825/2825025.svg" 
+                            img-alt="Image" img-top img-height="200px">
+                                <b-card-text style="margin-top:20px">
+                                    <h4>{{items.Name}}</h4>
+                                </b-card-text>
+                                <hr>
+                                <b-card-text class="small" style="height:50px;">
+                                    한줄소개{{items.Intro}}
+                                </b-card-text>
+                                <b-button variant="dark" size="sm" @click="editProfile">정보 수정</b-button>
+                            </b-card>
+                        </b-col>
+                        <b-col class="profileTable" cols="8">
+                            <table class="table">
+                                <tr>
+                                    <th>{{fields[0]}}</th>
+                                    <td>{{items.Major}}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{fields[1]}}</th>
+                                    <td>{{items.Grade}}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{fields[2]}}</th>
+                                    <td>{{items.Github}}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{fields[3]}}</th>
+                                    <td>{{items.Language}}</td>
+                                </tr>
+                            </table>
+                        </b-col>
+                    </b-row>
                 </div>
+                <hr style="margin:30px 0;">
+                <h5>다음내용</h5>
             </div>
         </div>
       </b-col>
@@ -54,25 +67,40 @@ export default {
   },
   data() {
       return {
-        fields:['name', 'major','grade','github','language'],
-        items: [],
+        fields:['Major', 'Grade', 'Github', 'Language'],
+        //items: [],
+        items: {},
+        gitUrl:''
       }
    },
    mounted() {
         axios.get('/api/user')
         .then(response => {
-            this.items.push(response.data);
+            let info={
+                'Name':response.data.name,
+                'Major':response.data.det_dept_id,
+                'Grade':response.data.grade,
+                'Github':response.data.github,
+                'Intro':response.data.intro,
+                'Language':response.data.det_detLanguage_id
+            }
+            //this.items.push(info);
+            this.items=info;
+            this.gitUrl='https://github.com/'+response.data.github
         }).catch((erro)=> {
           console.error(erro);
         });
 
    },
    methods:{
-       editProfile() {
+        editProfile() {
             this.$router.push({
                 path: '/editProfile'
             })
-        }
+            let items=this.items
+            console.log("정보수정으로 이동")
+            console.log(items)
+        },
    }
 }
 </script>
@@ -88,15 +116,17 @@ export default {
 
     .infoContainer h5{
         font-weight: bold;
-        float: left;
         margin-right: 30px;
     }
     .profileTable{
-        margin: auto;
-        margin-top:30px;
         max-width: 1000px;
     }
     .table1{
         text-align: center;
+    }
+    .profileCard{
+        max-width: 300px;
+        min-width: 200px;
+        padding: 20px;
     }
 </style>
