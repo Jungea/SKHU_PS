@@ -39,7 +39,13 @@ public class UserService {
 		es.sendEmail(studentSignUpModel.getEmail(), auth_key);
 		 userRepository.save(user);
 	 }
-
+	 
+	 @Transactional
+	 public void emailCheckChange(String authKey) {
+		 User user=userRepository.findByAuthKey(authKey);
+		user.setEmailCheck(true);
+		userRepository.save(user);
+	 }
 	public User findById(int userId) {
 		return userRepository.findById(userId).get();
 	}

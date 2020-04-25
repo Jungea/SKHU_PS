@@ -8,4 +8,5 @@ public class StudentSignUpModel {
 	String password;
 	String name;
 	String email;
+	String authKey;
 }

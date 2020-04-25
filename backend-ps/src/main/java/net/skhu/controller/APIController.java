@@ -1,16 +1,17 @@
 package net.skhu.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 
 import net.skhu.domain.Project;
 import net.skhu.domain.User;
-import net.skhu.etc.SendEmail;
-import net.skhu.etc.TempAuth_key;
 import net.skhu.model.StudentSignUpModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.repository.UserRepository;
@@ -43,18 +44,16 @@ public class APIController {
 		} else if(redundantUserNum!=null &&redundantEmail!=null){ // userNum과 email 둘다 중복일 떄
 			return "userNum과 email 둘 다 중복입니다.";
 		} else {
-//			String auth_key = new TempAuth_key().getKey(44, false); // 이메일 인증 키 설정
-//			userRepository.save(new User(userModel.getEmail(), userModel.getPassword(), userModel.getNickname(), null,
-//					auth_key, false, false));
-//			SendEmail es = new SendEmail();
-//			es.sendEmail(studentSignUpModel.getEmail(), auth_key); // 받는 사람 이메일
 			userService.StudentSignUp(studentSignUpModel);
 			return "success";
 		}
-
-		
 	}
-
+	// 이메일 인증
+	@RequestMapping(value="authKeyChange/{authKey}",method = RequestMethod.POST)
+	public void authKeyChange(@PathVariable("authKey") String authKey) {
+		userService.emailCheckChange(authKey);
+	}
+	
 	// PathVariable
 
 	// 로그인
