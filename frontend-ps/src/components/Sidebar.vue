@@ -29,17 +29,25 @@
 </div>
 </template>
 <script>
+import axios from 'axios';
 export default {
     name: "Sidebar",
     data() {
       return {
-        selected:'',
-        options: [
-          { value: '디비 캡스톤디자인', text: '디비 캡스톤디자인' },
-          { value: '파이썬 프로젝트', text: '파이썬 프로젝트' },
-          { value: '소프트웨어 캡스톤디자인', text: '소프트웨어 캡스톤디자인' },
-        ]
+        selected: null,
+        options: [ {value: null, text: '프로젝트를 선택하세요.'} ]
       }
+    },
+    mounted() {
+      axios.get('/api/user/sidebar'
+          ).then(response => {
+
+            this.options = response.data;
+            this.options.unshift({value: null, text: '프로젝트를 선택하세요.'})
+        
+        }).catch((erro)=> {
+          console.error(erro);
+        });
     },
     methods: {
       projectBoard(evt) {

@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.skhu.domain.Project;
 import net.skhu.domain.User;
 import net.skhu.model.ProfileModel;
+import net.skhu.model.SidebarModel;
 import net.skhu.model.StudentSignUpModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.repository.UserRepository;
@@ -48,12 +48,13 @@ public class APIController {
 			return "success";
 		}
 	}
+
 	// 이메일 인증
-	@RequestMapping(value="authKeyChange/{authKey}",method = RequestMethod.POST)
+	@RequestMapping(value = "authKeyChange/{authKey}", method = RequestMethod.POST)
 	public void authKeyChange(@PathVariable("authKey") String authKey) {
 		userService.emailCheckChange(authKey);
 	}
-	
+
 	// PathVariable
 
 	// 로그인
@@ -74,12 +75,17 @@ public class APIController {
 	public List<Project> userProjects() {
 		return projectService.findProjectByUserId(1);
 	}
-	
-	//마이페이지 프로필이 수정되고 저장되었을 때
+
+	// 마이페이지 프로필이 수정되고 저장되었을 때
 	@RequestMapping(value = "user/profile", method = RequestMethod.POST)
 	public void profile(@RequestBody ProfileModel profileModel) {
 		System.out.println(profileModel);
 //		userService.update(1,profileModel);
+	}
+
+	@RequestMapping(value = "user/sidebar", method = RequestMethod.GET)
+	public List<SidebarModel> userSidebar() {
+		return projectService.userSidebar(1);
 	}
 
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import net.skhu.domain.Project;
+import net.skhu.model.SidebarModel;
 import net.skhu.repository.ProjectRepository;
 
 @Service
@@ -17,6 +18,10 @@ public class ProjectService {
 	// userId 유저의 프로젝트 목록
 	public List<Project> findProjectByUserId(int userId) {
 		return projectRepository.findProjectByUserId(userId);
+	}
+
+	public List<SidebarModel> userSidebar(int userId) {
+		return projectRepository.findProjectIdAndProjectNameByUserId(userId);
 	}
 
 }

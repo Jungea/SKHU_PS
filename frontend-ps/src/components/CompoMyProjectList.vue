@@ -13,8 +13,9 @@
                 <b-row cols="2">    
                     <b-col :key="item" v-for="item in data">
                     <b-card align="left" bg-variant="dark" :header="item.projectName" text-variant="white" style="width: 25rem; height: 10rem; margin: 60px;">    
-                        <b-card-text>    
-                            {{item.content}}    
+                        
+                        <b-card-text>   
+                            {{item.content}}   
                         </b-card-text>    
                     </b-card>    
 
