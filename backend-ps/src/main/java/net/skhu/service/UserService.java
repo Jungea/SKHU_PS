@@ -9,8 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import net.skhu.domain.User;
 import net.skhu.etc.SendEmail;
 import net.skhu.etc.TempAuth_key;
+import net.skhu.model.FindPassModel;
 import net.skhu.model.ProfileModel;
-import net.skhu.model.StudentSignUpModel;
+import net.skhu.model.SignUpModel;
 import net.skhu.repository.UserRepository;
 
 @Service
@@ -24,10 +25,11 @@ public class UserService {
 	}
 
 	@Transactional
-	public void StudentSignUp(StudentSignUpModel studentSignUpModel) {
+	public void SignUp(SignUpModel studentSignUpModel,boolean userType) {
+		// userType에서 학생은 false, 교수는 true
 		String auth_key = new TempAuth_key().getKey(44, false); // 이메일 인증 키 설정
 		User user = new User(Integer.parseInt(studentSignUpModel.getUserNum()), studentSignUpModel.getName(),
-				studentSignUpModel.getEmail(), studentSignUpModel.getPassword(), LocalDateTime.now(), false, // 학생
+				studentSignUpModel.getEmail(), studentSignUpModel.getPassword(), LocalDateTime.now(), userType,
 				false, auth_key);
 		SendEmail es = new SendEmail();
 		es.sendEmail(studentSignUpModel.getEmail(), auth_key);
@@ -39,6 +41,22 @@ public class UserService {
 		 User user=userRepository.findByAuthKey(authKey);
 		user.setEmailCheck(true);
 		userRepository.save(user);
+	 }
+	 
+	 // 비밀번호 변경 메일 링크 보내기
+	 public void sendPwMail(String toEmail) {
+		User user=userRepository.findByEmail(toEmail);
+		SendEmail es = new SendEmail();
+		es.sendPwChange(toEmail, user.getAuthKey());
+	 }
+	 // 비밀번호 바꾸기
+	 @Transactional
+	 public void changePw(FindPassModel findPassModel,String authKey) {
+		 System.out.println("auth: "+authKey);
+		 System.out.println("password: "+findPassModel.getPassword());
+		 User user=userRepository.findByAuthKey(authKey);
+		 user.setPassword(findPassModel.getPassword());
+		 userRepository.save(user);
 	 }
 
 	public User findById(int userId) {

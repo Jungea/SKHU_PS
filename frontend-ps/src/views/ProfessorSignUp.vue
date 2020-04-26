@@ -3,12 +3,12 @@
     <div class="inputbox" style="margin:100px auto; width:500px;">
       <b-jumbotron style="background:none; text-align:left">
         <center>
-          <h2 style="margin-left: 60px">SignUp</h2>
+          <h2 style="margin-left: 60px">Professor SignUp</h2>
           <hr style="border:2px solid black; width: 500px;">
           <b-form @submit="signUp">
             <table>
               <tr>
-                <b-form-group id="input-group-1" label="아이디" label-for="input-1">
+                <b-form-group id="input-group-1" label="학번" label-for="input-1">
                   <b-form-input id="input-1" v-model="form.id" type="text" required placeholder="Enter Id"></b-form-input>
                 </b-form-group>
               </tr>
@@ -50,6 +50,7 @@
 </template>
  
 <script>
+import axios from 'axios';
   export default {
     name: 'ProfessorSignUp',
     data() {
@@ -66,12 +67,27 @@
     },
     methods: {
       signUp(evt) {
-        evt.preventDefault()
-        alert(JSON.stringify(this.form))
-        alert("회원가입 완료")
-        this.$router.push({
-        path: '/'
-        })
+        evt.preventDefault();
+        axios.post('/api/professorSignUp', 
+        {
+          userNum: this.form.id,
+          email:this.form.email,
+          name:this.form.name,
+          password:this.form.pass1,
+        }).then(response => { 
+          this.user = response.data;
+          if(this.user=='userNum 중복입니다.') {
+            alert('userNum 중복입니다.');
+          } else if(this.user=='email 중복입니다.') {
+            alert('email 중복입니다.');
+          } else if(this.user=='userNum과 email 둘 다 중복입니다.') {
+            alert('userNum과 email 둘 다 중복입니다.');
+          } else {
+            this.$router.push({
+            path: '/signUpAlert'
+            }) 
+          }
+        });
       },
     }
   }

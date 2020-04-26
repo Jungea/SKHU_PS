@@ -3,7 +3,7 @@
     <div class="inputbox" style="margin:100px auto; width:500px;">
       <b-jumbotron style="background:none; text-align:left">
         <center>
-          <h2 style="margin-left: 60px">SignUp</h2>
+          <h2 style="margin-left: 60px">Student SignUp</h2>
           <hr style="border:2px solid black; width: 500px;">
           <b-form @submit="signUp">
             <table>
@@ -39,7 +39,6 @@
           </b-form>
         </center>
       </b-jumbotron>
-      {{form.id}}
     </div>
   </div>
 
@@ -51,7 +50,7 @@ import axios from 'axios';
     name: 'StudentSignUp',
     data() {
     return {
-        form: {
+          form: {
           id: '',
           pass1: '',
           pass2: '',

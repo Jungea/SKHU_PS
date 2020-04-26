@@ -14,6 +14,7 @@ import UserSelect from '../views/UserSelect.vue';
 import ProfessorSignUp from '../views/ProfessorSignUp.vue';
 import SignUpAlert from '../views/SignUpAlert.vue';
 import AuthAlert from '../views/AuthAlert.vue';
+import ChangePw from '../views/ChangePw.vue';
 
 Vue.use(VueRouter)
 
@@ -87,6 +88,11 @@ Vue.use(VueRouter)
     path: '/authAlert/:authKey',
     name: 'AuthAlert',
     component: AuthAlert
+  },
+  {
+    path: '/changePw/:authKey',
+    name: 'ChangePw',
+    component: ChangePw
   },
 ]
 

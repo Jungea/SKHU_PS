@@ -29,8 +29,6 @@ export default {
         {
         }).then(response => { 
           this.user = response.data;
-          
-            console.log('bbb')
         })
     },
     methods: {
