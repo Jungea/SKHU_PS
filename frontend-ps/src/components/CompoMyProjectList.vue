@@ -12,18 +12,17 @@
                 </b-row>    
                 <b-row cols="2">    
                     <b-col :key="item" v-for="item in data">
-                    <b-card align="left" bg-variant="dark" :header="item.projectName" text-variant="white" style="width: 25rem; height: 10rem; margin: 60px;">    
+                    <b-card @click="viewSummary" align="left" bg-variant="dark" :header="item.projectName" text-variant="white" style="width: 25rem; height: 10rem; margin: 60px;">    
                         
                         <b-card-text>   
                             {{item.content}}   
                         </b-card-text>    
                     </b-card>    
-
                     </b-col>
                 </b-row>    
             </b-container>    
         </center>    
-    
+
         <!--프로젝트 생성 모달 -->
         <b-modal id="modal-xl" size="lg" title="프로젝트 생성">
             <b-table stacked :items="items" :fields="fields">
@@ -65,7 +64,15 @@ export default {
             items2: [{'플젝 이름': '파이썬 프로젝트', '사용 언어': '자바','사용 도구':'스프링','주제':'자바로 계산기 만들기','내용':'자바를 이용해서 배운걸 토대로 만들어볼 예정입니다.','모집여부':'모집중'},               ],
             data:{}
         };
-    }
+    },
+     methods: {
+                viewSummary() {
+                    
+                    this.$router.push({
+                    path: '/summary'
+                    })
+                }
+            }
 }
 </script>
 
