@@ -10,7 +10,7 @@ import net.skhu.domain.User;
 import net.skhu.etc.SendEmail;
 import net.skhu.etc.TempAuth_key;
 import net.skhu.model.ProfileModel;
-import net.skhu.model.StudentSignUpModel;
+import net.skhu.model.SignUpModel;
 import net.skhu.repository.UserRepository;
 
 @Service
@@ -24,10 +24,11 @@ public class UserService {
 	}
 
 	@Transactional
-	public void StudentSignUp(StudentSignUpModel studentSignUpModel) {
+	public void SignUp(SignUpModel studentSignUpModel,boolean userType) {
+		// userType에서 학생은 false, 교수는 true
 		String auth_key = new TempAuth_key().getKey(44, false); // 이메일 인증 키 설정
 		User user = new User(Integer.parseInt(studentSignUpModel.getUserNum()), studentSignUpModel.getName(),
-				studentSignUpModel.getEmail(), studentSignUpModel.getPassword(), LocalDateTime.now(), false, // 학생
+				studentSignUpModel.getEmail(), studentSignUpModel.getPassword(), LocalDateTime.now(), userType,
 				false, auth_key);
 		SendEmail es = new SendEmail();
 		es.sendEmail(studentSignUpModel.getEmail(), auth_key);
