@@ -18,9 +18,8 @@
                                 <b-card-text style="margin-top:20px">
                                     <h4>{{items.Name}}</h4>
                                 </b-card-text>
-                                <hr>
-                                <b-card-text class="small" style="height:50px;">
-                                    한줄소개{{items.Intro}}
+                                <b-card-text class="small" style="height:50px;" v-if="(items.Intro==null)?false:true">
+                                    <hr><span>{{items.Intro}}</span>
                                 </b-card-text>
                                 <b-button variant="dark" size="sm" @click="editProfile">정보 수정</b-button>
                             </b-card>
@@ -37,7 +36,7 @@
                                 </tr>
                                 <tr>
                                     <th>{{fields[2]}}</th>
-                                    <td>{{items.Github}}</td>
+                                    <td><a v-bind:href="gitUrl" target="_blank">{{gitUrl}}</a></td>
                                 </tr>
                                 <tr>
                                     <th>{{fields[3]}}</th>
@@ -47,7 +46,9 @@
                         </b-col>
                     </b-row>
                 </div>
-                <hr style="margin:30px 0;">
+            </div>
+            <hr style="margin:30px 0;">
+            <div class="infoContainer">
                 <h5>다음내용</h5>
             </div>
         </div>
@@ -86,7 +87,9 @@ export default {
             }
             //this.items.push(info);
             this.items=info;
+            //깃 닉네임으로 링크 생성
             this.gitUrl='https://github.com/'+response.data.github
+            console.log(this.items.Intro)
         }).catch((erro)=> {
           console.error(erro);
         });
@@ -116,17 +119,17 @@ export default {
 
     .infoContainer h5{
         font-weight: bold;
-        margin-right: 30px;
     }
     .profileTable{
         max-width: 1000px;
-    }
-    .table1{
-        text-align: center;
     }
     .profileCard{
         max-width: 300px;
         min-width: 200px;
         padding: 20px;
+    }
+    .profileTable tr>td >a{
+        text-decoration: none;
+        color: black;
     }
 </style>
