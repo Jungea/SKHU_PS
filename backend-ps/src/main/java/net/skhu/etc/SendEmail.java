@@ -66,14 +66,14 @@ public class SendEmail { // 이메일 보내기 위해 만든 클래스
 
 		try {
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress("iris21kr0@gmail.com"));
+			message.setFrom(new InternetAddress(username));
 			message.setRecipients(
 					Message.RecipientType.TO,
 					InternetAddress.parse(toEmail) // 받는 사람 email
 					);
 			message.setSubject("SKHU-PS 비밀번호 변경");
 			message.setText(new StringBuffer().append("아래의 링크를 눌러 비밀번호를 바꾸세요.\n")
-					.append("http://localhost:8080/page/changePw?auth_key=")
+					.append("http://localhost:8081/changePw/")
 					.append(auth_key)
 					.toString());
 			Transport.send(message);

@@ -14,7 +14,6 @@
                         <b-form-input 
                         id="ProPass" 
                         v-model="form.password" 
-                        :state="state" 
                         type="password"
                         trim
                         placeholder="Enter Password"

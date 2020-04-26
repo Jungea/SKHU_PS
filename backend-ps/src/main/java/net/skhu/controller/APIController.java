@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.skhu.domain.Project;
 import net.skhu.domain.User;
+import net.skhu.model.FindPassModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.SidebarModel;
 import net.skhu.model.SignUpModel;
@@ -74,7 +75,22 @@ public class APIController {
 	public void authKeyChange(@PathVariable("authKey") String authKey) {
 		userService.emailCheckChange(authKey);
 	}
-
+	// 비밀번호 변경 링크 보내기
+	@RequestMapping(value = "findPass", method = RequestMethod.POST)
+	public String findPass(@RequestBody FindPassModel findPassModel) {
+		User user=userRepository.findByEmail(findPassModel.getEmail());
+		if(user==null)  // 해당되는 email이 없을때
+			return "email이 존재하지 않습니다.";
+		else {
+			userService.sendPwMail(findPassModel.getEmail());
+			return "success";
+		}
+	}
+	
+	@RequestMapping(value = "changePw/{authKey}", method = RequestMethod.POST)
+	public void changePw(@RequestBody FindPassModel findPassModel,@PathVariable("authKey") String authKey) {
+		userService.changePw(findPassModel, authKey);
+	}
 	// PathVariable
 
 	// 로그인

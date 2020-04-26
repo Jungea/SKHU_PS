@@ -13,8 +13,7 @@
                     >
                         <b-form-input 
                         id="email" 
-                        v-model="form.email" 
-                        :state="state" 
+                        v-model="form.email"  
                         type="email"
                         required
                         trim
@@ -30,6 +29,7 @@
     </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
     name: 'FindPass',
     data() {
@@ -37,21 +37,26 @@ export default {
         form: {
           email: ''
         },
-        show: true
+        show: true,
+        result:null
       }
     },
     methods: {
         onSubmit(evt) {
             evt.preventDefault()
-            location.href="/findPassAlert"
-        },
-        /*
-        findPassalert() {
-            this.$router.push({
-                path: '/findPassAlert'
+            axios.post('/api/findPass', {
+                email:this.form.email
+            }).then(response=> {
+                this.result=response.data;
+                if(this.result=='email이 존재하지 않습니다.') {
+                    alert(this.result);
+                } else {
+                    this.$router.push({
+                        path:'/findPassAlert'
+                    })
+                }
             })
-        }
-        */
+        },
     }
 }
 </script>

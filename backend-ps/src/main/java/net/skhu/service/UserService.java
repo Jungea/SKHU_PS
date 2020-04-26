@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import net.skhu.domain.User;
 import net.skhu.etc.SendEmail;
 import net.skhu.etc.TempAuth_key;
+import net.skhu.model.FindPassModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.repository.UserRepository;
@@ -40,6 +41,22 @@ public class UserService {
 		 User user=userRepository.findByAuthKey(authKey);
 		user.setEmailCheck(true);
 		userRepository.save(user);
+	 }
+	 
+	 // 비밀번호 변경 메일 링크 보내기
+	 public void sendPwMail(String toEmail) {
+		User user=userRepository.findByEmail(toEmail);
+		SendEmail es = new SendEmail();
+		es.sendPwChange(toEmail, user.getAuthKey());
+	 }
+	 // 비밀번호 바꾸기
+	 @Transactional
+	 public void changePw(FindPassModel findPassModel,String authKey) {
+		 System.out.println("auth: "+authKey);
+		 System.out.println("password: "+findPassModel.getPassword());
+		 User user=userRepository.findByAuthKey(authKey);
+		 user.setPassword(findPassModel.getPassword());
+		 userRepository.save(user);
 	 }
 
 	public User findById(int userId) {
