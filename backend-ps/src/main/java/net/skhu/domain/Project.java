@@ -28,11 +28,13 @@ public class Project {
 	int projectId;
 
 	String projectName;
+	int memNum;
 	String theme;
 	String content;
 	LocalDateTime startDate;
 	Boolean progState;
 	Boolean rcrtState;
+	String tag;
 	Boolean contest;
 	String github;
 	Integer year; // null 허용
@@ -41,10 +43,6 @@ public class Project {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "capId")
 	User user;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "detLanguageId")
-	Detail detLanguage;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "detSubjectId")

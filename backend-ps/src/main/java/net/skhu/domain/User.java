@@ -43,7 +43,7 @@ public class User {
 
    @ManyToOne(fetch = FetchType.EAGER)
    @JoinColumn(name = "detDeptId")
-   Detail det_dept_id;
+   Detail detDepartment;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
