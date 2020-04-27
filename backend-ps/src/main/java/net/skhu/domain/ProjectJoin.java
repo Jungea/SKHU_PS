@@ -24,10 +24,10 @@ public class ProjectJoin {
 	int joinId;
 
 	LocalDateTime joinTime;
-	int state;
 	String color;
-	Boolean pin;
+	boolean pin;
 	int type;
+	int state;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userId")

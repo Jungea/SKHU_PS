@@ -1,5 +1,6 @@
 package net.skhu.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,10 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.Project;
+import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Subject;
 import net.skhu.domain.User;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.MyProjectListModel;
 import net.skhu.model.SidebarModel;
+import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
@@ -25,11 +29,9 @@ public class ProjectService {
 	UserRepository userRepository;
 	@Autowired
 	SubjectRepository subjectRepository;
+	@Autowired
+	ProjectJoinRepository projectJoinRepository;
 	
-	// userId 유저의 프로젝트 목록
-	public List<Project> findProjectByUserId(int userId) {
-		return projectRepository.findProjectByUserId(userId);
-	}
 
 	public List<SidebarModel> userSidebar(int userId) {
 		return projectRepository.findProjectIdAndProjectNameByUserId(userId);
@@ -62,6 +64,22 @@ public class ProjectService {
 		projectRepository.save(project);
 		return "success";
 		
+	}
+	public List<MyProjectListModel> projectList(int userId) {
+		List<ProjectJoin> projectJoins=projectJoinRepository.findAllByUser_UserId(userId);
+		List<MyProjectListModel> myProjectsList = new ArrayList<>();
+		for(int i=0;i<projectJoins.size();i++) {
+			if(projectJoins.get(i).getState()==1) { // 초대가 승인인 상태일 때
+				MyProjectListModel myProject=new MyProjectListModel();
+				myProject.setProjectId(projectJoins.get(i).getProject().getProjectId());
+				myProject.setProjectName(projectJoins.get(i).getProject().getProjectName());
+				myProject.setMemNum(projectJoins.get(i).getProject().getMemNum());
+				myProject.setProgState(projectJoins.get(i).getProject().isProgState());
+				myProject.setPin(projectJoins.get(i).isPin());
+				myProjectsList.add(myProject);
+			}
+		}
+		return myProjectsList;
 	}
 	
 

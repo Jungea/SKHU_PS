@@ -8,25 +8,27 @@
                     </b-col>    
                 </b-row>    
                 <b-row style="padding-left: 94%">    
-                    <b-button v-b-modal.modal-xl variant="outline-secondary" style="width: 100px ; height: 70px;">프로젝트 생성</b-button>    
+                    <b-button v-b-modal.modal-xl variant="outline-secondary" style="width: 80px ; height: 70px;">프로젝트 생성</b-button>    
                 </b-row>    
                 <b-row cols="2">    
-                    <b-col :key="item" v-for="item in data">
-                    <b-card @click="viewSummary" align="left" bg-variant="dark"  text-variant="white" style="width: 30rem; height: 15rem; margin: 60px;"> <!-- 30rem == 480px -->
+                    <b-col :key="index" v-for="(item, index) in data">
+                    <b-card @click="viewSummary" align="left" bg-variant="dark"  text-variant="white" style="width: 30rem; height: 12rem; margin: 60px;"> <!-- 30rem == 480px -->
                         <div>
                             <b-card-header style="padding: 0 0 10px 0">
                                 <table>
                                     <tr>
                                         <td style="width: 100%">{{item.projectName}}</td>
-                                        <td><b-button @click="pin1" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="starIcon.name"></b-icon></b-button></td>
+                                        <td><b-button @click="changePin(item.projectId)" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="item.pin==true?'star-fill':'star'"></b-icon></b-button></td>
                                     </tr>
                                 </table>
                             </b-card-header>
                        </div>
                         <b-card-text style="margin-top: 10px">
-                            {{item.content}}
+                            <p style="font-size:17px">인원 :{{item.memNum}}명</p>
+                            <b-button variant="success" style="cursor:default;" v-show="item.progState==false">진행중</b-button>
+                            <b-button variant="danger"  style="cursor:default" v-show="item.progState==true">진행완료</b-button>
                         </b-card-text>    
-                    </b-card>    
+                    </b-card>  
                     </b-col>
                 </b-row>    
             </b-container>    
@@ -43,12 +45,10 @@
                 <tbody>
                     <tr>
                         <th scope="row" style="width:28%">프로젝트명</th>
-                        <td><b-form-input  v-model="projectName" id="input-default" placeholder="프로젝트 이름을 입력하세요"></b-form-input>
-                                            </td></tr>
+                        <td><b-form-input  v-model="projectName" id="input-default" placeholder="프로젝트 이름을 입력하세요"></b-form-input></td></tr>
                     <tr>
                         <th scope="row">주제</th>
-                        <td><b-form-input required id="input-default2" :state="nameState" v-model="theme" placeholder="주제를 입력하세요"></b-form-input>
-                        <b-form-invalid-feedback :state="nameValidation" ></b-form-invalid-feedback></td>
+                        <td><b-form-input required id="input-default2" :state="nameState" v-model="theme" placeholder="주제를 입력하세요"></b-form-input></td>
                     </tr>
                     <tr>
                         <th scope="row">내용</th>
@@ -97,9 +97,6 @@ export default {
     },
     data() {
         return {
-            fields: { 프로젝트이름: "", 사용언어 : "",사용기술:"",주제:"",내용:"" },
-            items: [{ 프로젝트이름: "", 사용언어:"" ,사용기술:"",주제:"",내용:""}],
-            items2: [{'플젝 이름': '파이썬 프로젝트', '사용 언어': '자바','사용 도구':'스프링','주제':'자바로 계산기 만들기','내용':'자바를 이용해서 배운걸 토대로 만들어볼 예정입니다.','모집여부':'모집중'},               ],
             data:{},
             starIcon: { name: 'star', pin: false},
             
@@ -126,25 +123,11 @@ export default {
                     path: '/summary'
                     })
                 },
-                pin1() {                    
-                    if(this.starIcon.name == "star")
-                    {
-                        this.starIcon.name = "star-fill"
-                        this.starIcon.pin = true
-                    }
-                    else
-                    {
-                        this.starIcon.name = "star"
-                        this.starIcon.pin = false
-                    }
-
-                    alert(this.starIcon.pin)
-
-                    axios.post('url', {
-                        pin: this.starIcon.pin
+                changePin(itemProjectId) {  
+                    axios.post('/api/changePin', {
+                        projectId:itemProjectId
                     })
-                    .then()
-                    
+                    .then(response => {this.data = response.data })
                     event.stopPropagation()
                 },
         handleSubmit() {

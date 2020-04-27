@@ -12,15 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.skhu.domain.Project;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.SidebarModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
+import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.UserRepository;
+import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.UserService;
 
@@ -33,6 +35,11 @@ public class APIController {
 	UserRepository userRepository;
 	@Autowired
 	ProjectService projectService;
+	@Autowired
+	ProjectJoinRepository projectJoinRepository;
+	@Autowired
+	ProjectJoinService projectJoinService;
+	
 
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -122,8 +129,8 @@ public class APIController {
 	}
 
 	@RequestMapping(value = "user/projects", method = RequestMethod.GET)
-	public List<Project> userProjects(HttpServletRequest request) {
-		return projectService.findProjectByUserId(getLoginUserId(request));
+	public List<MyProjectListModel> userProjects(HttpServletRequest request) {
+		return projectService.projectList(getLoginUserId(request));
 	}
 
 	// 마이페이지 프로필이 수정되고 저장되었을 때
@@ -150,6 +157,12 @@ public class APIController {
 		System.out.println("tag:" + makeProjectModel.getTag());
 		return projectService.makeProject(makeProjectModel);
 
+	}
+	// 핀 바꾸기
+	@RequestMapping(value = "changePin", method = RequestMethod.POST)
+	public List<MyProjectListModel> changePin(@RequestBody MyProjectListModel myProjectListModel,HttpServletRequest request) {
+		System.out.println("changePin");
+		return projectJoinService.changePin(myProjectListModel,getLoginUserId(request));
 	}
 
 }
