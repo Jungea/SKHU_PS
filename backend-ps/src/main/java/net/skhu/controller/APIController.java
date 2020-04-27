@@ -123,5 +123,11 @@ public class APIController {
 	public List<SidebarModel> userSidebar() {
 		return projectService.userSidebar(1);
 	}
+	
+	//0427 윤영
+	@RequestMapping(value = "alluser", method = RequestMethod.GET)
+	public List<User> allUser() {
+		return userService.findAll();
+	}
 
 }

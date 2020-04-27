@@ -1,6 +1,7 @@
 package net.skhu.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,11 @@ public class UserService {
 		user.setLanguage(profileModel.getLanguage());
 
 		userRepository.save(user);
+	}
+	
+	//0427 윤영 추가
+	public List<User> findAll() {
+		return userRepository.findAll();
 	}
 
 }
