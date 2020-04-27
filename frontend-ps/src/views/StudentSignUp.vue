@@ -45,6 +45,11 @@
                 </b-form-group>
               </tr>
               <tr>
+                <b-form-group id="input-group-6" label="학과" lebel-for="input-6">
+                 <b-form-select v-model="form.selected" :options="deptOptions" value-field="detId" text-field="detName" ></b-form-select>
+                </b-form-group>
+              </tr>
+              <tr>
                 <b-form-group id="input-group-5" label="이메일" label-for="input-5">
                   <b-form-input id="input-5" type="email" v-model="form.email" trim required placeholder="Enter Email"></b-form-input>
                   <b-form-text id="input-live-help">입력한 이메일로 인증 링크가 전송됩니다. 정확하게 입력해주세요.</b-form-text>
@@ -78,12 +83,14 @@ import axios from 'axios';
           pass1: '',
           pass2: '',
           email: '',
-          name: ''
+          name: '',
+          selected: '1'
         },
         show: true,
         user:null,
         userNums:[],
         userEmails:[],
+        deptOptions:{},
       }
     },
     methods: {
@@ -95,6 +102,8 @@ import axios from 'axios';
           email:this.form.email,
           name:this.form.name,
           password:this.form.pass1,
+          detDeptId: this.form.selected
+
         }).then(response => { 
           this.user = response.data;
           if(!this.numValidation) {  //학번 중복
@@ -114,6 +123,7 @@ import axios from 'axios';
       },
     },
     mounted(){
+      
       axios.get('/api/alluser')
         .then(response => {
             for (var i in response.data){
@@ -124,7 +134,11 @@ import axios from 'axios';
             console.log(this.userEmails)
         }).catch((erro)=> {
           console.error(erro);
-        });
+        }),
+        axios.get('api/departments')
+        .then(res => {
+          this.deptOptions = res.data
+        })
     },
     computed:{
       passValidation(){

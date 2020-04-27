@@ -79,11 +79,11 @@ export default {
         .then(response => {
             let info={
                 'Name':response.data.name,
-                'Major':response.data.det_dept_id,
+                'Major':response.data.detDepartment.detName,
                 'Grade':response.data.grade,
                 'Github':response.data.github,
                 'Intro':response.data.intro,
-                'Language':response.data.det_detLanguage_id
+                'Language':response.data.language
             }
             //this.items.push(info);
             this.items=info;

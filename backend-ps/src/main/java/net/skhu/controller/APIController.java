@@ -2,6 +2,9 @@ package net.skhu.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import net.skhu.domain.Detail;
 import net.skhu.domain.Project;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
@@ -18,6 +22,7 @@ import net.skhu.model.SidebarModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.repository.UserRepository;
+import net.skhu.service.DetailService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.UserService;
 
@@ -30,6 +35,14 @@ public class APIController {
 	UserRepository userRepository;
 	@Autowired
 	ProjectService projectService;
+	@Autowired
+	DetailService detailService;
+
+	public int getLoginUserId(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		int userId = (int) session.getAttribute("userId");
+		return userId;
+	}
 
 	@RequestMapping(value = "studentSignUp", method = RequestMethod.POST)
 	public String studentSignUp(@RequestBody SignUpModel studentSignUpModel) {
@@ -46,7 +59,7 @@ public class APIController {
 		} else if (redundantUserNum != null && redundantEmail != null) { // userNum과 email 둘다 중복일 떄
 			return "userNum과 email 둘 다 중복입니다.";
 		} else {
-			userService.SignUp(studentSignUpModel,false);
+			userService.SignUp(studentSignUpModel, false);
 			return "success";
 		}
 	}
@@ -66,76 +79,87 @@ public class APIController {
 		} else if (redundantUserNum != null && redundantEmail != null) { // userNum과 email 둘다 중복일 떄
 			return "userNum과 email 둘 다 중복입니다.";
 		} else {
-			userService.SignUp(professorSignUpModel,true);
+			userService.SignUp(professorSignUpModel, true);
 			return "success";
 		}
 	}
-	
+
 	// 이메일 인증
 	@RequestMapping(value = "authKeyChange/{authKey}", method = RequestMethod.POST)
 	public void authKeyChange(@PathVariable("authKey") String authKey) {
 		userService.emailCheckChange(authKey);
 	}
+
 	// 비밀번호 변경 링크 보내기
 	@RequestMapping(value = "findPass", method = RequestMethod.POST)
 	public String findPass(@RequestBody FindPassModel findPassModel) {
-		User user=userRepository.findByEmail(findPassModel.getEmail());
-		if(user==null)  // 해당되는 email이 없을때
+		User user = userRepository.findByEmail(findPassModel.getEmail());
+		if (user == null) // 해당되는 email이 없을때
 			return "email이 존재하지 않습니다.";
 		else {
 			userService.sendPwMail(findPassModel.getEmail());
 			return "success";
 		}
 	}
-	
+
 	@RequestMapping(value = "changePw/{authKey}", method = RequestMethod.POST)
-	public void changePw(@RequestBody FindPassModel findPassModel,@PathVariable("authKey") String authKey) {
+	public void changePw(@RequestBody FindPassModel findPassModel, @PathVariable("authKey") String authKey) {
 		userService.changePw(findPassModel, authKey);
 	}
-	// PathVariable
 
 	// 로그인
-	// session, cookie 추가 필요
 	@RequestMapping(value = "user/login", method = RequestMethod.POST)
-	public User login(@RequestBody UserLoginModel userLoginModel) {
+	public User login(@RequestBody UserLoginModel userLoginModel, HttpServletRequest request) {
 		System.out.println(userLoginModel);
-		return userService.login(Integer.parseInt(userLoginModel.getUserNum()), userLoginModel.getPassword());
+		User u = userService.login(Integer.parseInt(userLoginModel.getUserNum()), userLoginModel.getPassword());
+		if (u != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("userId", u.getUserId());
+		}
+		return u;
 	}
 
-	// ** 1을 로그인한 유저 값으로 변경(session, cookie)
+	//
 	@RequestMapping(value = "user", method = RequestMethod.GET)
-	public User user() {
-		return userService.findById(1);
+	public User user(HttpServletRequest request) {
+		return userService.findById(getLoginUserId(request));
 	}
 
 	@RequestMapping(value = "user/projects", method = RequestMethod.GET)
-	public List<Project> userProjects() {
-		return projectService.findProjectByUserId(1);
+	public List<Project> userProjects(HttpServletRequest request) {
+		return projectService.findProjectByUserId(getLoginUserId(request));
 	}
 
 	// 마이페이지 프로필이 수정되고 저장되었을 때
 	@RequestMapping(value = "user/profile", method = RequestMethod.POST)
-	public void profile(@RequestBody ProfileModel profileModel) {
+	public void profile(@RequestBody ProfileModel profileModel, HttpServletRequest request) {
 		System.out.println(profileModel);
-//		userService.update(1,profileModel);
+		userService.update(getLoginUserId(request), profileModel);
 	}
 
 	@RequestMapping(value = "user/sidebar", method = RequestMethod.GET)
-	public List<SidebarModel> userSidebar() {
-		return projectService.userSidebar(1);
+	public List<SidebarModel> userSidebar(HttpServletRequest request) {
+		return projectService.userSidebar(getLoginUserId(request));
 	}
-	
-	//0427 윤영
+
+	// 0427 윤영
 	@RequestMapping(value = "alluser", method = RequestMethod.GET)
 	public List<User> allUser() {
 		return userService.findAll();
 	}
+
 	// 프로젝트 생성
 	@RequestMapping(value = "makeProject", method = RequestMethod.POST)
 	public String makeProject(@RequestBody MakeProjectModel makeProjectModel) {
-		System.out.println("tag:"+makeProjectModel.getTag());
+		System.out.println("tag:" + makeProjectModel.getTag());
 		return projectService.makeProject(makeProjectModel);
 
+	}
+
+	// 학과 셀렉션을 위한 메소드
+	@RequestMapping(value = "departments", method = RequestMethod.GET)
+	public List<Detail> departments() {
+		return detailService.getDepartments();
 	}
 
 }

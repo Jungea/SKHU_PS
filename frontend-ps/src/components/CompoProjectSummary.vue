@@ -33,14 +33,14 @@
 import axios from 'axios';
 export default {
      mounted() {
-        axios.get('api/user/project1')
+        axios.get('api/user/projects')
         .then(response => {
             this.data.push(response.data)
         })
      },
      methods: {
-        /*
         save() {
+            /*
             axios.post('url',{
                 projectName: this.data.projectName,
                 tag: this.data.tag,
@@ -50,8 +50,8 @@ export default {
             })
             .then(response => {
            
-            })
-        }*/
+            })*/
+        }
     },
     data() {
         return { 

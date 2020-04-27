@@ -7,9 +7,9 @@
                 <p style="font-size:10pt; color: grey; margin-bottom:30px;">가입할 때 입력한 이메일로 비밀번호 재설정 링크를 보내드립니다.</p>
                 <b-form @submit="onSubmit" v-if="show">
                     <b-form-group style="text-align:left"
-                    id="input-group-1"
-                    label="E-mail"
-                    label-for="email"
+                        id="input-group-1"
+                        label="E-mail"
+                        label-for="email"
                     >
                         <b-form-input 
                         id="email" 
