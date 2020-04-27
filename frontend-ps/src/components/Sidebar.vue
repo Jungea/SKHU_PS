@@ -3,7 +3,7 @@
   <b-nav vertical class="w-25" style="min-width: 200px">
     <p class="mt-4 ml-3">
       <b-icon-house-fill  style="cursor:pointer" class="mr-3" font-scale="1.5" @click="home"></b-icon-house-fill>
-      길보미 님
+      {{name}} 님
       <b-icon-bell style="cursor:pointer" class="ml-3" font-scale="1.4" ></b-icon-bell>
       <b-icon-gear style="cursor:pointer" class="ml-3" font-scale="1.4" @click="profile"></b-icon-gear>
       </p>
@@ -34,11 +34,20 @@ export default {
     name: "Sidebar",
     data() {
       return {
+        name: '',
         selected: null,
         options: [ {value: null, text: '프로젝트를 선택하세요.'} ]
       }
     },
     mounted() {
+
+      axios.get('/api/user')
+        .then(response => {
+          this.name = response.data.name
+        }).catch((erro)=> {
+          console.error(erro);
+        });
+
       axios.get('/api/user/sidebar'
           ).then(response => {
 
@@ -48,6 +57,8 @@ export default {
         }).catch((erro)=> {
           console.error(erro);
         });
+
+        
     },
     methods: {
       projectBoard(evt) {
