@@ -24,24 +24,54 @@
         </center>    
 
         <!--프로젝트 생성 모달 -->
-        <b-modal id="modal-xl" size="lg" title="프로젝트 생성">
-            <b-table stacked :items="items" :fields="fields">
-            <template v-slot:cell(프로젝트이름)="row">
-                <b-form-input v-model="row.item.프로젝트이름"/>
-            </template>
-            <template v-slot:cell(사용언어)="row">
-                <b-form-input v-model="row.item.사용언어"/>
-            </template>
-            <template v-slot:cell(사용기술)="row">
-                <b-form-input v-model="row.item.사용기술"/>
-            </template>
-            <template v-slot:cell(주제)="row">
-                <b-form-input v-model="row.item.주제"/>
-            </template>
-            <template v-slot:cell(내용)="row">
-                <b-form-textarea v-model="row.item.내용"/>
-            </template>
-        </b-table>
+        <b-modal id="modal-xl" size="lg" title="프로젝트 생성" 
+            @show="resetModal"
+            @hidden="resetModal"
+            @ok="submit">
+            <form ref="form" @submit.stop.prevent="handleSubmit">
+            <b-form-group>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th scope="row" style="width:28%">프로젝트명</th>
+                        <td><b-form-input  v-model="projectName" id="input-default" placeholder="프로젝트 이름을 입력하세요"></b-form-input>
+                                            </td></tr>
+                    <tr>
+                        <th scope="row">주제</th>
+                        <td><b-form-input required id="input-default2" :state="nameState" v-model="theme" placeholder="주제를 입력하세요"></b-form-input>
+                        <b-form-invalid-feedback :state="nameValidation" ></b-form-invalid-feedback></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">내용</th>
+                        <td><b-form-textarea id="textarea-state" v-model="content" placeholder="내용을 입력하세요"></b-form-textarea></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">사용기술과 언어</th>
+                        <td>
+                            <b-form-tags
+                                input-id="tags-remove-on-delete"
+                                :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
+                                v-model="tagArray"
+                                separator=" ,;"
+                                placeholder="태그를 입력하세요"
+                                remove-on-delete
+                                add-on-enter
+                                class="mb-2"
+                            ></b-form-tags>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">인원 모집 상태</th>
+                        <td><b-form-select v-model="rcrtState" :options="options"></b-form-select></td>
+                    <tr>
+                        <th scope="row">과목 인증키 </th>
+                        <td><b-form-input id="input-default3" v-model="authKey" placeholder="수강 과목의 인증키를 입력하세요"></b-form-input></td>
+                    </tr>
+                </tbody>
+ 
+            </table>
+            </b-form-group>
+            </form>
         </b-modal>
     </div>
 
@@ -54,26 +84,95 @@ export default {
     mounted() {
         axios.get('/api/user/projects')
         .then(response => {
-            this.data = response.data }
-        )
+            this.data = response.data })
     },
     data() {
         return {
             fields: { 프로젝트이름: "", 사용언어 : "",사용기술:"",주제:"",내용:"" },
             items: [{ 프로젝트이름: "", 사용언어:"" ,사용기술:"",주제:"",내용:""}],
-            items2: [{'플젝 이름': '파이썬 프로젝트', '사용 언어': '자바','사용 도구':'스프링','주제':'자바로 계산기 만들기','내용':'자바를 이용해서 배운걸 토대로 만들어볼 예정입니다.','모집여부':'모집중'},               ],
-            data:{}
+            data:{},
+            
+            // 프로젝트 생성 모달 창
+            rcrtState:false,
+            projectName:'',
+            theme:null,
+            content:'',
+            options: [
+                { value: false, text: '모집중' },
+                { value: true, text: '모집 완료' },
+            ],
+            tagArray:[],
+            authKey:'',
+            stringTag:'',
+            project:null,
+            nameState:null,
         };
     },
+
      methods: {
-                viewSummary() {
-                    
-                    this.$router.push({
-                    path: '/summary'
-                    })
-                }
+        viewSummary() {
+            this.$router.push({
+                path: '/summary'
+                })
             }
-}
+        },
+        handleSubmit() {
+            // Exit when the form isn't valid
+            if (!this.checkFormValidity()) {
+                return true
+            }
+        },
+        checkFormValidity() {
+            const valid = this.$refs.form.checkValidity()
+            this.nameState = valid
+            return valid
+        },
+        resetModal() {
+            this.projectName='';
+            this.theme='';
+            this.content='';
+            this.stringTag='';
+            this.tagArray=[];
+            this.rcrtState=false;
+            this.authKey='';
+            this.project=null;
+            this.nameState=null
+        },
+        submit(bvModalEvt) {
+            bvModalEvt.preventDefault()
+            if(this.handleSubmit()) {
+                alert('alert:'+false)
+                return
+            } else {
+            console.log('name:'+this.projectName);
+            for(var i in this.tagArray) {
+               this.stringTag+=this.tagArray[i]+",";
+            }
+            this.stringTag=this.stringTag.slice(0,this.stringTag.length-1);
+            alert(this.stringTag);
+            axios.post('/api/makeProject',{
+                projectName:this.projectName,
+                theme:this.theme,
+                content:this.content,
+                tag:this.stringTag,
+                rcrtState:this.rcrtState,
+                authKey:this.authKey,
+            }).then(response => { 
+                this.project = response.data;
+                if(this.project=='authKey를 잘못 입력했습니다') {
+                    alert('authKey가 일치한 과목이 없습니다');
+                    return;
+                } else {
+                    this.$nextTick(() => {
+                    this.$bvModal.hide('modal-xl')
+                    })
+                    alert('성공!');
+                }
+            });
+            }
+        },
+    }
+
 </script>
 
 <style>

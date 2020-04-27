@@ -32,23 +32,35 @@ public class Project {
 	String theme;
 	String content;
 	LocalDateTime startDate;
-	Boolean progState;
-	Boolean rcrtState;
+	boolean progState;
+	boolean rcrtState;
 	String tag;
-	Boolean contest;
+	boolean contest;
 	String github;
-	Integer year; // null 허용
-	Integer semester; // null 허용
+	Integer year; // null 허용(경진대회)
+	Integer semester; // null 허용(경진대회)
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "capId")
 	User user;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "detSubjectId")
-	Detail detSubject;
+	@JoinColumn(name = "subjectId")
+	Subject subject;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
 	List<ProjectJoin> projectJoins;
+	
+	public Project() {
+	}
+
+	public Project(String projectName,String theme,String content,String tag,boolean rcrtState) {
+	      this.projectName = projectName;
+	      this.theme = theme;
+	      this.content = content;
+	      this.tag = tag;
+	      this.rcrtState = rcrtState;
+	      this.startDate=LocalDateTime.now();
+	}
 }
