@@ -29,15 +29,17 @@
             @hidden="resetModal"
             @ok="submit">
             <form ref="form" @submit.stop.prevent="handleSubmit">
+            <b-form-group>
             <table class="table table-bordered">
                 <tbody>
                     <tr>
                         <th scope="row" style="width:28%">프로젝트명</th>
-                        <td><b-form-input  :state="projectName.length <= 10 && projectName.length>0" v-model="projectName" id="input-default" placeholder="프로젝트 이름을 입력하세요"></b-form-input></td>
-                    </tr>
+                        <td><b-form-input  v-model="projectName" id="input-default" placeholder="프로젝트 이름을 입력하세요"></b-form-input>
+                                            </td></tr>
                     <tr>
                         <th scope="row">주제</th>
-                        <td><b-form-input id="input-default2" v-model="theme" placeholder="주제를 입력하세요"></b-form-input></td>
+                        <td><b-form-input required id="input-default2" :state="nameState" v-model="theme" placeholder="주제를 입력하세요"></b-form-input>
+                        <b-form-invalid-feedback :state="nameValidation" ></b-form-invalid-feedback></td>
                     </tr>
                     <tr>
                         <th scope="row">내용</th>
@@ -68,6 +70,7 @@
                 </tbody>
  
             </table>
+            </b-form-group>
             </form>
         </b-modal>
     </div>
@@ -93,7 +96,7 @@ export default {
             // 프로젝트 생성 모달 창
             rcrtState:false,
             projectName:'',
-            theme:'',
+            theme:null,
             content:'',
             options: [
                 { value: false, text: '모집중' },
@@ -102,11 +105,28 @@ export default {
             tagArray:[],
             authKey:'',
             stringTag:'',
-            project:null
+            project:null,
+            nameState:null,
         };
     },
     methods: {
-        submit() {
+        handleSubmit() {
+            // Exit when the form isn't valid
+            if (!this.checkFormValidity()) {
+                return true
+            }
+        },
+        checkFormValidity() {
+            const valid = this.$refs.form.checkValidity()
+            this.nameState = valid
+            return valid
+        },
+        submit(bvModalEvt) {
+            bvModalEvt.preventDefault()
+            if(this.handleSubmit()) {
+                alert('alert:'+false)
+                return
+            } else {
             console.log('name:'+this.projectName);
             for(var i in this.tagArray) {
                this.stringTag+=this.tagArray[i]+",";
@@ -126,9 +146,13 @@ export default {
                     alert('authKey가 일치한 과목이 없습니다');
                     return;
                 } else {
+                    this.$nextTick(() => {
+                    this.$bvModal.hide('modal-xl')
+                    })
                     alert('성공!');
                 }
             });
+            }
         },
         resetModal() {
             this.projectName='';
@@ -139,6 +163,7 @@ export default {
             this.rcrtState=false;
             this.authKey='';
             this.project=null;
+            this.nameState=null
         },
     }
 }
