@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import net.skhu.domain.Detail;
 import net.skhu.domain.Project;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
@@ -21,6 +22,7 @@ import net.skhu.model.SidebarModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.repository.UserRepository;
+import net.skhu.service.DetailService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.UserService;
 
@@ -33,6 +35,8 @@ public class APIController {
 	UserRepository userRepository;
 	@Autowired
 	ProjectService projectService;
+	@Autowired
+	DetailService detailService;
 
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -130,7 +134,7 @@ public class APIController {
 	@RequestMapping(value = "user/profile", method = RequestMethod.POST)
 	public void profile(@RequestBody ProfileModel profileModel, HttpServletRequest request) {
 		System.out.println(profileModel);
-//		userService.update(getLoginUserId(request),profileModel);
+		userService.update(getLoginUserId(request), profileModel);
 	}
 
 	@RequestMapping(value = "user/sidebar", method = RequestMethod.GET)
@@ -150,6 +154,12 @@ public class APIController {
 		System.out.println("tag:" + makeProjectModel.getTag());
 		return projectService.makeProject(makeProjectModel);
 
+	}
+
+	// 학과 셀렉션을 위한 메소드
+	@RequestMapping(value = "departments", method = RequestMethod.GET)
+	public List<Detail> departments() {
+		return detailService.getDepartments();
 	}
 
 }
