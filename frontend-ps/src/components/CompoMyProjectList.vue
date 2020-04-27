@@ -24,7 +24,11 @@
         </center>    
     
         <!--프로젝트 생성 모달 -->
-        <b-modal id="modal-xl" size="lg" title="프로젝트 생성" @ok="submit">
+        <b-modal id="modal-xl" size="lg" title="프로젝트 생성" 
+            @show="resetModal"
+            @hidden="resetModal"
+            @ok="submit">
+            <form ref="form" @submit.stop.prevent="handleSubmit">
             <table class="table table-bordered">
                 <tbody>
                     <tr>
@@ -33,7 +37,7 @@
                     </tr>
                     <tr>
                         <th scope="row">주제</th>
-                        <td><b-form-input id="input-default" v-model="theme" placeholder="주제를 입력하세요"></b-form-input></td>
+                        <td><b-form-input id="input-default2" v-model="theme" placeholder="주제를 입력하세요"></b-form-input></td>
                     </tr>
                     <tr>
                         <th scope="row">내용</th>
@@ -45,7 +49,7 @@
                             <b-form-tags
                                 input-id="tags-remove-on-delete"
                                 :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
-                                v-model="tag"
+                                v-model="tagArray"
                                 separator=" ,;"
                                 placeholder="태그를 입력하세요"
                                 remove-on-delete
@@ -59,11 +63,12 @@
                         <td><b-form-select v-model="rcrtState" :options="options"></b-form-select></td>
                     <tr>
                         <th scope="row">과목 인증키 </th>
-                        <td><b-form-input id="input-default" v-model="authKey" placeholder="수강 과목의 인증키를 입력하세요"></b-form-input></td>
+                        <td><b-form-input id="input-default3" v-model="authKey" placeholder="수강 과목의 인증키를 입력하세요"></b-form-input></td>
                     </tr>
                 </tbody>
  
             </table>
+            </form>
         </b-modal>
     </div>
 
@@ -94,19 +99,47 @@ export default {
                 { value: false, text: '모집중' },
                 { value: true, text: '모집 완료' },
             ],
-            tag:[],
+            tagArray:[],
             authKey:'',
+            stringTag:'',
+            project:null
         };
     },
     methods: {
         submit() {
-            axios.post('/api/makeProject'),{
-
-            }.then(response => { 
-            this.user = response.data;
-                
+            console.log('name:'+this.projectName);
+            for(var i in this.tagArray) {
+               this.stringTag+=this.tagArray[i]+",";
+            }
+            this.stringTag=this.stringTag.slice(0,this.stringTag.length-1);
+            alert(this.stringTag);
+            axios.post('/api/makeProject',{
+                projectName:this.projectName,
+                theme:this.theme,
+                content:this.content,
+                tag:this.stringTag,
+                rcrtState:this.rcrtState,
+                authKey:this.authKey,
+            }).then(response => { 
+                this.project = response.data;
+                if(this.project=='authKey를 잘못 입력했습니다') {
+                    alert('authKey가 일치한 과목이 없습니다');
+                    return;
+                } else {
+                    alert('성공!');
+                }
             });
-        }
+        },
+        resetModal() {
+            this.projectName='';
+            this.theme='';
+            this.content='';
+            this.stringTag='';
+            this.tagArray=[];
+            this.rcrtState=false;
+            this.authKey='';
+            this.project=null;
+        },
     }
 }
 </script>

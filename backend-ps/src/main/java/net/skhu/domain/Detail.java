@@ -34,10 +34,6 @@ public class Detail {
 	Common common;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "detSubject", fetch = FetchType.LAZY)
-	List<Project> subjectProjects;
-
-	@JsonIgnore
 	@OneToMany(mappedBy = "detDepartment", fetch = FetchType.LAZY)
 	List<User> departmentUsers;
 

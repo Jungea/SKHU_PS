@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import net.skhu.domain.Project;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
+import net.skhu.model.MakeProjectModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.SidebarModel;
 import net.skhu.model.SignUpModel;
@@ -122,6 +123,13 @@ public class APIController {
 	@RequestMapping(value = "user/sidebar", method = RequestMethod.GET)
 	public List<SidebarModel> userSidebar() {
 		return projectService.userSidebar(1);
+	}
+	
+	// 프로젝트 생성
+	@RequestMapping(value = "makeProject", method = RequestMethod.POST)
+	public String makeProject(@RequestBody MakeProjectModel makeProjectModel) {
+		System.out.println("tag:"+makeProjectModel.getTag());
+		return projectService.makeProject(makeProjectModel);
 	}
 
 }
