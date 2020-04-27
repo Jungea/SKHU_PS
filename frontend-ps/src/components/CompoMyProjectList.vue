@@ -11,8 +11,8 @@
                     <b-button v-b-modal.modal-xl variant="outline-secondary" style="width: 100px ; height: 70px;">프로젝트 생성</b-button>    
                 </b-row>    
                 <b-row cols="2">    
-                    <b-col :key="item" v-for="item in data">
-                    <b-card @click="viewSummary" align="left" bg-variant="dark"  text-variant="white" style="width: 30rem; height: 15rem; margin: 60px;"> <!-- 30rem == 480px -->
+                    <b-col :key="index" v-for="(item, index) in data">
+                    <b-card @click="viewSummary" align="left" bg-variant="dark" text-variant="white" style="width: 30rem; height: 15rem; margin: 60px;"> <!-- 30rem == 480px -->
                         <div>
                             <b-card-header style="padding: 0 0 10px 0">
                                 <table>
@@ -48,7 +48,7 @@
                     <tr>
                         <th scope="row">주제</th>
                         <td><b-form-input required id="input-default2" :state="nameState" v-model="theme" placeholder="주제를 입력하세요"></b-form-input>
-                        <b-form-invalid-feedback :state="nameValidation" ></b-form-invalid-feedback></td>
+                        <b-form-invalid-feedback :state="validation" >주제를 입력하세요.</b-form-invalid-feedback></td>
                     </tr>
                     <tr>
                         <th scope="row">내용</th>
@@ -95,13 +95,18 @@ export default {
         .then(response => {
             this.data = response.data })
     },
+    computed: {
+    validation() {
+       return !this.data.theme
+    }
+  },
     data() {
         return {
             fields: { 프로젝트이름: "", 사용언어 : "",사용기술:"",주제:"",내용:"" },
             items: [{ 프로젝트이름: "", 사용언어:"" ,사용기술:"",주제:"",내용:""}],
             items2: [{'플젝 이름': '파이썬 프로젝트', '사용 언어': '자바','사용 도구':'스프링','주제':'자바로 계산기 만들기','내용':'자바를 이용해서 배운걸 토대로 만들어볼 예정입니다.','모집여부':'모집중'},               ],
-            data:{},
-            starIcon: { name: 'star', pin: false},
+            data:{ },
+            starIcon: { name: 'star', pin: false },
             
             // 프로젝트 생성 모달 창
             rcrtState:false,
@@ -144,66 +149,65 @@ export default {
                         pin: this.starIcon.pin
                     })
                     .then()
-                    
                     event.stopPropagation()
                 },
-        handleSubmit() {
-            // Exit when the form isn't valid
-            if (!this.checkFormValidity()) {
-                return true
-            }
-        },
-        checkFormValidity() {
-            const valid = this.$refs.form.checkValidity()
-            this.nameState = valid
-            return valid
-        },
-        resetModal() {
-            this.projectName='';
-            this.theme='';
-            this.content='';
-            this.stringTag='';
-            this.tagArray=[];
-            this.rcrtState=false;
-            this.authKey='';
-            this.project=null;
-            this.nameState=null
-        },
-        submit(bvModalEvt) {
-            bvModalEvt.preventDefault()
-            if(this.handleSubmit()) {
-                alert('alert:'+false)
-                return
-            } else {
-            console.log('name:'+this.projectName);
-            for(var i in this.tagArray) {
-               this.stringTag+=this.tagArray[i]+",";
-            }
-            this.stringTag=this.stringTag.slice(0,this.stringTag.length-1);
-            alert(this.stringTag);
-            axios.post('/api/makeProject',{
-                projectName:this.projectName,
-                theme:this.theme,
-                content:this.content,
-                tag:this.stringTag,
-                rcrtState:this.rcrtState,
-                authKey:this.authKey,
-            }).then(response => { 
-                this.project = response.data;
-                if(this.project=='authKey를 잘못 입력했습니다') {
-                    alert('authKey가 일치한 과목이 없습니다');
-                    return;
-                } else {
-                    this.$nextTick(() => {
-                    this.$bvModal.hide('modal-xl')
-                    })
-                    alert('성공!');
-                }
-            });
-            }
-        },
+                 handleSubmit() {
+                 // Exit when the form isn't valid
+                    if (!this.checkFormValidity()) {
+                    return true
+                   }
+                },
+                checkFormValidity() {
+                    const valid = this.$refs.form.checkValidity()
+                    this.nameState = valid
+                    return valid
+                },
+                resetModal() {
+                    this.projectName='';
+                    this.theme='';
+                    this.content='';
+                    this.stringTag='';
+                    this.tagArray=[];
+                    this.rcrtState=false;
+                    this.authKey='';
+                    this.project=null;
+                    this.nameState=null
+                },
+                submit(bvModalEvt) {
+                    bvModalEvt.preventDefault()
+                    if(this.handleSubmit()) {
+                        alert('alert:'+false)
+                        return
+                    } else {
+                    console.log('name:'+this.projectName);
+                    for(var i in this.tagArray) {
+                    this.stringTag+=this.tagArray[i]+",";
+                    }
+                    this.stringTag=this.stringTag.slice(0,this.stringTag.length-1);
+                    alert(this.stringTag);
+                    axios.post('/api/makeProject',{
+                        projectName:this.projectName,
+                        theme:this.theme,
+                        content:this.content,
+                        tag:this.stringTag,
+                        rcrtState:this.rcrtState,
+                        authKey:this.authKey,
+                    }).then(response => { 
+                        this.project = response.data;
+                        if(this.project=='authKey를 잘못 입력했습니다') {
+                            alert('authKey가 일치한 과목이 없습니다');
+                            return;
+                        } else {
+                            this.$nextTick(() => {
+                            this.$bvModal.hide('modal-xl')
+                            })
+                            alert('성공!');
+                        }
+                    });
+              }
+         },
+        }
     }
-}
 
 </script>
 
