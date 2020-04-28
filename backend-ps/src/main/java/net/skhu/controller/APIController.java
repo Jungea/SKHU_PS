@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.skhu.domain.Detail;
 import net.skhu.domain.Project;
+import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
@@ -160,6 +161,39 @@ public class APIController {
 	@RequestMapping(value = "departments", method = RequestMethod.GET)
 	public List<Detail> departments() {
 		return detailService.getDepartments();
+	}
+
+	// 프로젝트에서 멤버 초대(팀장만)
+	@RequestMapping(value = "invite/{projectId}/{userNum}", method = RequestMethod.GET)
+	public String invite(@PathVariable("projectId") String projectId, @PathVariable("userNum") String userNum,
+			HttpServletRequest request) {
+
+		int intUserNum = Integer.parseInt(userNum);
+		int intProjectId = Integer.parseInt(projectId);
+
+		if (userService.findByUserNum(intUserNum) == null)
+			return "잘못된 번호를 입력하였습니다.";
+
+		User capUser = userService.findById(getLoginUserId(request));
+		if (intUserNum == capUser.getUserNum())
+			return "자기 자신의 번호입니다.";
+
+		// stream으로 바꾸기
+		List<ProjectJoin> member = projectService.member(intProjectId);
+		for (int i = 0; i < member.size(); i++)
+			if (member.get(i).getUser().getUserNum() == intUserNum)
+				return "팀원의 번호입니다.";
+
+		Boolean result = projectService.inviteMember(intProjectId, intUserNum);
+		if (result == true)
+			return userNum + "님에게 초대 메세지를 보냈습니다.";
+		else
+			return "프로젝트에 참여신청한 유저입니다.";
+	}
+
+	@RequestMapping(value = "a", method = RequestMethod.GET)
+	public List<ProjectJoin> invite() {
+		return projectService.member(5);
 	}
 
 }
