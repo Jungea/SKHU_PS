@@ -85,4 +85,7 @@ public class UserService {
 		return userRepository.findAll();
 	}
 
+	public User findByUserNum(int userNum) {
+		return userRepository.findByUserNum(userNum);
+	}
 }

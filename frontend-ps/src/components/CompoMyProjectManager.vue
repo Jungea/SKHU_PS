@@ -4,17 +4,35 @@
         <hr>
         <div>
             <h5>팀원</h5>
-            <b-form inline>
-                <label class="sr-only" for="inline-form-input-name">Name</label>
-                <b-input class="mr-2" type="search" v-model="text" placeholder="팀원이름"></b-input>
-                <b-button variant="primary">Save</b-button>
+            <b-form inline @submit="invite">
+                <label class="sr-only" for="inline-form-input-userNum">Number</label>
+                <b-input class="mr-2" type="search" v-model="userNum" placeholder="Enter member number"></b-input>
+                <b-button variant="primary" type="submit" :disabled="userNum.length == 0">Invite</b-button>
             </b-form>
         </div>
     </div>
 </template>
 <script>
+import axios from 'axios';
 export default {
-    
+    data() {
+        return {
+            userNum: '',
+            projectId: 5,
+        }
+    },
+    methods: {
+        invite(evt) {
+            evt.preventDefault();
+
+             axios.get('/api/invite/'+this.projectId+"/"+this.userNum)
+            .then(response => alert(response.data)).catch((erro)=> {
+                console.error(erro);
+            });
+            // response => {this.name = response.data.name}
+            
+        }
+    },
 }
 </script>
 <style lang="stylus" scoped>
