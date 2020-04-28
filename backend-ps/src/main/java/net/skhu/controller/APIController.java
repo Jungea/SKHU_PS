@@ -191,9 +191,15 @@ public class APIController {
 			return "프로젝트에 참여신청한 유저입니다.";
 	}
 
-	@RequestMapping(value = "a", method = RequestMethod.GET)
-	public List<ProjectJoin> invite() {
-		return projectService.member(5);
+	@RequestMapping(value = "project/{projectId}/member", method = RequestMethod.GET)
+	public List<ProjectJoin> projectMember(@PathVariable("projectId") String projectId) {
+		return projectService.member(Integer.parseInt(projectId));
 	}
+	
+	@RequestMapping(value = "project/{projectId}/inviteList", method = RequestMethod.GET)
+	public List<ProjectJoin> projectInviteList(@PathVariable("projectId") String projectId) {
+		return projectService.inviteList(Integer.parseInt(projectId));
+	}
+	
 
 }

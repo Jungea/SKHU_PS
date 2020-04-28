@@ -84,8 +84,14 @@ public class ProjectService {
 		return true;
 	}
 
+	//멤버
 	public List<ProjectJoin> member(int projectId) {
-		return projectJoinRepository.findByProject_ProjectIdAndStateAndTypeNot(projectId, 1, 0);
+		return projectJoinRepository.findByProject_ProjectIdAndTypeNotAndState(projectId, 0, 1);
+	}
+	
+	//초대한 후 대기중인 목록
+	public List<ProjectJoin> inviteList(int projectId) {
+		return projectJoinRepository.findByProject_ProjectIdAndTypeAndStateNot(projectId, 1, 1);
 	}
 
 }
