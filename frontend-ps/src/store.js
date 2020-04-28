@@ -7,7 +7,8 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
     state: {
         myProjectPin:[], // 사이드 바의 셀렉션에 나타날 핀 프로젝트
-        selectedPinProjectId:null // 사이드바에서 셀렉트 된 프로젝트
+        selectedPinProjectId:null, // 사이드바에서 셀렉트 된 프로젝트
+        aa:null
     },
     mutations: {
         makeMyProjectPin(state,data){  
@@ -24,6 +25,9 @@ export const store = new Vuex.Store({
         changeSelectedPinProjectId(state,pinProjectId) {
             state.selectedPinProjectId=pinProjectId
         }
+    },
+    actions: {
+        
     }
 
 });

@@ -17,6 +17,11 @@ export default {
   name: 'PojectBoard',
   components: {
     Sidebar, 
+  },
+  methods: {
+    click1() {
+        alert('pin2:'+this.$store.state.selectedPinProjectId)
+    }
   }
 }
 </script>
