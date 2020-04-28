@@ -36,7 +36,9 @@
                                 </tr>
                                 <tr>
                                     <th>{{fields[2]}}</th>
-                                    <td><a v-bind:href="gitUrl" target="_blank">{{gitUrl}}</a></td>
+                                    <td>
+                                        <a v-bind:href="gitUrl" target="_blank" v-if="items.Github!=null">{{gitUrl}}</a>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>{{fields[3]}}</th>

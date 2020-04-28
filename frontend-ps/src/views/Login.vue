@@ -8,17 +8,11 @@
         <!--아디-->
           <b-form-group style="text-align:left" id="input-group-1" label="Number" label-for="number">
             <b-form-input id="number" v-model="form.number" type="text" trim placeholder="Enter your number"></b-form-input>
-              <b-form-invalid-feedback :state="idValidation" v-if="form.number.length == 0 ? true : false">
-                id를 입력하세요.
-              </b-form-invalid-feedback>
           </b-form-group>
 
           <!--비번-->
           <b-form-group style="text-align:left" id="input-group-2" label="Password" label-for="password">
             <b-form-input id="password" v-model="form.password" type="password" required trim placeholder="Enter Password"></b-form-input>
-            <b-form-invalid-feedback :state="passValidation" v-if="form.password.length == 0 ? true : false">
-              비밀번호를 입력하세요.
-            </b-form-invalid-feedback>
           </b-form-group>
 
           <b-button style="width:100%; margin-top:15px;" type="submit">Login</b-button>
@@ -35,14 +29,6 @@
 <script>
 import axios from 'axios';
   export default {
-    computed: {
-     idValidation() {
-        return this.form.number == null
-      },
-      passValidation() {
-        return this.form.password == null
-      }      
-    },
     data() {
       return {
         form: {
@@ -63,10 +49,11 @@ import axios from 'axios';
         }).then(response => {
             this.user = response.data;
             if(typeof this.user == 'object') {
-              alert("로그인")
+              console.log('로그인한 유저')
+              console.log(response.data.name)
               location.href="/home" 
             }else {        
-              alert("아이디나 비밀번호가 틀렸습니다.");
+              alert("아이디 또는 비밀번호를 확인해주세요.");
               this.form.number='';
               this.form.password='';
             }
