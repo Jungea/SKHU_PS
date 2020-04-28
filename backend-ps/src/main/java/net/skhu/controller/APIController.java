@@ -140,11 +140,6 @@ public class APIController {
 //		userService.update(getLoginUserId(request),profileModel);
 	}
 
-	@RequestMapping(value = "user/sidebar", method = RequestMethod.GET)
-	public List<SidebarModel> userSidebar(HttpServletRequest request) {
-		return projectService.userSidebar(getLoginUserId(request));
-	}
-
 	// 0427 윤영
 	@RequestMapping(value = "alluser", method = RequestMethod.GET)
 	public List<User> allUser() {

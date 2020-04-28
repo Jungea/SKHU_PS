@@ -32,11 +32,6 @@ public class ProjectService {
 	@Autowired
 	ProjectJoinRepository projectJoinRepository;
 	
-
-	public List<SidebarModel> userSidebar(int userId) {
-		return projectRepository.findProjectIdAndProjectNameByUserId(userId);
-	}
-	
 	// 프로젝트 생성
 	@Transactional
 	public String makeProject(MakeProjectModel makeProjectModel) {

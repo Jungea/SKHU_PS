@@ -1,3 +1,4 @@
+<!--props로 구현한 원본-->
 <template>
 <div>
   <b-nav vertical class="w-25" style="min-width: 200px">
@@ -11,7 +12,7 @@
     <b-nav-item disabled>내가 pin한 프로젝트</b-nav-item>
     <b-nav-item> 
       <b-form-select style="width:200px" 
-      v-model="this.$store.state.pinProjectId"
+      v-model="pinProjectId"
       :options="this.myProjectList"
       class="mb-1 "
       value-field="projectId"
@@ -40,11 +41,12 @@
 import axios from 'axios';
 export default {
     name: "Sidebar",
+    props: ['myProjectList','selectedPinProjectId'],
     data() {
       return {
         name: '',
         projectName:null,
-        pinProjectId:this.$store.state.selectedPinProjectId,
+        pinProjectId:null
       }
     },
     mounted() {
@@ -64,7 +66,6 @@ export default {
               this.projectName=this.myProjectList[i].projectName
             }
           }
-          this.$store.commit('changeSelectedPinProjectId',this.pinProjectId)
         },
         myProjectList() { // 현재 셀렉션에서 셀렉트 된 프로젝트가 pin에서 false로 될 때
           let count=0

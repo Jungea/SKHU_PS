@@ -11,7 +11,7 @@
                     <b-button v-b-modal.modal-xl variant="outline-secondary" style="width: 80px ; height: 70px;">프로젝트 생성</b-button>    
                 </b-row>    
                 <b-row cols="2">    
-                    <b-col :key="index" v-for="(item, index) in data">
+                    <b-col :key="index" v-for="(item, index) in this.data">
                     <b-card @click="viewSummary" align="left" bg-variant="dark"  text-variant="white" style="width: 30rem; height: 12rem; margin: 60px;"> <!-- 30rem == 480px -->
                         <div>
                             <b-card-header style="padding: 0 0 10px 0">
@@ -88,18 +88,12 @@
 
 <script>
 import axios from 'axios';
-
 export default {
-    mounted() {
-        axios.get('/api/user/projects')
-        .then(response => {
-            this.data = response.data })
-    },
+
     data() {
         return {
             data:{},
-            starIcon: { name: 'star', pin: false},
-            
+            a:[{"maru":'bomi',keke:'mo'},{maru:'hehe'}],
             // 프로젝트 생성 모달 창
             rcrtState:false,
             projectName:'',
@@ -116,6 +110,22 @@ export default {
             nameState:null,
         };
     },
+    mounted() { 
+        axios.get('/api/user/projects')
+        .then(response => {
+            this.data = response.data 
+            // alert('json:'+JSON.stringify(this.data[0].pin))
+            let count=0;
+            this.$store.state.myProjectPin=[]
+            for (let i=0;i<this.data.length;i++) {
+                if(this.data[i].pin==true) {
+                    this.$store.state.myProjectPin[count]={}
+                    this.$store.state.myProjectPin[count].projectName=this.data[i].projectName
+                    this.$store.state.myProjectPin[count++].projectId=this.data[i].projectId
+                }
+            }
+        });
+    },
 
      methods: {
                 viewSummary() {                    
@@ -127,7 +137,18 @@ export default {
                     axios.post('/api/changePin', {
                         projectId:itemProjectId
                     })
-                    .then(response => {this.data = response.data })
+                    .then(response => {this.data = response.data
+                        let count=0;
+                        this.$store.state.myProjectPin=[]
+                        for (let i=0;i<this.data.length;i++) {
+                            if(this.data[i].pin==true) {
+                                this.$store.state.myProjectPin[count]={}
+                                this.$store.state.myProjectPin[count].projectName=this.data[i].projectName
+                                this.$store.state.myProjectPin[count++].projectId=this.data[i].projectId
+                            }
+                        }
+                    })
+                    
                     event.stopPropagation()
                 },
         handleSubmit() {

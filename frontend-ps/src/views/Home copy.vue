@@ -1,8 +1,9 @@
+<!--props로 구현한 원본 -->
 <template>
   <div class="home h-100">
     <b-row class="h-100">
       <b-col class="myNav overflow-auto" cols="200px">
-        <Sidebar/>
+        <Sidebar v-bind:my-project-list="myProjectPin" v-bind:selected-pin-projectId="selectedPinProjectId"/>
       </b-col>
       <b-col>
         <center>    
@@ -118,8 +119,8 @@ export default {
             stringTag:'',
             project:null,
             nameState:null,
-            // myProjectPin:[], // 내가 pin한 프로젝트 목록
-            // selectedPinProjectId:null
+            myProjectPin:[], // 내가 pin한 프로젝트 목록
+            selectedPinProjectId:null
         };
     },
     mounted() { 
@@ -127,7 +128,15 @@ export default {
         .then(response => {
             this.data = response.data 
             // alert('json:'+JSON.stringify(this.data[0].pin))
-             this.$store.commit('makeMyProjectPin', this.data)
+            let count=0;
+            this.myProjectPin=[]
+            for (let i=0;i<this.data.length;i++) {
+                if(this.data[i].pin==true) {
+                    this.myProjectPin[count]={}
+                    this.myProjectPin[count].projectName=this.data[i].projectName
+                    this.myProjectPin[count++].projectId=this.data[i].projectId
+                }
+            }
         });
     },
 
@@ -142,7 +151,15 @@ export default {
                         projectId:itemProjectId
                     })
                     .then(response => {this.data = response.data
-                         this.$store.commit('makeMyProjectPin', this.data)
+                        let count=0;
+                        this.myProjectPin=[]
+                        for (let i=0;i<this.data.length;i++) {
+                            if(this.data[i].pin==true) {
+                                this.myProjectPin[count]={}
+                                this.myProjectPin[count].projectName=this.data[i].projectName
+                                this.myProjectPin[count++].projectId=this.data[i].projectId
+                            }
+                        }
                     })
                     
                     event.stopPropagation()
