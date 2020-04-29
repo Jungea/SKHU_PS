@@ -82,5 +82,4 @@ export default {
 </script>
 
 <style>
-.asd {background-color: }
 </style>

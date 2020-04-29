@@ -46,11 +46,18 @@
               </tr>
               <tr>
                 <b-form-group id="input-group-6" label="학부/학과" lebel-for="input-6" style="display:inline-block; width:63%">
-                 <b-form-select id="input-6" v-model="form.selected" :options="deptOptions" value-field="detId" text-field="detName" ></b-form-select>
+                  <b-form-select id="input-6" v-model="form.selected" :options="deptOptions" value-field="detId" text-field="detName" ></b-form-select>
+                  <b-form-invalid-feedback :state="deptValidation">
+                    학과를 선택하세요.
+                  </b-form-invalid-feedback>
+                  <b-form-valid-feedback :state="deptValidation">
+                  </b-form-valid-feedback>
                 </b-form-group>
+
                 <b-form-group id="input-group-7" label="학년" lebel-for="input-7" style="display:inline-block; width:35%; float: right;">
                  <b-form-select id="input-7" v-model="form.gradeSelected" :options="gradeOptions" value-field="item" text-field="value" ></b-form-select>
                 </b-form-group>
+                
               </tr>
               <tr>
                 <b-form-group id="input-group-5" label="이메일" label-for="input-5">
@@ -87,14 +94,14 @@ import axios from 'axios';
           pass2: '',
           email: '',
           name: '',
-          selected: '1',
+          selected: null,
           gradeSelected:'1'
         },
         show: true,
         user:null,
         userNums:[],
         userEmails:[],
-        deptOptions:{},
+        deptOptions:[],
         gradeOptions:[
           {item: 1, value:'1학년'},
           {item: 2, value:'2학년'},
@@ -122,6 +129,8 @@ import axios from 'axios';
             alert('비밀번호를 확인해주세요.');
           } else if(!this.passValidation) {   //비밀번호 불일치
             alert('비밀번호가 일치하지 않습니다.');
+          } else if(!this.deptValidation){
+            alert('학부/학과를 선택해주세요.');
           } else if(!this.emailValidation) {    //이메일 중복
             alert('이메일을 확인해주세요.');
           } else {
@@ -162,6 +171,11 @@ import axios from 'axios';
       },
       emailValidation(){
         return this.userEmails.indexOf(this.form.email)==-1
+      },
+      deptValidation(){
+        if(this.form.selected==null)
+          return false
+        return true
       }
 
     }
