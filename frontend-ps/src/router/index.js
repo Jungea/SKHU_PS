@@ -16,6 +16,8 @@ import SignUpAlert from '../views/SignUpAlert.vue';
 import AuthAlert from '../views/AuthAlert.vue';
 import ChangePw from '../views/ChangePw.vue';
 
+import test from '../views/test.vue'
+
 import MyProjectSummary from '../views/summary'
 
 Vue.use(VueRouter)
@@ -26,6 +28,7 @@ Vue.use(VueRouter)
     name: 'Login',
     component: Login
   },
+  { path: '/1', name: 'test', component: test},
   {
     path: '/professorSignUp',
     name: 'ProfessorSignUp',
