@@ -71,17 +71,15 @@ export default {
         })
      },
      methods: {
-        save() {/*
-            axios.post('url',{
+        save() {
+            axios.post('api/project/edit/5',{
                 projectName: this.data.projectName,
                 tag: this.data.tag,
                 theme: this.data.theme,
                 content: this.data.content,
                 memNum: this.data.memNum
             })
-            .then(response => {
-           
-            })*/
+            .then()
         },
         subjectCheck() {
             if(this.data.subjectId == null )
