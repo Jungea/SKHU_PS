@@ -132,8 +132,7 @@ import axios from 'axios';
         });
       },
     },
-    mounted(){
-      
+    mounted() {
       axios.get('/api/alluser')
         .then(response => {
             for (var i in response.data){

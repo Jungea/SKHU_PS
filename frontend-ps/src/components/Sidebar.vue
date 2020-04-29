@@ -5,7 +5,7 @@
       <b-icon-house-fill  style="cursor:pointer" class="mr-3" font-scale="1.5" @click="home"></b-icon-house-fill>
       {{name}} 님
       <b-icon-bell style="cursor:pointer" class="ml-3" font-scale="1.4" ></b-icon-bell>
-      <b-icon-gear style="cursor:pointer" class="ml-3" font-scale="1.4" @click="profile"></b-icon-gear>
+      <b-icon-person-fill style="cursor:pointer" class="ml-3" font-scale="1.4" @click="profile"></b-icon-person-fill>
       </p>
     <b-nav-item disabled><hr></b-nav-item>
     <b-nav-item> 
@@ -82,6 +82,10 @@ export default {
         location.href="/profile"
       },
       logout() {
+        axios.get('/api/user/logout')
+        .then().catch((erro)=> {
+          console.error(erro);
+        });
         this.$router.push({
           path: '/'
         })
@@ -97,6 +101,6 @@ export default {
 
 <style>
 
-li { color: black}
+li { color: black }
 
 </style>
