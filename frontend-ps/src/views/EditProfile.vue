@@ -71,20 +71,27 @@
                       <!--Language-->
                       <b-form-group style="text-align:left"
                         id="input-group-5"
-                        label="주요 언어"
+                        label="주요 분야"
                         label-for="language"
                       >
-                        <b-form-input 
-                        id="language" 
-                        v-model="input.language" 
-                        type="text"
-                        placeholder="주요 언어 없음"
-                        ></b-form-input>
-                        <b-form-text id="input-live-help">주로 사용하는 프로그래밍 언어가 있다면 입력하세요.</b-form-text>
+                        <b-form-tags
+                          input-id="language"
+                          :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
+                          v-model="tagArray"
+                          separator=" ,;"
+                          placeholder="태그를 입력하세요"
+                          remove-on-delete
+                          add-on-enter
+                          class="mb-2"
+                      ></b-form-tags>
+                        <b-form-text id="input-live-help">주로 사용하는 프로그래밍 언어나 기술이 있다면 입력하세요.</b-form-text>
                       </b-form-group>
 
                       <b-button style="width:100%; margin-top:15px;" type="submit">Change my profile</b-button>
                     </b-form>
+
+                    {{tagArray}}
+                    {{tagArray.join(',')}}
                 </div>
             </div>
         </div>
@@ -114,7 +121,8 @@ export default {
           {item: 4, value:'4학년'}
         ],
         //학과 임시 목록 리스트
-        deptOptions:[]
+        deptOptions:[],
+        tagArray: [],
       }
    },  
   mounted() {
@@ -128,6 +136,7 @@ export default {
                 'language':response.data.language
             }
             this.input=info;
+            this.tagArray=this.input.language.split(',')
         }).catch((erro)=> {
           console.error(erro);
         });
@@ -144,6 +153,8 @@ export default {
    methods:{
      onSubmit(evt) {
         evt.preventDefault()
+        this.input.language=this.tagArray.join(',')
+        alert(this.input.language)
         axios.post('/api/user/profile', this.input).then()
         .catch((erro)=> {
           console.error(erro);
