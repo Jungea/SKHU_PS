@@ -8,4 +8,5 @@ public class SignUpModel {
 	String password;
 	String name;
 	String email;
+	String detDeptId;
 }

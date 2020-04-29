@@ -119,6 +119,12 @@ public class APIController {
 		}
 		return u;
 	}
+	
+	@RequestMapping(value = "user/logout", method = RequestMethod.GET)
+	public void logout(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		session.removeAttribute("userId");
+	}
 
 	//
 	@RequestMapping(value = "user", method = RequestMethod.GET)

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.skhu.domain.Detail;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.User;
 import net.skhu.etc.SendEmail;
@@ -34,11 +35,12 @@ public class UserService {
 
 	@Transactional
 	public void SignUp(SignUpModel studentSignUpModel, boolean userType) {
-		// userType에서 학생은 false, 교수는 true
+//		 userType에서 학생은 false, 교수는 true
 		String auth_key = new TempAuth_key().getKey(44, false); // 이메일 인증 키 설정
+		Detail detDeptId = detailRepository.findById(Integer.parseInt(studentSignUpModel.getDetDeptId())).get();
 		User user = new User(Integer.parseInt(studentSignUpModel.getUserNum()), studentSignUpModel.getName(),
 				studentSignUpModel.getEmail(), studentSignUpModel.getPassword(), LocalDateTime.now(), userType, false,
-				auth_key);
+				auth_key, detDeptId);
 		SendEmail es = new SendEmail();
 		es.sendEmail(studentSignUpModel.getEmail(), auth_key);
 		userRepository.save(user);

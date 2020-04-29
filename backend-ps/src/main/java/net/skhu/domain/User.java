@@ -57,7 +57,7 @@ public class User {
    }
 
    public User(int userNum, String name, String email, String password, LocalDateTime timelineTime, boolean userType,
-         boolean emailCheck, String authKey) {
+         boolean emailCheck, String authKey, Detail detDepartment) {
       this.userNum = userNum;
       this.name = name;
       this.email = email;
@@ -67,6 +67,7 @@ public class User {
       this.emailCheck = emailCheck;
       this.authKey = authKey;
       this.grade=1;
+      this.detDepartment = detDepartment;
    }
 
 }
