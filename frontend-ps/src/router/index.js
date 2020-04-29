@@ -16,6 +16,7 @@ import SignUpAlert from '../views/SignUpAlert.vue';
 import AuthAlert from '../views/AuthAlert.vue';
 import ChangePw from '../views/ChangePw.vue';
 
+
 import MyProjectSummary from '../views/summary'
 
 Vue.use(VueRouter)

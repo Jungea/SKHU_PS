@@ -1,31 +1,63 @@
 <template>
     <div>
         <h4 style="margin-top: 80px">프로젝트 개요</h4>
-        <div style="text-align: right">
-            <b-button v-b-modal.modal-xl variant="outline-secondary" class="mb-5">수정</b-button>
-        </div>
-             <b-table class="b1t" :items="data" :fields="fields" stacked>
-            </b-table>
-
-         <b-modal id="modal-xl" size="lg" title="프로젝트 수정" @OK="save">
-            <b-table stacked :items="data" :fields="fields">
-                <template v-slot:cell(projectName)="row">
-                    <b-form-input v-model="row.item.projectName"/>
-                </template>
-                <template v-slot:cell(tag)="row">
-                    <b-form-input v-model="row.item.tag"/>
-                </template>
-                <template v-slot:cell(theme)="row">
-                    <b-form-input v-model="row.item.theme"/>
-                </template>
-                <template v-slot:cell(content)="row">
-                    <b-form-input v-model="row.item.content"/>
-                </template>
-                <template v-slot:cell(memNum)="row">
-                    <b-form-textarea v-model="row.item.memNum"/>
-                </template>
-            </b-table>
-        </b-modal>
+        
+        <form ref="form" @submit.stop.prevent="handleSubmit">
+            <b-form-group
+                :state="projectState"
+                label-for="ProjectSummary"
+                invalid-feedback="입력하지 않은 필수 입력 사항이 있습니다."
+            >
+                <table class="table table-bordered" id="ProjectSummary">
+                    <tbody>
+                        <tr>
+                            <th scope="row" style="width:28%">프로젝트명</th>
+                            <td>
+                                {{ this.data.projectName }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">주제</th>
+                            <td>
+                                {{ this.data.theme }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">내용</th>
+                            <td>
+                                {{ this.data.content }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">사용기술과 언어</th>
+                            <td>
+                                {{ this.data.tag }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">깃허브 리포지토리 주소</th>
+                            <td>
+                              {{ this.data.github }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">인원 모집 상태</th>
+                            <td>
+                                {{ rcrtStateCheck() }}
+                               {{ this.state }}
+                            </td>
+                        <tr>
+                            <th scope="row">과목 여부</th>
+                            <td>
+                                {{ subjectCheck() }}
+                                 {{ this.subject }}
+                            </td>
+                        </tr>
+                    </tbody>
+    
+                </table>
+            </b-form-group>
+            </form>
     </div>
 </template>
 
@@ -33,14 +65,13 @@
 import axios from 'axios';
 export default {
      mounted() {
-        axios.get('api/user/project1')
+        axios.get('api/project/5')
         .then(response => {
-            this.data.push(response.data)
+            this.data = response.data
         })
      },
      methods: {
-        /*
-        save() {
+        save() {/*
             axios.post('url',{
                 projectName: this.data.projectName,
                 tag: this.data.tag,
@@ -50,32 +81,26 @@ export default {
             })
             .then(response => {
            
-            })
-        }*/
+            })*/
+        },
+        subjectCheck() {
+            if(this.data.subjectId == null )
+                this.subject = '과목없음'
+            else
+                this.subject = '과목있음'
+        },
+        rcrtStateCheck() {
+            if(this.data.rcrtState == 0)
+                this.state = '모집중'
+            else
+                this.state = '모집안함'
+        }
     },
     data() {
         return { 
-            data: [],
-            fields: [{
-                    key: "projectName",
-                    label: "프로젝트 이름"
-                },
-                {
-                    key: "tag",
-                    label: "태그"
-                },
-                {
-                    key: "theme",
-                    label: "주제"
-                },
-                {
-                    key: "content",
-                    label: "내용"
-                },
-                {
-                    key: "memNum",
-                    label: "조원"}
-                ]           
+            data: {},
+            subject: '',
+            state: ''
         } 
     },
 }

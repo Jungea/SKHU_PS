@@ -19,7 +19,7 @@
                       >
                         <b-form-input 
                         id="intro" 
-                        v-model="input.Intro" 
+                        v-model="input.intro" 
                         type="text"
                         placeholder="한 줄 소개 없음"
                         ></b-form-input>
@@ -33,7 +33,7 @@
                       >
                         <b-form-select
                           id="grade"
-                          v-model="input.Grade"
+                          v-model="input.grade"
                           :options="gradeOptions"
                           value-field="item"
                           text-field="value"
@@ -47,10 +47,10 @@
                         label-for="department"
                       >
                         <b-form-select
-                          v-model="input.Major"
+                          v-model="input.department"
                           :options="deptOptions"
-                          value-field="id"
-                          text-field="name"
+                          value-field="detId"
+                          text-field="detName"
                         ></b-form-select>
                       </b-form-group>
 
@@ -62,7 +62,7 @@
                       >
                         <b-form-input 
                         id="github" 
-                        v-model="input.Github" 
+                        v-model="input.github" 
                         type="text"
                         ></b-form-input>
                         <b-form-text id="input-live-help">깃허브 계정이 있다면 입력하세요.</b-form-text>
@@ -71,21 +71,27 @@
                       <!--Language-->
                       <b-form-group style="text-align:left"
                         id="input-group-5"
-                        label="주요 언어"
+                        label="주요 분야"
                         label-for="language"
                       >
-                        <b-form-input 
-                        id="language" 
-                        v-model="input.Language" 
-                        type="text"
-                        placeholder="주요 언어 없음"
-                        ></b-form-input>
-                        <b-form-text id="input-live-help">주로 사용하는 프로그래밍 언어가 있다면 입력하세요.</b-form-text>
+                        <b-form-tags
+                          input-id="language"
+                          :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
+                          v-model="tagArray"
+                          separator=" ,;"
+                          placeholder="태그를 입력하세요"
+                          remove-on-delete
+                          add-on-enter
+                          class="mb-2"
+                      ></b-form-tags>
+                        <b-form-text id="input-live-help">주로 사용하는 프로그래밍 언어나 기술이 있다면 입력하세요.</b-form-text>
                       </b-form-group>
 
                       <b-button style="width:100%; margin-top:15px;" type="submit">Change my profile</b-button>
-                      
                     </b-form>
+
+                    {{tagArray}}
+                    {{tagArray.join(',')}}
                 </div>
             </div>
         </div>
@@ -109,38 +115,52 @@ export default {
         input: {
         },
         gradeOptions:[
-          {item:'1', value:'1학년'},
-          {item:'2', value:'2학년'},
-          {item:'3', value:'3학년'},
-          {item:'4', value:'4학년'}
+          {item: 1, value:'1학년'},
+          {item: 2, value:'2학년'},
+          {item: 3, value:'3학년'},
+          {item: 4, value:'4학년'}
         ],
         //학과 임시 목록 리스트
-        deptOptions:[
-          {id:'1', name:'소프트웨어공학과'},
-          {id:'2', name:'컴퓨터공학과'},
-        ]
+        deptOptions:[],
+        tagArray: [],
       }
    },  
   mounted() {
         axios.get('/api/user')
         .then(response => {
             let info={
-                'Major':response.data.det_dept_id,
-                'Grade':response.data.grade,
-                'Github':response.data.github,
-                'Intro':response.data.intro,
-                'Language':response.data.det_detLanguage_id
+                'department':response.data.detDepartment.detId,
+                'grade':response.data.grade,
+                'github':response.data.github,
+                'intro':response.data.intro,
+                'language':response.data.language
             }
             this.input=info;
+            this.tagArray=this.input.language.split(',')
         }).catch((erro)=> {
           console.error(erro);
         });
+
+        axios.get('api/departments')
+        .then(response => {
+          this.deptOptions=response.data})
+        .catch((error) => {
+          console.error(error)
+        })
+
+
    },
    methods:{
      onSubmit(evt) {
         evt.preventDefault()
-        alert("입력된 정보\n"+JSON.stringify(this.input))
-        //location.href="/profile"
+        this.input.language=this.tagArray.join(',')
+        alert(this.input.language)
+        axios.post('/api/user/profile', this.input).then()
+        .catch((erro)=> {
+          console.error(erro);
+        });
+
+        location.href="/profile"
         }
    }
 }

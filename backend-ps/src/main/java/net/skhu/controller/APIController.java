@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import net.skhu.domain.Detail;
+import net.skhu.domain.Project;
+import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
@@ -23,6 +26,7 @@ import net.skhu.model.UserLoginModel;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.service.ProjectJoinService;
+import net.skhu.service.DetailService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.UserService;
 
@@ -39,7 +43,8 @@ public class APIController {
 	ProjectJoinRepository projectJoinRepository;
 	@Autowired
 	ProjectJoinService projectJoinService;
-	
+	@Autowired
+	DetailService detailService;
 
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -121,6 +126,12 @@ public class APIController {
 		}
 		return u;
 	}
+	
+	@RequestMapping(value = "user/logout", method = RequestMethod.GET)
+	public void logout(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		session.removeAttribute("userId");
+	}
 
 	//
 	@RequestMapping(value = "user", method = RequestMethod.GET)
@@ -137,7 +148,12 @@ public class APIController {
 	@RequestMapping(value = "user/profile", method = RequestMethod.POST)
 	public void profile(@RequestBody ProfileModel profileModel, HttpServletRequest request) {
 		System.out.println(profileModel);
-//		userService.update(getLoginUserId(request),profileModel);
+		userService.update(getLoginUserId(request), profileModel);
+	}
+	
+	@RequestMapping(value = "user/inviteList", method = RequestMethod.GET)
+	public List<ProjectJoin> userInviteList(HttpServletRequest request) {
+		return userService.inviteList(getLoginUserId(request));
 	}
 
 	// 0427 윤영
@@ -165,5 +181,50 @@ public class APIController {
 		System.out.println("pinList");
 		return projectJoinService.pinProjectList(getLoginUserId(request));
 	}
+
+	// 학과 셀렉션을 위한 메소드
+	@RequestMapping(value = "departments", method = RequestMethod.GET)
+	public List<Detail> departments() {
+		return detailService.getDepartments();
+	}
+
+	// 프로젝트에서 멤버 초대(팀장만)
+	@RequestMapping(value = "invite/{projectId}/{userNum}", method = RequestMethod.GET)
+	public String invite(@PathVariable("projectId") String projectId, @PathVariable("userNum") String userNum,
+			HttpServletRequest request) {
+
+		int intUserNum = Integer.parseInt(userNum);
+		int intProjectId = Integer.parseInt(projectId);
+
+		if (userService.findByUserNum(intUserNum) == null)
+			return "잘못된 번호를 입력하였습니다.";
+
+		User capUser = userService.findById(getLoginUserId(request));
+		if (intUserNum == capUser.getUserNum())
+			return "자기 자신의 번호입니다.";
+
+		// stream으로 바꾸기
+		List<ProjectJoin> member = projectService.member(intProjectId);
+		for (int i = 0; i < member.size(); i++)
+			if (member.get(i).getUser().getUserNum() == intUserNum)
+				return "팀원의 번호입니다.";
+
+		Boolean result = projectService.inviteMember(intProjectId, intUserNum);
+		if (result == true)
+			return userNum + "님에게 초대 메세지를 보냈습니다.";
+		else
+			return "프로젝트에 참여신청한 유저입니다.";
+	}
+
+	@RequestMapping(value = "project/{projectId}/member", method = RequestMethod.GET)
+	public List<ProjectJoin> projectMember(@PathVariable("projectId") String projectId) {
+		return projectService.member(Integer.parseInt(projectId));
+	}
+	
+	@RequestMapping(value = "project/{projectId}/inviteList", method = RequestMethod.GET)
+	public List<ProjectJoin> projectInviteList(@PathVariable("projectId") String projectId) {
+		return projectService.inviteList(Integer.parseInt(projectId));
+	}
+	
 
 }

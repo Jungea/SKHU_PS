@@ -1,6 +1,5 @@
 package net.skhu.domain;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Entity;

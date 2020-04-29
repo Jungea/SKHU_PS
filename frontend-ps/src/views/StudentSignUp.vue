@@ -4,14 +4,14 @@
       <b-jumbotron style="background:none; text-align:left">
         <center>
           <h2 style="margin-left: 60px">Student SignUp</h2>
-          <hr style="border:2px solid black; width: 500px;">
+          <hr style="border:2px solid black; width: 500px; margin-bottom: 50px;">
           <b-form @submit="signUp">
             <table>
               <tr>
                 <b-form-group id="input-group-1" label="학번" label-for="input-1">
-                  <b-form-input id="input-1" v-model="form.id" type="text" trim required placeholder="Enter Id"></b-form-input>
+                  <b-form-input id="input-1" v-model="form.id" type="text" trim required placeholder="Enter number"></b-form-input>
                   <b-form-invalid-feedback :state="numValidation" v-if="form.id.length>0?true:false">
-                    이미 가입된 학번입니다.
+                    이미 가입된 정보입니다.
                   </b-form-invalid-feedback>
                   <b-form-valid-feedback :state="numValidation" v-if="form.id.length>0?true:false">                   
                   </b-form-valid-feedback>
@@ -19,7 +19,7 @@
               </tr>
               <tr>
                 <b-form-group id="input-group-2" label="비밀번호" label-for="input-2">
-                  <b-form-input id="input-2" type="password" v-model="form.pass1" trim required placeholder="Enter Password"></b-form-input>
+                  <b-form-input id="input-2" type="password" v-model="form.pass1" trim required placeholder="Enter password"></b-form-input>
                   <b-form-invalid-feedback :state="passValidation2" v-if="form.pass1.length>0?true:false">
                     비밀번호는 8자 이상 12자 이하입니다.
                   </b-form-invalid-feedback>
@@ -30,7 +30,7 @@
               </tr>
               <tr>
                 <b-form-group id="input-group-3" label="비밀번호 확인" label-for="input-3">
-                  <b-form-input id="input-3" type="password" v-model="form.pass2" trim required placeholder="Enter Password"></b-form-input>
+                  <b-form-input id="input-3" type="password" v-model="form.pass2" trim required placeholder="Check password"></b-form-input>
                   <b-form-invalid-feedback :state="passValidation" v-if="form.pass2.length>0?true:false">
                     입력한 비밀번호와 일치하지 않습니다.
                   </b-form-invalid-feedback>
@@ -41,8 +41,23 @@
               </tr>
               <tr>
                 <b-form-group id="input-group-4" label="이름" lebel-for="input-4">
-                  <b-form-input id="input-4" type="text" v-model="form.name" trim required placeholder="Enter Name"></b-form-input>
+                  <b-form-input id="input-4" type="text" v-model="form.name" trim required placeholder="Enter name"></b-form-input>
                 </b-form-group>
+              </tr>
+              <tr>
+                <b-form-group id="input-group-6" label="학부/학과" lebel-for="input-6" style="display:inline-block; width:63%">
+                  <b-form-select id="input-6" v-model="form.selected" :options="deptOptions" value-field="detId" text-field="detName" ></b-form-select>
+                  <b-form-invalid-feedback :state="deptValidation">
+                    학과를 선택하세요.
+                  </b-form-invalid-feedback>
+                  <b-form-valid-feedback :state="deptValidation">
+                  </b-form-valid-feedback>
+                </b-form-group>
+
+                <b-form-group id="input-group-7" label="학년" lebel-for="input-7" style="display:inline-block; width:35%; float: right;">
+                 <b-form-select id="input-7" v-model="form.gradeSelected" :options="gradeOptions" value-field="item" text-field="value" ></b-form-select>
+                </b-form-group>
+                
               </tr>
               <tr>
                 <b-form-group id="input-group-5" label="이메일" label-for="input-5">
@@ -55,8 +70,8 @@
                   </b-form-valid-feedback>
                 </b-form-group>
               </tr>
-              <tr style="text-align: right">
-                <b-button type="submit">가입</b-button>
+              <tr>
+                <b-button style="width:100%;" type="submit">가입</b-button>
               </tr>
             </table>
           </b-form>
@@ -78,12 +93,21 @@ import axios from 'axios';
           pass1: '',
           pass2: '',
           email: '',
-          name: ''
+          name: '',
+          selected: null,
+          gradeSelected:'1'
         },
         show: true,
         user:null,
         userNums:[],
         userEmails:[],
+        deptOptions:[],
+        gradeOptions:[
+          {item: 1, value:'1학년'},
+          {item: 2, value:'2학년'},
+          {item: 3, value:'3학년'},
+          {item: 4, value:'4학년'}
+        ],
       }
     },
     methods: {
@@ -95,6 +119,8 @@ import axios from 'axios';
           email:this.form.email,
           name:this.form.name,
           password:this.form.pass1,
+          detDeptId: this.form.selected,
+          grade:this.form.gradeSelected
         }).then(response => { 
           this.user = response.data;
           if(!this.numValidation) {  //학번 중복
@@ -103,6 +129,8 @@ import axios from 'axios';
             alert('비밀번호를 확인해주세요.');
           } else if(!this.passValidation) {   //비밀번호 불일치
             alert('비밀번호가 일치하지 않습니다.');
+          } else if(!this.deptValidation){
+            alert('학부/학과를 선택해주세요.');
           } else if(!this.emailValidation) {    //이메일 중복
             alert('이메일을 확인해주세요.');
           } else {
@@ -113,7 +141,7 @@ import axios from 'axios';
         });
       },
     },
-    mounted(){
+    mounted() {
       axios.get('/api/alluser')
         .then(response => {
             for (var i in response.data){
@@ -124,7 +152,11 @@ import axios from 'axios';
             console.log(this.userEmails)
         }).catch((erro)=> {
           console.error(erro);
-        });
+        }),
+        axios.get('api/departments')
+        .then(res => {
+          this.deptOptions = res.data
+        })
     },
     computed:{
       passValidation(){
@@ -138,6 +170,11 @@ import axios from 'axios';
       },
       emailValidation(){
         return this.userEmails.indexOf(this.form.email)==-1
+      },
+      deptValidation(){
+        if(this.form.selected==null)
+          return false
+        return true
       }
 
     }

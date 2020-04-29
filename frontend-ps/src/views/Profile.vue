@@ -7,19 +7,19 @@
       <b-col>
         <div class="profileContainer">
             <h3>마이페이지</h3>
-            <hr style="margin:30px 0;">
+            <hr style="margin:30px 0;min-width:900px;">
             <div class="infoContainer">
                 <h5>내 정보</h5>
-                <div style="margin-top:30px; min-width:900px; padding: 30px; padding-right:120px">
+                <div style="margin-top:30px; min-width:900px; padding: 30px; padding-right:120px;">
                     <b-row>
                         <b-col cols="4">
                             <b-card class="profileCard" img-src="https://image.flaticon.com/icons/svg/2825/2825025.svg" 
                             img-alt="Image" img-top img-height="200px">
                                 <b-card-text style="margin-top:20px">
-                                    <h4>{{items.Name}}</h4>
+                                    <h4>{{items.name}}</h4>
                                 </b-card-text>
-                                <b-card-text class="small" style="height:50px;" v-if="(items.Intro==null)?false:true">
-                                    <hr><span>{{items.Intro}}</span>
+                                <b-card-text class="small" style="height:50px;" v-if="(items.intro==null)?false:true">
+                                    <hr><span>{{items.intro}}</span>
                                 </b-card-text>
                                 <b-button variant="dark" size="sm" @click="editProfile">정보 수정</b-button>
                             </b-card>
@@ -28,28 +28,36 @@
                             <table class="table">
                                 <tr>
                                     <th>{{fields[0]}}</th>
-                                    <td>{{items.Major}}</td>
+                                    <td>{{items.major}}</td>
                                 </tr>
                                 <tr>
                                     <th>{{fields[1]}}</th>
-                                    <td>{{items.Grade}}</td>
+                                    <td>{{items.grade}}</td>
                                 </tr>
                                 <tr>
                                     <th>{{fields[2]}}</th>
-                                    <td><a v-bind:href="gitUrl" target="_blank">{{gitUrl}}</a></td>
+                                    <td>
+                                        <a v-bind:href="gitUrl" target="_blank" v-if="items.github!=null">{{gitUrl}}</a>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>{{fields[3]}}</th>
-                                    <td>{{items.Language}}</td>
+                                    <td><b-badge variant="secondary" v-for="(tag,index) in tagArray" :key="index" style="margin-right:5px">{{tag}}</b-badge></td>
                                 </tr>
                             </table>
                         </b-col>
                     </b-row>
                 </div>
             </div>
-            <hr style="margin:30px 0;">
+            <hr style="margin:30px 0; min-width:900px;">
             <div class="infoContainer">
-                <h5>다음내용</h5>
+                <h5>초대받은 이력</h5>
+                <ul>
+                    <li v-for="invit in inviteList" :key="invit.joinId">
+                        {{invit.project.projectName}}(팀장: {{invit.project.user.name}}) - 수락/거절
+                    </li>
+               </ul>
+                <br/>
             </div>
         </div>
       </b-col>
@@ -71,28 +79,37 @@ export default {
         fields:['Major', 'Grade', 'Github', 'Language'],
         //items: [],
         items: {},
-        gitUrl:''
+        gitUrl:'',
+        tagArray:[]
+
       }
    },
    mounted() {
         axios.get('/api/user')
         .then(response => {
             let info={
-                'Name':response.data.name,
-                'Major':response.data.det_dept_id,
-                'Grade':response.data.grade,
-                'Github':response.data.github,
-                'Intro':response.data.intro,
-                'Language':response.data.det_detLanguage_id
+                'name':response.data.name,
+                'major':response.data.detDepartment.detName,
+                'grade':response.data.grade,
+                'github':response.data.github,
+                'intro':response.data.intro,
+                'language':response.data.language
             }
             //this.items.push(info);
             this.items=info;
             //깃 닉네임으로 링크 생성
             this.gitUrl='https://github.com/'+response.data.github
+            this.tagArray=this.items.language.split(',')
             console.log(this.items.Intro)
         }).catch((erro)=> {
           console.error(erro);
         });
+
+        axios.get('/api/user/inviteList')
+            .then(response => this.inviteList=response.data)
+            .catch((erro)=> {
+                console.error(erro);
+            });
 
    },
    methods:{

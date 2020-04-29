@@ -6,34 +6,13 @@
       <div style="margin-top: 50px;">
         <b-form @submit="onSubmit" v-if="show">
         <!--아디-->
-          <b-form-group style="text-align:left"
-            id="input-group-1"
-            label="Number"
-            label-for="number"
-          >
-            <b-form-input 
-              id="number" 
-              v-model="form.number" 
-              type="text"
-              trim
-              placeholder="Enter your number"
-              ></b-form-input>
+          <b-form-group style="text-align:left" id="input-group-1" label="Number" label-for="number">
+            <b-form-input id="number" v-model="form.number" type="text" trim placeholder="Enter your number"></b-form-input>
           </b-form-group>
 
           <!--비번-->
-          <b-form-group style="text-align:left"
-            id="input-group-2"
-            label="Password"
-            label-for="password"
-          >
-            <b-form-input 
-              id="password" 
-              v-model="form.password" 
-              type="password" 
-              required
-              trim
-              placeholder="Enter Password"
-              ></b-form-input>
+          <b-form-group style="text-align:left" id="input-group-2" label="Password" label-for="password">
+            <b-form-input id="password" v-model="form.password" type="password" required trim placeholder="Enter Password"></b-form-input>
           </b-form-group>
 
           <b-button style="width:100%; margin-top:15px;" type="submit">Login</b-button>
@@ -68,13 +47,13 @@ import axios from 'axios';
           userNum: this.form.number,
           password: this.form.password
         }).then(response => {
-
             this.user = response.data;
             if(typeof this.user == 'object') {
-              alert("로그인")
+              console.log('로그인한 유저')
+              console.log(response.data.name)
               location.href="/home" 
             }else {        
-              alert("잘못된 입력입니다.");
+              alert("아이디 또는 비밀번호를 확인해주세요.");
               this.form.number='';
               this.form.password='';
             }
