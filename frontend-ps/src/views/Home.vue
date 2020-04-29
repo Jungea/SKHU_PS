@@ -5,7 +5,7 @@
       <b-col class="myNav overflow-auto" cols="200px">
           <!--home.vue에서 사이드바에서 셀렉트한 값의 pin이 바뀔 때 사이드바도 자동으로 바뀌게 하기 위해서.
           home.vue이외에는 myProjectPin대신에 [0] 넣기-->
-        <Sidebar v-bind:my-project-list="[0]"/>
+        <Sidebar v-bind:my-project-list="myProjectPin"/>
       </b-col>
       <b-col>
         <center>    
@@ -106,7 +106,6 @@ export default {
     data() {
         return {
             data:{},
-            a:[{"maru":'bomi',keke:'mo'},{maru:'hehe'}],
             // 프로젝트 생성 모달 창
             rcrtState:false,
             projectName:'',

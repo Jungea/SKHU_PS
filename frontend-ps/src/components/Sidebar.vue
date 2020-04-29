@@ -29,6 +29,8 @@
        <div>토론 게시판</div>
        <div>자유 게시판</div>
        <div>관리</div>
+       {{this.pinProjectId}}
+       {{this.projectName}}
        <hr>
     </b-nav-item>
     <b-nav-item>it 경진대회</b-nav-item>
@@ -45,21 +47,18 @@ export default {
     data() {
       return {
         name: '',
-        projectName:null,
-        pinProjectId:null,
-
-
+        projectName:null, // 현재 셀렉트 된 projectName
+        pinProjectId:null, // 현재 셀렉트 된 projectId
         myProjects:[],
-        a:null
       }
     },
-    beforeMount() {
+    created () {
       // props로 받는 변수가 [0]이면(home.vue 이외에서 sidebar 호출시 props로 보내는 값) /api/pinList에서 받아온 값을 이용하기
         if(JSON.stringify(this.myProjectList)==JSON.stringify([0])) {  
           alert('[0]') 
           // pin한 프로젝트 목록 받아오기
           axios.get('/api/pinList').then(response => {
-            this.myProjects = response.data
+            this.myProjectList = response.data
             alert('목록:'+JSON.stringify(this.myProjects))
           }).catch((erro)=> {
             console.error(erro);
