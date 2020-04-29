@@ -137,6 +137,11 @@ public class APIController {
 		System.out.println(profileModel);
 		userService.update(getLoginUserId(request), profileModel);
 	}
+	
+	@RequestMapping(value = "user/inviteList", method = RequestMethod.GET)
+	public List<ProjectJoin> userInviteList(HttpServletRequest request) {
+		return userService.inviteList(getLoginUserId(request));
+	}
 
 	@RequestMapping(value = "user/sidebar", method = RequestMethod.GET)
 	public List<SidebarModel> userSidebar(HttpServletRequest request) {

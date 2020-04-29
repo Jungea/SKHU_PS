@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.User;
 import net.skhu.etc.SendEmail;
 import net.skhu.etc.TempAuth_key;
@@ -14,6 +15,7 @@ import net.skhu.model.FindPassModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.repository.DetailRepository;
+import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.UserRepository;
 
 @Service
@@ -23,6 +25,8 @@ public class UserService {
 	UserRepository userRepository;
 	@Autowired
 	DetailRepository detailRepository;
+	@Autowired
+	ProjectJoinRepository projectJoinRepository;
 
 	public User login(int userNum, String password) {
 		return userRepository.findByUserNumAndPasswordAndEmailCheckTrue(userNum, password);
@@ -79,6 +83,10 @@ public class UserService {
 
 		userRepository.save(user);
 	}
+	
+	public List<ProjectJoin> inviteList(int userId) {
+		return projectJoinRepository.findByUser_UserIdAndTypeAndState(userId, 1, 0);
+	}
 
 	// 0427 윤영 추가
 	public List<User> findAll() {
@@ -88,4 +96,5 @@ public class UserService {
 	public User findByUserNum(int userNum) {
 		return userRepository.findByUserNum(userNum);
 	}
+	
 }

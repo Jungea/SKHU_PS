@@ -51,7 +51,13 @@
             </div>
             <hr style="margin:30px 0; min-width:900px;">
             <div class="infoContainer">
-                <h5>다음내용</h5>
+                <h5>초대받은 이력</h5>
+                <ul>
+                    <li v-for="invit in inviteList" :key="invit.joinId">
+                        {{invit.project.projectName}}(팀장: {{invit.project.user.name}}) - 수락/거절
+                    </li>
+               </ul>
+                <br/>
             </div>
         </div>
       </b-col>
@@ -98,6 +104,12 @@ export default {
         }).catch((erro)=> {
           console.error(erro);
         });
+
+        axios.get('/api/user/inviteList')
+            .then(response => this.inviteList=response.data)
+            .catch((erro)=> {
+                console.error(erro);
+            });
 
    },
    methods:{
