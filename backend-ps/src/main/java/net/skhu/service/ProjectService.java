@@ -76,6 +76,5 @@ public class ProjectService {
 		}
 		return myProjectsList;
 	}
-	
 
 }

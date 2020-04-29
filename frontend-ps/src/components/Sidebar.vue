@@ -1,3 +1,4 @@
+<!--props로 구현한 원본-->
 <template>
 <div>
   <b-nav vertical class="w-25" style="min-width: 200px">
@@ -12,7 +13,7 @@
     <b-nav-item> 
       <b-form-select style="width:200px" 
       v-model="pinProjectId"
-      :options="this.$store.state.myProjectPin"
+      :options="this.myProjectList"
       class="mb-1 "
       value-field="projectId"
       text-field="projectName"
@@ -40,16 +41,33 @@
 import axios from 'axios';
 export default {
     name: "Sidebar",
+    props: ['myProjectList'],
     data() {
       return {
         name: '',
         projectName:null,
         pinProjectId:null,
+
+
+        myProjects:[],
+        a:null
       }
     },
+    beforeMount() {
+      // props로 받는 변수가 [0]이면(home.vue 이외에서 sidebar 호출시 props로 보내는 값) /api/pinList에서 받아온 값을 이용하기
+        if(JSON.stringify(this.myProjectList)==JSON.stringify([0])) {  
+          alert('[0]') 
+          // pin한 프로젝트 목록 받아오기
+          axios.get('/api/pinList').then(response => {
+            this.myProjects = response.data
+            alert('목록:'+JSON.stringify(this.myProjects))
+          }).catch((erro)=> {
+            console.error(erro);
+          });
+        } 
+    },
     mounted() {
-      this.pinProjectId=this.$store.state.selectedPinProjectId
-      alert('pin:'+this.pinProjectId)
+
       axios.get('/api/user')
         .then(response => {
           this.name = response.data.name
@@ -60,26 +78,23 @@ export default {
     },
     watch: {
         pinProjectId() { // this.selected변수가 바뀔때마다 실행됨
-          for(let i=0;i<this.$store.state.myProjectPin.length;i++) {
-            if(this.$store.state.myProjectPin[i].projectId==this.pinProjectId) {
-              this.projectName=this.$store.state.myProjectPin[i].projectName
-              
+          for(let i=0;i<this.myProjectList.length;i++) {
+            if(this.myProjectList[i].projectId==this.pinProjectId) {
+              this.projectName=this.myProjectList[i].projectName
             }
           }
-          this.$store.commit('changeSelectedPinProjectId',this.pinProjectId)
-          alert('pin2:'+this.$store.state.selectedPinProjectId)
         },
-        // myProjectList() { // 현재 셀렉션에서 셀렉트 된 프로젝트가 pin에서 false로 될 때
-        //   let count=0
-        //   for(let i=0;i<this.myProjectList.length;i++) {
-        //     if(this.myProjectList[i].projectId!=this.pinProjectId) {
-        //       count++
-        //     }
-        //   }
-        //   if(count==this.myProjectList.length) {
-        //     this.pinProjectId=null
-        //   }
-        // }
+        myProjectList() { // 현재 셀렉션에서 셀렉트 된 프로젝트가 pin에서 false로 될 때
+          let count=0
+          for(let i=0;i<this.myProjectList.length;i++) {
+            if(this.myProjectList[i].projectId!=this.pinProjectId) {
+              count++
+            }
+          }
+          if(count==this.myProjectList.length) {
+            this.pinProjectId=null
+          }
+        }
     },
     methods: {
       projectBoard(evt) {

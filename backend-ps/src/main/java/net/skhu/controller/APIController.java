@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProfileModel;
-import net.skhu.model.SidebarModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.repository.ProjectJoinRepository;
@@ -158,6 +158,12 @@ public class APIController {
 	public List<MyProjectListModel> changePin(@RequestBody MyProjectListModel myProjectListModel,HttpServletRequest request) {
 		System.out.println("changePin");
 		return projectJoinService.changePin(myProjectListModel,getLoginUserId(request));
+	}
+	// 핀 바꾸기
+	@RequestMapping(value = "pinList", method = RequestMethod.GET)
+	public List<MyPinProjectModel> pinList(HttpServletRequest request) {
+		System.out.println("pinList");
+		return projectJoinService.pinProjectList(getLoginUserId(request));
 	}
 
 }

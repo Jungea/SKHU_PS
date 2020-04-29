@@ -1,4 +1,3 @@
-<!--props로 구현한 원본-->
 <template>
 <div>
   <b-nav vertical class="w-25" style="min-width: 200px">
@@ -13,7 +12,7 @@
     <b-nav-item> 
       <b-form-select style="width:200px" 
       v-model="pinProjectId"
-      :options="this.myProjectList"
+      :options="this.$store.state.myProjectPin"
       class="mb-1 "
       value-field="projectId"
       text-field="projectName"
@@ -41,16 +40,16 @@
 import axios from 'axios';
 export default {
     name: "Sidebar",
-    props: ['myProjectList','selectedPinProjectId'],
     data() {
       return {
         name: '',
         projectName:null,
-        pinProjectId:null
+        pinProjectId:null,
       }
     },
     mounted() {
-      this.pinProjectId=this.selectedPinProjectId
+      this.pinProjectId=this.$store.state.selectedPinProjectId
+      alert('pin:'+this.pinProjectId)
       axios.get('/api/user')
         .then(response => {
           this.name = response.data.name
@@ -61,23 +60,26 @@ export default {
     },
     watch: {
         pinProjectId() { // this.selected변수가 바뀔때마다 실행됨
-          for(let i=0;i<this.myProjectList.length;i++) {
-            if(this.myProjectList[i].projectId==this.pinProjectId) {
-              this.projectName=this.myProjectList[i].projectName
+          for(let i=0;i<this.$store.state.myProjectPin.length;i++) {
+            if(this.$store.state.myProjectPin[i].projectId==this.pinProjectId) {
+              this.projectName=this.$store.state.myProjectPin[i].projectName
+              
             }
           }
+          this.$store.commit('changeSelectedPinProjectId',this.pinProjectId)
+          alert('pin2:'+this.$store.state.selectedPinProjectId)
         },
-        myProjectList() { // 현재 셀렉션에서 셀렉트 된 프로젝트가 pin에서 false로 될 때
-          let count=0
-          for(let i=0;i<this.myProjectList.length;i++) {
-            if(this.myProjectList[i].projectId!=this.pinProjectId) {
-              count++
-            }
-          }
-          if(count==this.myProjectList.length) {
-            this.pinProjectId=null
-          }
-        }
+        // myProjectList() { // 현재 셀렉션에서 셀렉트 된 프로젝트가 pin에서 false로 될 때
+        //   let count=0
+        //   for(let i=0;i<this.myProjectList.length;i++) {
+        //     if(this.myProjectList[i].projectId!=this.pinProjectId) {
+        //       count++
+        //     }
+        //   }
+        //   if(count==this.myProjectList.length) {
+        //     this.pinProjectId=null
+        //   }
+        // }
     },
     methods: {
       projectBoard(evt) {

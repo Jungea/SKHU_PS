@@ -1,8 +1,11 @@
+<!--props로 구현한 원본 -->
 <template>
   <div class="home h-100">
     <b-row class="h-100">
       <b-col class="myNav overflow-auto" cols="200px">
-        <Sidebar/>
+          <!--home.vue에서 사이드바에서 셀렉트한 값의 pin이 바뀔 때 사이드바도 자동으로 바뀌게 하기 위해서.
+          home.vue이외에는 myProjectPin대신에 [0] 넣기-->
+        <Sidebar v-bind:my-project-list="[0]"/>
       </b-col>
       <b-col>
         <center>    
@@ -118,16 +121,23 @@ export default {
             stringTag:'',
             project:null,
             nameState:null,
-            // myProjectPin:[], // 내가 pin한 프로젝트 목록
-            // selectedPinProjectId:null
+            myProjectPin:[], // 내가 pin한 프로젝트 목록
         };
     },
     mounted() { 
-        axios.get('/api/user/projects')
+        axios.get('/api/user/projects') // 내 프로젝트 모든 목록
         .then(response => {
             this.data = response.data 
             // alert('json:'+JSON.stringify(this.data[0].pin))
-             this.$store.commit('makeMyProjectPin', this.data)
+            let count=0;
+            this.myProjectPin=[]
+            for (let i=0;i<this.data.length;i++) {
+                if(this.data[i].pin==true) {
+                    this.myProjectPin[count]={}
+                    this.myProjectPin[count].projectName=this.data[i].projectName
+                    this.myProjectPin[count++].projectId=this.data[i].projectId
+                }
+            }
         });
     },
 
@@ -137,12 +147,20 @@ export default {
                     path: '/summary'
                     })
                 },
-                changePin(itemProjectId) {  
+                changePin(itemProjectId) {   // pin이 바뀌었을때
                     axios.post('/api/changePin', {
                         projectId:itemProjectId
                     })
                     .then(response => {this.data = response.data
-                         this.$store.commit('makeMyProjectPin', this.data)
+                        let count=0;
+                        this.myProjectPin=[]
+                        for (let i=0;i<this.data.length;i++) {
+                            if(this.data[i].pin==true) {
+                                this.myProjectPin[count]={}
+                                this.myProjectPin[count].projectName=this.data[i].projectName
+                                this.myProjectPin[count++].projectId=this.data[i].projectId
+                            }
+                        }
                     })
                     
                     event.stopPropagation()
