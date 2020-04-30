@@ -87,11 +87,14 @@
                         <b-form-text id="input-live-help">주로 사용하는 프로그래밍 언어나 기술이 있다면 입력하세요.</b-form-text>
                       </b-form-group>
 
-                      <b-button style="width:100%; margin-top:15px;" type="submit">Change my profile</b-button>
+                      <div style="text-align: right">
+                        <b-button class="btStyle" type="submit">수정</b-button>
+                        <b-button class="btStyle" variant="danger" @click="cancle">취소</b-button>
+                      </div>
                     </b-form>
 
-                    {{tagArray}}
-                    {{tagArray.join(',')}}
+                    <!-- {{tagArray}}
+                    {{tagArray.join(',')}} -->
                 </div>
             </div>
         </div>
@@ -152,16 +155,21 @@ export default {
    },
    methods:{
      onSubmit(evt) {
-        evt.preventDefault()
-        this.input.language=this.tagArray.join(',')
-        alert(this.input.language)
-        axios.post('/api/user/profile', this.input).then()
-        .catch((erro)=> {
-          console.error(erro);
-        });
+          evt.preventDefault()
+          this.input.language=this.tagArray.join(',')
+          // alert(this.input.language)
+          axios.post('/api/user/profile', this.input).then()
+          .catch((erro)=> {
+            console.error(erro);
+          });
 
-        location.href="/profile"
-        }
+          location.href="/profile"
+        },
+        cancle() {
+            this.$router.push({
+            path: '/profile'
+          })
+        },
    }
 }
 </script>
@@ -187,5 +195,11 @@ export default {
     }
     .editForm input::placeholder{
       color:silver;
+    }
+
+    .btStyle {
+      margin-top: 15px;
+      margin-left: 5px;
+      margin-right: 5px;
     }
 </style>

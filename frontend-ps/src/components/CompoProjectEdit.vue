@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <h4 style="margin-top: 80px">프로젝트 개요 수정 창</h4>
+    <div class="containerStyle">
+        <h3>프로젝트 개요 수정</h3>
         <form ref="form" @submit.stop.prevent="handleSubmit" class="mt-5">
             <b-form-group
                 label-for="ProjectSummary"
@@ -12,18 +12,27 @@
                             <th scope="row" style="width:28%">프로젝트명</th>
                             <td>
                                 <b-form-input v-model="data.projectName"></b-form-input>
+                                <b-form-invalid-feedback :state="nameValidation">
+                                    프로젝트 이름을 입력해주세요.
+                                </b-form-invalid-feedback>
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">주제</th>
                             <td>
                                 <b-form-input v-model="data.theme"></b-form-input>
+                                <b-form-invalid-feedback :state="themeValidation">
+                                    주제를 입력해주세요.
+                                </b-form-invalid-feedback>
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">내용</th>
                             <td>
                                 <b-form-input v-model="data.content"></b-form-input>
+                                <b-form-invalid-feedback :state="contentValidation">
+                                    프로젝트 내용을 입력해주세요.
+                                </b-form-invalid-feedback>
                             </td>
                         </tr>
                         <tr>
@@ -32,6 +41,9 @@
                                 <b-form-tags input-id="tag" :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }" v-model="tagArray"
                                separator=" ,;" placeholder="태그를 입력하세요" remove-on-delete add-on-enter class="mb-2">
                                </b-form-tags>
+                               <b-form-invalid-feedback :state="tagValidation">
+                                    태그를 입력해주세요.
+                                </b-form-invalid-feedback>
                             </td>
                         </tr>
                         <tr>
@@ -50,12 +62,15 @@
                             <th scope="row">멤버 수</th>
                             <td>
                                 <b-form-input v-model="data.memNum"></b-form-input>
+                                <b-form-invalid-feedback :state="memNumValidation">
+                                    프로젝트를 진행 할 멤버 수를 입력해주세요.
+                                </b-form-invalid-feedback>
                             </td>
                         </tr>
                     </tbody>    
                 </table>
                 <div style="text-align: right">
-                    <b-button variant="dark" @click="save">수정</b-button> <b-button variant="danger" @click="done">취소</b-button>
+                    <b-button variant="dark" @click="save">수정</b-button> <b-button variant="danger" @click="cancle">취소</b-button>
                 </div>
             </b-form-group>
             </form>
@@ -80,30 +95,41 @@ export default {
      },
      methods: {
         save() {
-            if(this.state == 0) {
+            if(this.state == 0)
                 this.stateName = "false"
-            }
-            else {
+            else
                 this.stateName = 'true'
-            }
-            this.data.tag = this.tagArray.join(','),
+
+            this.data.tag = this.tagArray.join(',')
             
-            axios.post('/api/project/'+this.$route.params.projectId+'/edit',{
-                projectId: this.data.projectId,
-                projectName: this.data.projectName,
-                memNum: this.data.memNum,
-                theme: this.data.theme,
-                content: this.data.content,
-                tag: this.data.tag,
-                github: this.data.github,
-                rcrtState: this.stateName
-                })
-            .then().catch((erro)=> { console.error(erro);
-            });
-            
-            location.href='/project/'+this.$route.params.projectId+'/summary'            
+            if(!this.nameValidation)
+                alert("프로젝트 이름을 입력하세요.")
+            else if(!this.themeValidation)
+                alert("프로젝트 주제를 입력하세요.")
+            else if(!this.contentValidation)
+                alert("프로젝트 내용을 입력하세요.")
+            else if(!this.tagValidation)
+                alert("태그를 입력하세요.")
+            else if(!this.memNumValidation)
+                alert("멤버 수를 입력하세요.")
+            else {
+                axios.post('/api/project/'+this.$route.params.projectId+'/edit',{
+                    projectId: this.data.projectId,
+                    projectName: this.data.projectName,
+                    memNum: this.data.memNum,
+                    theme: this.data.theme,
+                    content: this.data.content,
+                    tag: this.data.tag,
+                    github: this.data.github,
+                    rcrtState: this.stateName
+                    })
+                .then().catch((erro)=> { console.error(erro);
+                });
+                
+                location.href='/project/'+this.$route.params.projectId+'/summary'    
+            }        
          },
-        done() {
+        cancle() {
                     this.$router.push({
                     path: '/project/'+this.$route.params.projectId+'/summary'
                 })
@@ -125,8 +151,33 @@ export default {
             stateName: ''
         } 
     },
+    computed: {
+        nameValidation() {
+            return this.data.projectName.length > 0
+        },
+        themeValidation() {
+            return this.data.theme.length > 0
+        },
+        contentValidation() {
+            return this.data.content.length > 0
+        },
+        tagValidation() {
+            return this.tagArray.length > 0
+        },
+        memNumValidation() {
+            return this.data.memNum > 0
+        }
+    }
 }
 </script>
 
 <style>
+.containerStyle h3{
+    font-weight: bold;
+}
+
+.containerStyle {
+    margin: 100px;
+    min-width: 500px;
+}
 </style>
