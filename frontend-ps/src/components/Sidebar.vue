@@ -21,18 +21,18 @@
 
     </b-nav-item>
      <b-nav-item><hr></b-nav-item>
-      <b-nav-item disabled v-show="this.pinProjectId" v-model="this.pinProjectId">
+      <div disabled v-show="this.pinProjectId">
         <ul style="list-style-type: none ; padding: 0px">
-            <b-nav-item><li><strong>{{ this.projectName }}</strong></li></b-nav-item>
-            <b-nav-item><li>프로젝트 정보</li></b-nav-item>
-            <b-nav-item><li>캘린더</li></b-nav-item>
-            <b-nav-item><li>주차별 목표(to-do-list)</li></b-nav-item>
-            <b-nav-item><li>토론 게시판</li></b-nav-item>
-            <b-nav-item><li>자유 게시판</li></b-nav-item>
-            <b-nav-item @click="management"><li>관리</li></b-nav-item>
+            <b-nav-item><strong>{{ this.projectName }}</strong></b-nav-item>
+            <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
+            <li><b-nav-item>캘린더</b-nav-item></li>
+            <li><b-nav-item>주차별 목표(to-do-list)</b-nav-item></li>
+            <li><b-nav-item>토론 게시판</b-nav-item></li>
+            <li><b-nav-item>자유 게시판</b-nav-item></li>
+            <li><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
         </ul>
         <hr>
-      </b-nav-item>
+      </div>
     <b-nav-item>it 경진대회</b-nav-item>
     <b-nav-item @click="projectBoard">프로젝트 게시판</b-nav-item>
     <b-nav-item >커뮤니티 게시판</b-nav-item>
@@ -57,7 +57,7 @@ export default {
       }
     },
    
-    created() {
+    mounted() {
       if(this.$route.params.projectId!=null) { // 프로젝트를 선택한 상태일때
         this.pinProjectId=this.$route.params.projectId
         axios.get('/api/project/projectName/'+this.pinProjectId).then(response => { // 프로젝트 이름 가져오기
@@ -113,9 +113,13 @@ export default {
           path: '/'
         })
       },
+      projectInfoChange(infoName) {
+        location.href= '/project/'+this.$route.params.projectId+'/'+infoName
+      
+      },
       management(){
         this.$router.push({
-          path: '/myprojectmanager'
+          path: '/project/'+this.$route.params.projectId+'/manager'
         })
       },
       changeSelect(pinProjectId) {

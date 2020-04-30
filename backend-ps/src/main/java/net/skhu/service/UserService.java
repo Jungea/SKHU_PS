@@ -30,7 +30,7 @@ public class UserService {
 	ProjectJoinRepository projectJoinRepository;
 
 	public User login(int userNum, String password) {
-		return userRepository.findByUserNumAndPasswordAndEmailCheckTrue(userNum, password);
+		return userRepository.findByUserNumAndPassword(userNum, password);
 	}
 
 	@Transactional
