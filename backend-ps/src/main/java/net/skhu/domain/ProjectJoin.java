@@ -36,4 +36,16 @@ public class ProjectJoin {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "projectId")
 	Project project;
+	public ProjectJoin() {
+		
+	}
+	public ProjectJoin(LocalDateTime joinTime,User user,Project project) {
+		this.joinTime=joinTime;
+		this.state=1;
+		this.color="#000000";
+		this.pin=false;
+		this.type=0;
+		this.user=user;
+		this.project=project;
+	}
 }

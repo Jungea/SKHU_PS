@@ -1,10 +1,7 @@
 <template>
-    <div>
-        <h4 style="margin-top: 80px">프로젝트 개요</h4>
-        <div class="mb-4" style="text-align: right">
-            <b-button variant="dark" @click="edit(data.projectId)">수정</b-button>
-        </div>
-        
+    <div class="containerStyle">
+        <h3>프로젝트 개요</h3>
+        <hr>        
         <form ref="form" @submit.stop.prevent="handleSubmit">
             <b-form-group
                 label-for="ProjectSummary"
@@ -51,7 +48,7 @@
                         <tr>
                             <th scope="row">인원 모집 상태</th>
                             <td>
-                                {{ rcrtStateCheck() }}
+                                {{ rcrtStateCheck()}}
                                {{ this.state }}
                             </td>
                         <tr>
@@ -62,8 +59,10 @@
                             </td>
                         </tr>
                     </tbody>
-    
                 </table>
+                <div class="mb-4" style="text-align: right">
+                    <b-button variant="dark" @click="edit(data.projectId)">수정</b-button>
+                </div>
             </b-form-group>
             </form>
     </div>
@@ -86,10 +85,10 @@ export default {
                 this.subject = '과목있음'
         },
         rcrtStateCheck() {
-            if(this.data.rcrtState == 0)
+           if(this.data.rcrtState == 0)
                 this.state = '모집중'
             else
-                this.state = '모집완료'
+                this.state = '모집완료'           
         },
         edit(projectId) {
             this.$router.push({
@@ -102,10 +101,17 @@ export default {
             data: {},
             subject: '',
             state: ''
-        } 
-    },
+        }
+    }
 }
 </script>
 
 <style>
+.containerStyle h3{
+    font-weight: bold;
+}
+
+.containerStyle {
+    margin: 100px
+}
 </style>

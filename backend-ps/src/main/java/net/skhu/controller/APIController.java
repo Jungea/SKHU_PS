@@ -165,16 +165,14 @@ public class APIController {
 
 	// 프로젝트 생성
 	@RequestMapping(value = "makeProject", method = RequestMethod.POST)
-	public String makeProject(@RequestBody MakeProjectModel makeProjectModel) {
+	public String makeProject(@RequestBody MakeProjectModel makeProjectModel,HttpServletRequest request) {
 		System.out.println("tag:" + makeProjectModel.getTag());
-		return projectService.makeProject(makeProjectModel);
+		return projectService.makeProject(makeProjectModel,getLoginUserId(request));
 	}
 	
 	// 프로젝트 개요가 수정되고 저장되었을 때
     @RequestMapping(value = "project/{projectId}/edit", method = RequestMethod.POST)
     public void editProject(@RequestBody EditProjectModel editProjectModel, @PathVariable("projectId") String projectId) {
-       System.out.println("이게맞을까요: " + editProjectModel);
-       System.out.println("나도 모르죠 시발ㅇㄻㅇㄻㄴㄹㄴㅇㅁㄹㅇ");
        projectService.update(Integer.parseInt(projectId), editProjectModel);
     }
     
@@ -204,9 +202,17 @@ public class APIController {
 
 		int intUserNum = Integer.parseInt(userNum);
 		int intProjectId = Integer.parseInt(projectId);
-
-		if (userService.findByUserNum(intUserNum) == null)
-			return "잘못된 번호를 입력하였습니다.";
+		
+		User user = userService.findByUserNum(intUserNum);
+		
+		if (user == null)
+			return "잘못된 학번을 입력하였습니다.";
+		
+		if (user.getUserType() == true)
+			return "초대하려는 사람이 교수입니다.";
+		
+		if (user.isEmailCheck() == false)
+			return "메일 인증이 안된 유저입니다.";
 
 		User capUser = userService.findById(getLoginUserId(request));
 		if (intUserNum == capUser.getUserNum())

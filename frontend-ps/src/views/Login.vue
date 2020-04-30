@@ -51,7 +51,11 @@ import axios from 'axios';
             if(typeof this.user == 'object') {
               console.log('로그인한 유저')
               console.log(response.data.name)
-              location.href="/home" 
+              if(this.user.emailCheck==false) {
+                alert('이메일 인증을 완료해주세요.');
+              } else {
+                location.href="/home" 
+              }
             }else {        
               alert("아이디 또는 비밀번호를 확인해주세요.");
               this.form.number='';
