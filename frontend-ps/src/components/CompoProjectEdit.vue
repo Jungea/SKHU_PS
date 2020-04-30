@@ -88,7 +88,7 @@ export default {
             }
             this.data.tag = this.tagArray.join(','),
             
-            axios.post('/api/editProject/',{
+            axios.post('/api/editProject/5',{
                 projectId: this.data.projectId,
                 projectName: this.data.projectName,
                 memNum: this.data.memNum,
