@@ -67,7 +67,7 @@ import axios from 'axios';
 export default {
     name: 'editProject',
     mounted() {
-        axios.get('api/project/5')
+        axios.get('/api/project/'+this.$route.params.projectId)
         .then(response => {
             this.data = response.data
             this.tagArray = this.data.tag.split(',')
@@ -88,7 +88,7 @@ export default {
             }
             this.data.tag = this.tagArray.join(','),
             
-            axios.post('/api/editProject/5',{
+            axios.post('/api/project/'+this.$route.params.projectId+'/edit',{
                 projectId: this.data.projectId,
                 projectName: this.data.projectName,
                 memNum: this.data.memNum,
@@ -100,14 +100,13 @@ export default {
                 })
             .then().catch((erro)=> { console.error(erro);
             });
-            this.$router.push({
-                path: '/summary'
-            })
+            
+            location.href='/project/'+this.$route.params.projectId+'/summary'            
          },
         done() {
-            this.$router.push({
-                path: '/summary'
-            })
+                    this.$router.push({
+                    path: '/project/'+this.$route.params.projectId+'/summary'
+                })
         },
         stateCheck() {
             if(this.data.rcrtState == false) {

@@ -1,6 +1,7 @@
 package net.skhu.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import net.skhu.domain.Subject;
 import net.skhu.domain.User;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.MyProjectListModel;
 import net.skhu.model.SidebarModel;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
@@ -64,10 +66,6 @@ public class ProjectService {
       return "success";
    }
    
-   public Project findById(int projectId) {
-      return projectRepository.findById(projectId).get();
-   }
-   
    // 프로젝트 수정후 저장
       public void update(int projectId, EditProjectModel editProjectModel) {
          System.out.println("업데이트작동미ㅑㅓㄷ리ㅑ너리ㅑㅓ디ㅑ러니런디ㅏ러ㅏㅣㄴ더라ㅣㄴ더라ㅣㅓㅏㅣㄷㄴ러ㅏㅣㄴ더라ㅣ더ㅣ");
@@ -108,12 +106,58 @@ public class ProjectService {
 
    //멤버
    public List<ProjectJoin> member(int projectId) {
-      return projectJoinRepository.findByProject_ProjectIdAndTypeNotAndState(projectId, 0, 1);
+	   return projectJoinRepository.findByProject_ProjectIdAndTypeNotAndState(projectId, 0, 1);
    }
    
    //초대한 후 대기중인 목록
    public List<ProjectJoin> inviteList(int projectId) {
-      return projectJoinRepository.findByProject_ProjectIdAndTypeAndStateNot(projectId, 1, 1);
+	   return projectJoinRepository.findByProject_ProjectIdAndTypeAndStateNot(projectId, 1, 1);
    }
+
+
+	public List<MyProjectListModel> projectList(int userId) {
+		List<ProjectJoin> projectJoins=projectJoinRepository.findAllByUser_UserId(userId);
+		List<MyProjectListModel> myProjectsList = new ArrayList<>();
+		for(int i=0;i<projectJoins.size();i++) {
+			if(projectJoins.get(i).getState()==1) { // 초대가 승인인 상태일 때
+				MyProjectListModel myProject=new MyProjectListModel();
+				myProject.setProjectId(projectJoins.get(i).getProject().getProjectId());
+				myProject.setProjectName(projectJoins.get(i).getProject().getProjectName());
+				myProject.setMemNum(projectJoins.get(i).getProject().getMemNum());
+				myProject.setProgState(projectJoins.get(i).getProject().isProgState());
+				myProject.setPin(projectJoins.get(i).isPin());
+				myProjectsList.add(myProject);
+			}
+		}
+		return myProjectsList;
+	}
+
+//	public List<AllProjectsListModel> allProjectsList(int userId) {
+//		List<Project> allProjects=projectRepository.findAll(); // 모든 프로젝트
+//		List<ProjectJoin> myProjects=projectJoinRepository.findAllByUser_UserId(userId); // 내가 참여하고있는 프로젝트
+//	
+//		List<AllProjectsListModel> allProjectsListModel = new ArrayList<>();
+//		
+//		for(int i=0;i<allProjects.size();i++) {
+//			if(myProjects.get(i).getState()==1) { // 초대가 승인인 상태일 때
+//				AllProjectsListModel myProject=new AllProjectsListModel();
+//				
+//				myProject.setProjectId(myProjects.get(i).getProject().getProjectId());
+//				myProject.setProjectName(myProjects.get(i).getProject().getProjectName());
+//				myProject.setPin(myProjects.get(i).isPin());
+//				allProjectsListModel.add(myProject);
+//			}
+//		}
+//		return myProjectsList;
+//	}
+
+	public Project findById(int userId) {
+		Optional<Project> p=projectRepository.findById(userId);
+		return p.get();
+		
+	}
+	public Project findByProjectId(int projectId) {
+		return projectRepository.findByProjectId(projectId);
+	}
 
 }

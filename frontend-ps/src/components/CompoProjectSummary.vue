@@ -2,7 +2,7 @@
     <div>
         <h4 style="margin-top: 80px">프로젝트 개요</h4>
         <div class="mb-4" style="text-align: right">
-            <b-button variant="dark" @click="edit">수정</b-button>
+            <b-button variant="dark" @click="edit(data.projectId)">수정</b-button>
         </div>
         
         <form ref="form" @submit.stop.prevent="handleSubmit">
@@ -10,7 +10,7 @@
                 label-for="ProjectSummary"
                 invalid-feedback="입력하지 않은 필수 입력 사항이 있습니다."
             >
-                <table class="table table-bordered" id="ProjectSummary">
+                <table class="table table-bordered" id="ProjectSummary" v-bind="this.data">
                     <tbody>
                         <tr>
                             <th scope="row" style="width:28%">프로젝트명</th>
@@ -73,7 +73,7 @@
 import axios from 'axios';
 export default {
      mounted() {
-        axios.get('api/project/5')
+        axios.get('/api/project/'+this.$route.params.projectId)
         .then(response => {
             this.data = response.data
         })        
@@ -91,9 +91,9 @@ export default {
             else
                 this.state = '모집완료'
         },
-        edit() {
+        edit(projectId) {
             this.$router.push({
-                path: '/editProject'
+                path: '/project/'+projectId+'/edit'
             })
         }
     },

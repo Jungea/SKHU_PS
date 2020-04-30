@@ -5,7 +5,7 @@
         <Sidebar/>
       </b-col>
       <b-col>
-        <CompoProjectBoard/>
+         <b-button @click="click1">Button</b-button>
       </b-col>
     </b-row>
   </div>
@@ -13,11 +13,15 @@
 
 <script>
 import Sidebar from '@/components/Sidebar.vue'
-import CompoProjectBoard from '@/components/CompoProjectBoard.vue'
 export default {
   name: 'PojectBoard',
   components: {
-    Sidebar, CompoProjectBoard
+    Sidebar, 
+  },
+  methods: {
+    click1() {
+        alert('pin2:'+this.$store.state.selectedPinProjectId)
+    }
   }
 }
 </script>

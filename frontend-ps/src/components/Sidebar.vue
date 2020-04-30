@@ -8,14 +8,22 @@
       <b-icon-person-fill style="cursor:pointer" class="ml-3" font-scale="1.4" @click="profile"></b-icon-person-fill>
       </p>
     <b-nav-item disabled><hr></b-nav-item>
+    <b-nav-item disabled>내가 pin한 프로젝트</b-nav-item>
     <b-nav-item> 
-      <b-form-select style="width:200px" v-model="selected" :options="options"></b-form-select>
+      <b-form-select style="width:200px" 
+      v-model="pinProjectId"
+      :options="this.myProjects"
+      class="mb-1 "
+      value-field="projectId"
+      text-field="projectName"
+      @change="changeSelect(pinProjectId)"
+    ></b-form-select>
+
     </b-nav-item>
      <b-nav-item><hr></b-nav-item>
-     
-      <div v-show="selected">
+      <b-nav-item disabled v-show="this.pinProjectId" v-model="this.pinProjectId">
         <ul style="list-style-type: none ; padding: 0px">
-            <b-nav-item><li><strong>{{ selected }}</strong></li></b-nav-item>
+            <b-nav-item><li><strong>{{ this.projectName }}</strong></li></b-nav-item>
             <b-nav-item><li>프로젝트 정보</li></b-nav-item>
             <b-nav-item><li>캘린더</li></b-nav-item>
             <b-nav-item><li>주차별 목표(to-do-list)</li></b-nav-item>
@@ -24,8 +32,7 @@
             <b-nav-item @click="management"><li>관리</li></b-nav-item>
         </ul>
         <hr>
-      </div>
-    
+      </b-nav-item>
     <b-nav-item>it 경진대회</b-nav-item>
     <b-nav-item @click="projectBoard">프로젝트 게시판</b-nav-item>
     <b-nav-item >커뮤니티 게시판</b-nav-item>
@@ -43,29 +50,44 @@ export default {
     data() {
       return {
         name: '',
-        selected: null,
-        options: [ {value: null, text: '프로젝트를 선택하세요.'} ]
+        projectName:null, // 현재 셀렉트 된 projectName
+        pinProjectId:null, // 현재 셀렉트 된 projectId
+        myProjects:[],
+        allProjects:[],
       }
     },
-    mounted() {
-
+   
+    created() {
+      if(this.$route.params.projectId!=null) { // 프로젝트를 선택한 상태일때
+        this.pinProjectId=this.$route.params.projectId
+        axios.get('/api/project/projectName/'+this.pinProjectId).then(response => { // 프로젝트 이름 가져오기
+            let project = response.data
+            this.projectName=project.projectName
+          }).catch((erro)=> {
+          console.error(erro);
+        });
+      } 
       axios.get('/api/user')
         .then(response => {
           this.name = response.data.name
         }).catch((erro)=> {
           console.error(erro);
         });
-
-      axios.get('/api/user/sidebar'
-          ).then(response => {
-
-            this.options = response.data;
-            this.options.unshift({value: null, text: '프로젝트를 선택하세요.'})
-        
-        }).catch((erro)=> {
+        axios.get('/api/pinList').then(response => {
+            this.myProjects = response.data
+          }).catch((erro)=> {
           console.error(erro);
         });
 
+
+        // axios.get('/api/allProjects').then(response => {
+        //     this.allProjects = response.data
+        //   }).catch((erro)=> {
+        //   console.error(erro);
+        // });
+          
+    },
+    watch: {
         
     },
     methods: {
@@ -81,6 +103,7 @@ export default {
         evt.preventDefault()
         location.href="/profile"
       },
+
       logout() {
         axios.get('/api/user/logout')
         .then().catch((erro)=> {
@@ -94,6 +117,9 @@ export default {
         this.$router.push({
           path: '/myprojectmanager'
         })
+      },
+      changeSelect(pinProjectId) {
+        location.href='/project/'+pinProjectId+'/summary'
       }
     }
 }

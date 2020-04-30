@@ -16,7 +16,7 @@ import Sidebar from '@/components/Sidebar.vue'
 import CompoProjectSummary from '@/components/CompoProjectSummary.vue'
 
 export default {
-  name: 'MyProjectSummary',
+  name: 'Summary',
   components: {
     Sidebar, CompoProjectSummary
   }

@@ -80,8 +80,9 @@ export default {
         //items: [],
         items: {},
         gitUrl:'',
-        tagArray:[]
-
+        tagArray:[],
+        myProjectPin:[],
+        inviteList:[]
       }
    },
    mounted() {
