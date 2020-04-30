@@ -4,11 +4,10 @@
         
         <form ref="form" @submit.stop.prevent="handleSubmit">
             <b-form-group
-                :state="projectState"
                 label-for="ProjectSummary"
                 invalid-feedback="입력하지 않은 필수 입력 사항이 있습니다."
             >
-                <table class="table table-bordered" id="ProjectSummary">
+                <table class="table table-bordered" id="ProjectSummary" v-bind="this.data">
                     <tbody>
                         <tr>
                             <th scope="row" style="width:28%">프로젝트명</th>
@@ -65,7 +64,7 @@
 import axios from 'axios';
 export default {
      mounted() {
-        axios.get('api/project/5')
+        axios.get('/api/project/'+this.$route.params.projectId)
         .then(response => {
             this.data = response.data
         })

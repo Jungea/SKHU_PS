@@ -18,4 +18,5 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
 	// userId 유저의 프로젝트 목록
 	@Query("SELECT p FROM Project p JOIN p.projectJoins pj WHERE pj.user.userId = ?1 AND pj.state = 1")
 	List<Project> findProjectByUserId(int userId);
+	Project findByProjectId(int projectId);
 }

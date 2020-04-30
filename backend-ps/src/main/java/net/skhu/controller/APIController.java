@@ -25,8 +25,8 @@ import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.UserRepository;
-import net.skhu.service.ProjectJoinService;
 import net.skhu.service.DetailService;
+import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.UserService;
 
@@ -175,7 +175,7 @@ public class APIController {
 		System.out.println("changePin");
 		return projectJoinService.changePin(myProjectListModel,getLoginUserId(request));
 	}
-	// 핀 바꾸기
+	
 	@RequestMapping(value = "pinList", method = RequestMethod.GET)
 	public List<MyPinProjectModel> pinList(HttpServletRequest request) {
 		System.out.println("pinList");
@@ -225,6 +225,18 @@ public class APIController {
 	public List<ProjectJoin> projectInviteList(@PathVariable("projectId") String projectId) {
 		return projectService.inviteList(Integer.parseInt(projectId));
 	}
-	
+	@RequestMapping(value = "project/{projectId}")
+	   public Project project(@PathVariable("projectId") String projectId) {
+	      return projectService.findById(Integer.parseInt(projectId));
+	}
+	@RequestMapping(value = "/project/projectName/{projectId}")
+	   public Project projectName2(@PathVariable("projectId") String projectId) {
+		System.out.println("projectName2");
+	      return projectService.findByProjectId(Integer.parseInt(projectId));
+	}
+//	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
+//	public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
+//		return projectService.allProjectsList(getLoginUserId(request));
+//	}
 
 }

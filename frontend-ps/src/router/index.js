@@ -15,9 +15,7 @@ import ProfessorSignUp from '../views/ProfessorSignUp.vue';
 import SignUpAlert from '../views/SignUpAlert.vue';
 import AuthAlert from '../views/AuthAlert.vue';
 import ChangePw from '../views/ChangePw.vue';
-
-
-import MyProjectSummary from '../views/summary'
+import Summary from '../views/Summary.vue';
 
 Vue.use(VueRouter)
 
@@ -98,9 +96,9 @@ Vue.use(VueRouter)
     component: ChangePw
   },
   {
-    path: '/summary',
-    name: 'ProjectSummary',
-    component: MyProjectSummary
+    path: '/project/:projectId/summary',
+    name: 'Summary',
+    component: Summary
   }
 ]
 

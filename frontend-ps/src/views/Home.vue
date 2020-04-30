@@ -1,11 +1,8 @@
-<!--props로 구현한 원본 -->
 <template>
   <div class="home h-100">
     <b-row class="h-100">
       <b-col class="myNav overflow-auto" cols="200px">
-          <!--home.vue에서 사이드바에서 셀렉트한 값의 pin이 바뀔 때 사이드바도 자동으로 바뀌게 하기 위해서.
-          home.vue이외에는 myProjectPin대신에 [0] 넣기-->
-        <Sidebar v-bind:my-project-list="myProjectPin"/>
+        <Sidebar/>
       </b-col>
       <b-col>
          <div>
@@ -19,10 +16,10 @@
                 <b-row style="padding-left: 94%">    
                     <b-button v-b-modal.modal-xl variant="outline-secondary" style="min-width: 100px ; height: 70px;">프로젝트 생성</b-button>    
                 </b-row>
-                <p style="color:silver; margin:300px auto;" v-if="items.length==0?true:false">프로젝트가 비었습니다.</p>     
+                <p style="color:silver; margin:300px auto;" v-if="data.length==0?true:false">프로젝트가 비었습니다.</p>     
                 <b-row cols="2">    
                     <b-col :key="index" v-for="(item, index) in data">
-                    <b-card @click="viewSummary" align="left" bg-variant="dark" text-variant="white" style="width: 30rem; height: 15rem; margin: 60px;"> <!-- 30rem == 480px -->
+                    <b-card @click="viewSummary(item.projectId)" align="left" bg-variant="dark" text-variant="white" style="width: 30rem; height: 15rem; margin: 60px;"> <!-- 30rem == 480px -->
                         <div>
                             <b-card-header style="padding: 0 0 10px 0">
                                 <table>
@@ -178,8 +175,7 @@ export default {
             // 프로젝트 생성 모달 창
             rcrtState:false,
             projectName:'',
-            theme:null,
-
+            theme:'',
             content:'',
             options: [
                 { value: false, text: '모집중' },
@@ -189,7 +185,6 @@ export default {
             authKey:'',
             stringTag:'',
             project:null,
-            myProjectPin:[], // 내가 pin한 프로젝트 목록
             subjectChecked:false,
             repoUrl:'',
         };
@@ -199,15 +194,7 @@ export default {
         .then(response => {
             this.data = response.data 
             // alert('json:'+JSON.stringify(this.data[0].pin))
-            let count=0;
-            this.myProjectPin=[]
-            for (let i=0;i<this.data.length;i++) {
-                if(this.data[i].pin==true) {
-                    this.myProjectPin[count]={}
-                    this.myProjectPin[count].projectName=this.data[i].projectName
-                    this.myProjectPin[count++].projectId=this.data[i].projectId
-                }
-            }
+            
         });
     },
 
@@ -216,23 +203,16 @@ export default {
                     axios.post('/api/changePin', {
                         projectId:itemProjectId
                     })
-                    .then(response => {this.data = response.data
-                        let count=0;
-                        this.myProjectPin=[]
-                        for (let i=0;i<this.data.length;i++) {
-                            if(this.data[i].pin==true) {
-                                this.myProjectPin[count]={}
-                                this.myProjectPin[count].projectName=this.data[i].projectName
-                                this.myProjectPin[count++].projectId=this.data[i].projectId
-                            }
-                        }
+                    .then(response => {
+                        this.data = response.data
                     })
                     
                     event.stopPropagation()
+                    location.reload()
                 },
-                viewSummary() {
+                viewSummary(projectId) {
             this.$router.push({
-                path: '/summary'
+                path: '/project/'+projectId+'/summary'
                 })
         },
         
