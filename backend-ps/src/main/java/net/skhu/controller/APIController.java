@@ -255,6 +255,14 @@ public class APIController {
 	public void turnState(@PathVariable("joinId") int joinId, @PathVariable("state") int state) {
 		projectJoinService.turnState(joinId, state);
 	}
+	
+	//0501 추가
+	@RequestMapping(value = "/increaseMember/{projectId}",  method = RequestMethod.POST)
+	public void increaseMember(@PathVariable("projectId") int projectId) {
+		System.out.println("멤버수가증가합니다");
+		projectService.increaseMember(projectId);
+	}
+	
 //	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
 //	public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
 //		return projectService.allProjectsList(getLoginUserId(request));
