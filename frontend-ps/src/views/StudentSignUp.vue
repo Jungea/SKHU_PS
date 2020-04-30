@@ -113,17 +113,7 @@ import axios from 'axios';
     methods: {
       signUp(evt) {
         evt.preventDefault();
-        axios.post('/api/studentSignUp', 
-        {
-          userNum: this.form.id,
-          email:this.form.email,
-          name:this.form.name,
-          password:this.form.pass1,
-          detDeptId: this.form.selected,
-          grade:this.form.gradeSelected
-        }).then(response => { 
-          this.user = response.data;
-          if(!this.numValidation) {  //학번 중복
+        if(!this.numValidation) {  //학번 중복
             alert('학번을 확인해주세요.');
           } else if(!this.passValidation2) {   //비밀번호 규칙
             alert('비밀번호를 확인해주세요.');
@@ -133,12 +123,23 @@ import axios from 'axios';
             alert('학부/학과를 선택해주세요.');
           } else if(!this.emailValidation) {    //이메일 중복
             alert('이메일을 확인해주세요.');
-          } else {
-            this.$router.push({
-            path: '/signUpAlert'
-            }) 
           }
-        });
+            else {
+              axios.post('/api/studentSignUp', 
+              {
+                userNum: this.form.id,
+                email:this.form.email,
+                name:this.form.name,
+                password:this.form.pass1,
+                detDeptId: this.form.selected,
+                grade:this.form.gradeSelected
+              }).then(response => {
+                this.user = response.data;
+                this.$router.push({
+                path: '/signUpAlert'
+              }) 
+          })
+        }
       },
     },
     mounted() {

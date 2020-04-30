@@ -58,15 +58,6 @@
                                <b-form-select v-model="state" :options="stateArray" value-field="item" text-field="name"></b-form-select>
                             </td>
                         </tr>
-                        <tr>
-                            <th scope="row">멤버 수</th>
-                            <td>
-                                <b-form-input v-model="data.memNum"></b-form-input>
-                                <b-form-invalid-feedback :state="memNumValidation">
-                                    프로젝트를 진행 할 멤버 수를 입력해주세요.
-                                </b-form-invalid-feedback>
-                            </td>
-                        </tr>
                     </tbody>    
                 </table>
                 <div style="text-align: right">
@@ -110,13 +101,10 @@ export default {
                 alert("프로젝트 내용을 입력하세요.")
             else if(!this.tagValidation)
                 alert("태그를 입력하세요.")
-            else if(!this.memNumValidation)
-                alert("멤버 수를 입력하세요.")
             else {
                 axios.post('/api/project/'+this.$route.params.projectId+'/edit',{
                     projectId: this.data.projectId,
                     projectName: this.data.projectName,
-                    memNum: this.data.memNum,
                     theme: this.data.theme,
                     content: this.data.content,
                     tag: this.data.tag,
@@ -163,9 +151,6 @@ export default {
         },
         tagValidation() {
             return this.tagArray.length > 0
-        },
-        memNumValidation() {
-            return this.data.memNum > 0
         }
     }
 }
