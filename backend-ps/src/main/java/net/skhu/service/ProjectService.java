@@ -70,8 +70,6 @@ public class ProjectService {
    
    // 프로젝트 수정후 저장
       public void update(int projectId, EditProjectModel editProjectModel) {
-         System.out.println("업데이트작동미ㅑㅓㄷ리ㅑ너리ㅑㅓ디ㅑ러니런디ㅏ러ㅏㅣㄴ더라ㅣㄴ더라ㅣㅓㅏㅣㄷㄴ러ㅏㅣㄴ더라ㅣ더ㅣ");
-         
          Project project = findById(projectId);
          project.setProjectName(editProjectModel.getProjectName());
          project.setMemNum(editProjectModel.getMemNum());
@@ -80,8 +78,7 @@ public class ProjectService {
          project.setTag(editProjectModel.getTag());
          project.setGithub(editProjectModel.getGithub());
          project.setRcrtState(editProjectModel.isRcrtState());
-       
-         System.out.println(project);
+         
          projectRepository.save(project);
       }
       
