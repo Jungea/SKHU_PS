@@ -262,6 +262,7 @@ export default {
                 tag:this.stringTag,
                 rcrtState:this.rcrtState,
                 authKey:this.authKey,
+                github: this.repoUrl
             }).then(response => { 
                 this.project = response.data;
                 if(this.project=='authKey를 잘못 입력했습니다') {

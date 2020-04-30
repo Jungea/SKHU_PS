@@ -58,6 +58,12 @@
                                <b-form-select v-model="state" :options="stateArray" value-field="item" text-field="name"></b-form-select>
                             </td>
                         </tr>
+                        <tr>
+                             <th scope="row">과목 여부</th>
+                            <td>
+                              
+                            </td>
+                        </tr>
                     </tbody>    
                 </table>
                 <div style="text-align: right">
@@ -136,7 +142,7 @@ export default {
             stateArray: [ { item: 0, name: '모집중'}, { item: 1, name: '모집완료'} ],
             tagArray: [],
             state: 0,
-            stateName: ''
+            stateName: '',
         } 
     },
     computed: {
