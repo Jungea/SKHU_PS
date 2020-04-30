@@ -164,9 +164,9 @@ public class APIController {
 
 	// 프로젝트 생성
 	@RequestMapping(value = "makeProject", method = RequestMethod.POST)
-	public String makeProject(@RequestBody MakeProjectModel makeProjectModel) {
+	public String makeProject(@RequestBody MakeProjectModel makeProjectModel,HttpServletRequest request) {
 		System.out.println("tag:" + makeProjectModel.getTag());
-		return projectService.makeProject(makeProjectModel);
+		return projectService.makeProject(makeProjectModel,getLoginUserId(request));
 
 	}
 	// 핀 바꾸기

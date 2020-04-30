@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,12 +46,14 @@ public class ProjectService {
 
 	// 프로젝트 생성
 	@Transactional
-	public String makeProject(MakeProjectModel makeProjectModel) {
+	public String makeProject(MakeProjectModel makeProjectModel,int userId) {
 		Project project = new Project(makeProjectModel.getProjectName(), makeProjectModel.getTheme(),
 				makeProjectModel.getContent(), makeProjectModel.getTag(), makeProjectModel.isRcrtState());
-		Optional<User> u = userRepository.findById(1);
+		Optional<User> u = userRepository.findById(userId);
 		User user = u.get();
 		project.setUser(user);
+		
+		ProjectJoin projectJoin=new ProjectJoin(LocalDateTime.now(),user,project);
 		// 과목 authKey를 입력했다면
 		if (makeProjectModel.getAuthKey().length() != 0) {
 			Subject subject = subjectRepository.findByAuthKey(makeProjectModel.getAuthKey());
@@ -58,10 +62,12 @@ public class ProjectService {
 			} else {
 				project.setSubject(subject);
 				projectRepository.save(project);
+				projectJoinRepository.save(projectJoin);
 				return "authKey에 해당하는 subject가 있습니다.success";
 			}
 		}
 		projectRepository.save(project);
+		projectJoinRepository.save(projectJoin);
 		return "success";
 
 	}
