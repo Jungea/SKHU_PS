@@ -243,6 +243,12 @@ public class APIController {
 		System.out.println("projectName2");
 	      return projectService.findByProjectId(Integer.parseInt(projectId));
 	}
+	
+	//0430 추가
+	@RequestMapping(value = "/turnjoinstate/{joinId}/{state}", method = RequestMethod.POST)
+	public void turnState(@PathVariable("joinId") int joinId, @PathVariable("state") int state) {
+		projectJoinService.turnState(joinId, state);
+	}
 //	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
 //	public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
 //		return projectService.allProjectsList(getLoginUserId(request));

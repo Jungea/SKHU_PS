@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.ProjectJoin;
+import net.skhu.domain.User;
+import net.skhu.model.FindPassModel;
 import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
 import net.skhu.repository.ProjectJoinRepository;
@@ -41,6 +43,22 @@ public class ProjectJoinService {
 		}
 		return myPinProjectsList;
 	}
+	
+	//0430 조인테이블 수정
+	public void turnState(int joinId, int state) {
+		System.out.println(joinId);
+		ProjectJoin projectJoin=projectJoinRepository.findById(joinId).get();
+		projectJoin.setState(state);
+		projectJoinRepository.save(projectJoin);
+	}
+	
+//	public void changePw(FindPassModel findPassModel, String authKey) {
+//		System.out.println("auth: " + authKey);
+//		System.out.println("password: " + findPassModel.getPassword());
+//		User user = userRepository.findByAuthKey(authKey);
+//		user.setPassword(findPassModel.getPassword());
+//		userRepository.save(user);
+//	}
 
 
 }
