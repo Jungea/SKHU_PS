@@ -18,11 +18,14 @@ import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.MyPinProjectModel;
+import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProfileModel;
-import net.skhu.model.SidebarModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
+import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.UserRepository;
+import net.skhu.service.ProjectJoinService;
 import net.skhu.service.DetailService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.UserService;
@@ -36,6 +39,10 @@ public class APIController {
 	UserRepository userRepository;
 	@Autowired
 	ProjectService projectService;
+	@Autowired
+	ProjectJoinRepository projectJoinRepository;
+	@Autowired
+	ProjectJoinService projectJoinService;
 	@Autowired
 	DetailService detailService;
 
@@ -133,8 +140,8 @@ public class APIController {
 	}
 
 	@RequestMapping(value = "user/projects", method = RequestMethod.GET)
-	public List<Project> userProjects(HttpServletRequest request) {
-		return projectService.findProjectByUserId(getLoginUserId(request));
+	public List<MyProjectListModel> userProjects(HttpServletRequest request) {
+		return projectService.projectList(getLoginUserId(request));
 	}
 
 	// 마이페이지 프로필이 수정되고 저장되었을 때
@@ -149,11 +156,6 @@ public class APIController {
 		return userService.inviteList(getLoginUserId(request));
 	}
 
-	@RequestMapping(value = "user/sidebar", method = RequestMethod.GET)
-	public List<SidebarModel> userSidebar(HttpServletRequest request) {
-		return projectService.userSidebar(getLoginUserId(request));
-	}
-
 	// 0427 윤영
 	@RequestMapping(value = "alluser", method = RequestMethod.GET)
 	public List<User> allUser() {
@@ -166,6 +168,18 @@ public class APIController {
 		System.out.println("tag:" + makeProjectModel.getTag());
 		return projectService.makeProject(makeProjectModel);
 
+	}
+	// 핀 바꾸기
+	@RequestMapping(value = "changePin", method = RequestMethod.POST)
+	public List<MyProjectListModel> changePin(@RequestBody MyProjectListModel myProjectListModel,HttpServletRequest request) {
+		System.out.println("changePin");
+		return projectJoinService.changePin(myProjectListModel,getLoginUserId(request));
+	}
+	// 핀 바꾸기
+	@RequestMapping(value = "pinList", method = RequestMethod.GET)
+	public List<MyPinProjectModel> pinList(HttpServletRequest request) {
+		System.out.println("pinList");
+		return projectJoinService.pinProjectList(getLoginUserId(request));
 	}
 
 	// 학과 셀렉션을 위한 메소드

@@ -1,5 +1,6 @@
 package net.skhu.service;
 
+import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Subject;
 import net.skhu.domain.User;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.MyProjectListModel;
 import net.skhu.model.SidebarModel;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
@@ -88,7 +90,23 @@ public class ProjectService {
 	public List<ProjectJoin> member(int projectId) {
 		return projectJoinRepository.findByProject_ProjectIdAndTypeNotAndState(projectId, 0, 1);
 	}
-	
+
+	public List<MyProjectListModel> projectList(int userId) {
+		List<ProjectJoin> projectJoins=projectJoinRepository.findAllByUser_UserId(userId);
+		List<MyProjectListModel> myProjectsList = new ArrayList<>();
+		for(int i=0;i<projectJoins.size();i++) {
+			if(projectJoins.get(i).getState()==1) { // 초대가 승인인 상태일 때
+				MyProjectListModel myProject=new MyProjectListModel();
+				myProject.setProjectId(projectJoins.get(i).getProject().getProjectId());
+				myProject.setProjectName(projectJoins.get(i).getProject().getProjectName());
+				myProject.setMemNum(projectJoins.get(i).getProject().getMemNum());
+				myProject.setProgState(projectJoins.get(i).getProject().isProgState());
+				myProject.setPin(projectJoins.get(i).isPin());
+				myProjectsList.add(myProject);
+			}
+		}
+		return myProjectsList;
+	}
 	//초대한 후 대기중인 목록
 	public List<ProjectJoin> inviteList(int projectId) {
 		return projectJoinRepository.findByProject_ProjectIdAndTypeAndStateNot(projectId, 1, 1);

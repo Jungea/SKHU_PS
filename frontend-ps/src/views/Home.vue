@@ -1,8 +1,11 @@
+<!--props로 구현한 원본 -->
 <template>
   <div class="home h-100">
     <b-row class="h-100">
       <b-col class="myNav overflow-auto" cols="200px">
-        <Sidebar/>
+          <!--home.vue에서 사이드바에서 셀렉트한 값의 pin이 바뀔 때 사이드바도 자동으로 바뀌게 하기 위해서.
+          home.vue이외에는 myProjectPin대신에 [0] 넣기-->
+        <Sidebar v-bind:my-project-list="myProjectPin"/>
       </b-col>
       <b-col>
          <div>
@@ -25,15 +28,19 @@
                                 <table>
                                     <tr>
                                         <td style="width: 100%">{{item.projectName}}</td>
-                                        <td><b-button @click="pin1" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="starIcon.name"></b-icon></b-button></td>
+                                        <td><b-button @click="changePin(item.projectId)" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="item.pin==true?'star-fill':'star'"></b-icon></b-button></td>
+
                                     </tr>
                                 </table>
                             </b-card-header>
                        </div>
                         <b-card-text style="margin-top: 10px">
-                            {{item.content}}
+                            <p style="font-size:17px">인원 :{{item.memNum}}명</p>
+                            <b-button variant="success" style="cursor:default;" v-show="item.progState==false">진행중</b-button>
+                            <b-button variant="danger"  style="cursor:default" v-show="item.progState==true">진행완료</b-button>
                         </b-card-text>    
-                    </b-card>    
+                    </b-card>  
+
                     </b-col>
                 </b-row>    
             </b-container>    
@@ -160,29 +167,19 @@
 <script>
 import axios from 'axios';
 import Sidebar from '@/components/Sidebar.vue'
-
 export default {
-    mounted() {
-        axios.get('/api/user/projects')
-        .then(response => {
-            this.data = response.data })
-            console.log("테스트로그")
-            console.log(this.data)
-    },
-    name: 'home',
-    components: { Sidebar},
+  name: 'Home',
+  components: {
+    Sidebar,
+  },
     data() {
         return {
-            fields: { 프로젝트이름: "", 사용언어 : "",사용기술:"",주제:"",내용:"" },
-            items: [{ 프로젝트이름: "", 사용언어:"" ,사용기술:"",주제:"",내용:""}],
-            items2: [{'플젝 이름': '파이썬 프로젝트', '사용 언어': '자바','사용 도구':'스프링','주제':'자바로 계산기 만들기','내용':'자바를 이용해서 배운걸 토대로 만들어볼 예정입니다.','모집여부':'모집중'},               ],
-            data:{ },
-            starIcon: { name: 'star', pin: false },
-            
+            data:{},
             // 프로젝트 생성 모달 창
             rcrtState:false,
             projectName:'',
-            theme:'',
+            theme:null,
+
             content:'',
             options: [
                 { value: false, text: '모집중' },
@@ -192,10 +189,109 @@ export default {
             authKey:'',
             stringTag:'',
             project:null,
+            myProjectPin:[], // 내가 pin한 프로젝트 목록
             subjectChecked:false,
-            
             repoUrl:'',
         };
+    },
+    mounted() { 
+        axios.get('/api/user/projects') // 내 프로젝트 모든 목록
+        .then(response => {
+            this.data = response.data 
+            // alert('json:'+JSON.stringify(this.data[0].pin))
+            let count=0;
+            this.myProjectPin=[]
+            for (let i=0;i<this.data.length;i++) {
+                if(this.data[i].pin==true) {
+                    this.myProjectPin[count]={}
+                    this.myProjectPin[count].projectName=this.data[i].projectName
+                    this.myProjectPin[count++].projectId=this.data[i].projectId
+                }
+            }
+        });
+    },
+
+     methods: {
+                changePin(itemProjectId) {   // pin이 바뀌었을때
+                    axios.post('/api/changePin', {
+                        projectId:itemProjectId
+                    })
+                    .then(response => {this.data = response.data
+                        let count=0;
+                        this.myProjectPin=[]
+                        for (let i=0;i<this.data.length;i++) {
+                            if(this.data[i].pin==true) {
+                                this.myProjectPin[count]={}
+                                this.myProjectPin[count].projectName=this.data[i].projectName
+                                this.myProjectPin[count++].projectId=this.data[i].projectId
+                            }
+                        }
+                    })
+                    
+                    event.stopPropagation()
+                },
+                viewSummary() {
+            this.$router.push({
+                path: '/summary'
+                })
+        },
+        
+        //모달메소드
+        handleOk(bvModalEvt) {
+            // Prevent modal from closing
+            bvModalEvt.preventDefault()
+            // Trigger submit handler
+            this.handleSubmit()
+        },
+        handleSubmit() {
+            if (!this.nameValidation || !this.themeValidation || !this.contentValidation
+                || !this.tagValidation || !this.subjectValidation) {
+                return 
+            }
+            
+            this.submit()
+            this.$nextTick(() => {
+                this.$bvModal.hide('modal-xl')
+            })
+        },
+        resetModal() {
+            this.projectName='';
+            this.theme='';
+            this.content='';
+            this.stringTag='';
+            this.tagArray=[];
+            this.rcrtState=false;
+            this.authKey='';
+            this.repoUrl='';
+            this.subjectChecked=false;
+            //this.projectState=false;
+        },
+
+        submit() {
+            console.log('눌렀다')
+            console.log('name:'+this.projectName);
+            for(var i in this.tagArray) {
+               this.stringTag+=this.tagArray[i]+",";
+            }
+            this.stringTag=this.stringTag.slice(0,this.stringTag.length-1);
+            alert(this.stringTag);
+            axios.post('/api/makeProject',{
+                projectName:this.projectName,
+                theme:this.theme,
+                content:this.content,
+                tag:this.stringTag,
+                rcrtState:this.rcrtState,
+                authKey:this.authKey,
+            }).then(response => { 
+                this.project = response.data;
+                if(this.project=='authKey를 잘못 입력했습니다') {
+                    alert('입력한 인증키와 일치하는 과목이 없습니다');
+                    return;
+                } else {
+                    alert('성공!');
+                }
+            });
+        },
     },
     computed:{
         nameValidation(){        //플젝명 체크
@@ -220,93 +316,6 @@ export default {
          projectState(){
              return this.nameValidation&&this.themeValidation&&this.contentValidation
                     &&this.tagValidation&&this.subjectValidation
-         }
-    },
-
-     methods: { 
-        viewSummary() {
-            this.$router.push({
-                path: '/summary'
-                })
-        },
-        pin1() {                    
-            if(this.starIcon.name == "star")
-            {
-                this.starIcon.name = "star-fill"
-                this.starIcon.pin = true
-            }
-            else
-            {
-                this.starIcon.name = "star"
-                this.starIcon.pin = false
-            }
-
-            alert(this.starIcon.pin)
-
-            axios.post('url', {
-                pin: this.starIcon.pin
-            })
-            .then()
-            event.stopPropagation()
-        },
-        
-        //모달메소드
-        handleOk(bvModalEvt) {
-            // Prevent modal from closing
-            bvModalEvt.preventDefault()
-            // Trigger submit handler
-            this.handleSubmit()
-        },
-        handleSubmit() {
-            if (!this.nameValidation || !this.themeValidation || !this.contentValidation
-                || !this.tagValidation || !this.subjectValidation) {
-                return 
-            }
-            
-            this.submit()
-            this.$nextTick(() => {
-                this.$bvModal.hide('modal-xl')
-        })
-        },
-        resetModal() {
-            this.projectName='';
-            this.theme='';
-            this.content='';
-            this.stringTag='';
-            this.tagArray=[];
-            this.rcrtState=false;
-            this.authKey='';
-            this.repoUrl='';
-            this.subjectChecked=false;
-            //this.projectState=false;
-        },
-
-        submit() {
-            console.log('눌렀다')
-            
-            console.log('name:'+this.projectName);
-            for(var i in this.tagArray) {
-               this.stringTag+=this.tagArray[i]+",";
-            }
-            this.stringTag=this.stringTag.slice(0,this.stringTag.length-1);
-            alert(this.stringTag);
-            axios.post('/api/makeProject',{
-                projectName:this.projectName,
-                theme:this.theme,
-                content:this.content,
-                tag:this.stringTag,
-                rcrtState:this.rcrtState,
-                authKey:this.authKey,
-            }).then(response => { 
-                this.project = response.data;
-                if(this.project=='authKey를 잘못 입력했습니다') {
-                    alert('입력한 인증키와 일치하는 과목이 없습니다');
-                    return;
-                } else {
-                    alert('성공!');
-                }
-            });
-            
         },
     }
 }
@@ -314,9 +323,6 @@ export default {
 </script>
 
 <style>
-
 .card-header { font-size: 20px }
 .card-text { font-size: 13px }
-
-
 </style>
