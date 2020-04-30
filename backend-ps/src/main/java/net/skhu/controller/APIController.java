@@ -16,6 +16,7 @@ import net.skhu.domain.Detail;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.User;
+import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
 import net.skhu.model.MyPinProjectModel;
@@ -167,8 +168,16 @@ public class APIController {
 	public String makeProject(@RequestBody MakeProjectModel makeProjectModel,HttpServletRequest request) {
 		System.out.println("tag:" + makeProjectModel.getTag());
 		return projectService.makeProject(makeProjectModel,getLoginUserId(request));
-
 	}
+	
+	// 프로젝트 개요가 수정되고 저장되었을 때
+    @RequestMapping(value = "project/{projectId}/edit", method = RequestMethod.POST)
+    public void editProject(@RequestBody EditProjectModel editProjectModel, @PathVariable("projectId") String projectId) {
+       System.out.println("이게맞을까요: " + editProjectModel);
+       System.out.println("나도 모르죠 시발ㅇㄻㅇㄻㄴㄹㄴㅇㅁㄹㅇ");
+       projectService.update(Integer.parseInt(projectId), editProjectModel);
+    }
+    
 	// 핀 바꾸기
 	@RequestMapping(value = "changePin", method = RequestMethod.POST)
 	public List<MyProjectListModel> changePin(@RequestBody MyProjectListModel myProjectListModel,HttpServletRequest request) {

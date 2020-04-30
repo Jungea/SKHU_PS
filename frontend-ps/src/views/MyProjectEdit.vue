@@ -5,7 +5,7 @@
         <Sidebar/>
       </b-col>
       <b-col>
-        <CompoProjectSummary/>
+        <CompoProjectEdit/>
       </b-col>
     </b-row>
   </div>
@@ -13,12 +13,12 @@
 
 <script>
 import Sidebar from '@/components/Sidebar.vue'
-import CompoProjectSummary from '@/components/CompoProjectSummary.vue'
+import CompoProjectEdit from '@/components/CompoProjectEdit.vue'
 
 export default {
-  name: 'Summary',
+  name: 'MyProjectEdit',
   components: {
-    Sidebar, CompoProjectSummary
+    Sidebar, CompoProjectEdit
   }
 }
 </script>

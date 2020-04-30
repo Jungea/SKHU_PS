@@ -211,8 +211,8 @@ export default {
                     location.reload()
                 },
                 viewSummary(projectId) {
-            this.$router.push({
-                path: '/project/'+projectId+'/summary'
+                    this.$router.push({
+                    path: '/project/'+projectId+'/summary'
                 })
         },
         
