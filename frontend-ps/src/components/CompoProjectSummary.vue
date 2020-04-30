@@ -18,6 +18,12 @@
                                 {{ this.data.projectName }}
                             </td>
                         </tr>
+                         <tr>
+                            <th scope="row" style="width:28%">멤버 수</th>
+                            <td>
+                                {{ this.data.memNum }}
+                            </td>
+                        </tr>
                         <tr>
                             <th scope="row">주제</th>
                             <td>
@@ -70,7 +76,7 @@ export default {
         axios.get('api/project/5')
         .then(response => {
             this.data = response.data
-        })
+        })        
      },
      methods: {
         subjectCheck() {
@@ -83,7 +89,7 @@ export default {
             if(this.data.rcrtState == 0)
                 this.state = '모집중'
             else
-                this.state = '모집안함'
+                this.state = '모집완료'
         },
         edit() {
             this.$router.push({
