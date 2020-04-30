@@ -69,7 +69,7 @@ Vue.use(VueRouter)
     component: ProjectBoard
   },
   {
-    path: '/myProjectManager',
+    path: '/project/:projectId/manage',
     name: 'MyProjectManager',
     component: MyProjectManager
   },
