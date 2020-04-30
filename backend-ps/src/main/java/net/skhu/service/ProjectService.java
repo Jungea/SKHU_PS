@@ -192,5 +192,11 @@ public class ProjectService {
 		project.setMemNum(project.getMemNum()+1);
 		projectRepository.save(project);
 	}
+	//0501 멤버수 감소
+	public void decreaseMember(int projectId) {
+		Project project=projectRepository.findByProjectId(projectId);
+		project.setMemNum(project.getMemNum()-1);
+		projectRepository.save(project);
+	}
 
 }

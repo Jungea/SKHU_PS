@@ -1,12 +1,17 @@
 package net.skhu.service;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.User;
 import net.skhu.model.FindPassModel;
@@ -20,7 +25,7 @@ public class ProjectJoinService {
 	ProjectJoinRepository projectJoinRepository;
 	@Autowired
 	ProjectService projectService;
-	
+
 	@Transactional
 	public List<MyProjectListModel> changePin(MyProjectListModel myProjectListModel,int userId) {
 		ProjectJoin projectJoin=projectJoinRepository.findByProject_ProjectIdAndUser_UserId(myProjectListModel.getProjectId(),userId);
@@ -28,7 +33,7 @@ public class ProjectJoinService {
 		projectJoinRepository.save(projectJoin);
 		return projectService.projectList(userId);
 	}
-	
+
 	public List<MyPinProjectModel> pinProjectList(int userId) {
 		List<ProjectJoin> projectJoins=projectJoinRepository.findAllByUser_UserId(userId);
 		List<MyPinProjectModel> myPinProjectsList = new ArrayList<>();
@@ -43,7 +48,7 @@ public class ProjectJoinService {
 		}
 		return myPinProjectsList;
 	}
-	
+
 	//0430 조인테이블 수정
 	public void turnState(int joinId, int state) {
 		System.out.println(joinId);
@@ -51,14 +56,17 @@ public class ProjectJoinService {
 		projectJoin.setState(state);
 		projectJoinRepository.save(projectJoin);
 	}
-	
-//	public void changePw(FindPassModel findPassModel, String authKey) {
-//		System.out.println("auth: " + authKey);
-//		System.out.println("password: " + findPassModel.getPassword());
-//		User user = userRepository.findByAuthKey(authKey);
-//		user.setPassword(findPassModel.getPassword());
-//		userRepository.save(user);
-//	}
 
+	//0501 초대 기록 대기 삭제
+	public void deleteWaiting(int joinId) {
+		projectJoinRepository.deleteById(joinId);
+	}
+
+	//0501 멤버 삭제
+	@Transactional
+	public void exileMember(int memId, int projectId) {
+		projectJoinRepository.deleteByUser_UserIdAndProject_ProjectId(memId, projectId);
+		projectService.decreaseMember(projectId);
+	}
 
 }

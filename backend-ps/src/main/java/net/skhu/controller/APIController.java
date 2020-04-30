@@ -263,6 +263,20 @@ public class APIController {
 		projectService.increaseMember(projectId);
 	}
 	
+	//0501 초대 취소
+	@RequestMapping(value = "/deletejoin/{joinId}",  method = RequestMethod.POST)
+	public void deleteWaiting(@PathVariable("joinId") int joinId) {
+		System.out.println("초대 기록을 삭제합니다");
+		projectJoinService.deleteWaiting(joinId);
+	}
+	
+	//0501 멤버삭제
+	@RequestMapping(value = "/exile/{memId}/{projectId}",  method = RequestMethod.POST)
+	public void exileMember(@PathVariable("projectId") int projectId, @PathVariable("memId") int memId) {
+		System.out.println("멤버를 추방합니다");
+		projectJoinService.exileMember(memId,projectId);
+	}
+	
 //	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
 //	public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
 //		return projectService.allProjectsList(getLoginUserId(request));
