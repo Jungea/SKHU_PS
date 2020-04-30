@@ -51,12 +51,16 @@
             </div>
             <hr style="margin:30px 0; min-width:900px;">
             <div class="infoContainer">
-                <h5>초대받은 이력</h5>
-                <ul>
+                <h5>초대 이력</h5>
+                <div>
+                <ul style="list-style:none">
                     <li v-for="invit in inviteList" :key="invit.joinId">
-                        {{invit.project.projectName}}(팀장: {{invit.project.user.name}}) - 수락/거절
+                        {{invit.project.projectName}} (초대자: {{invit.project.user.name}})
+                        <b-button @click="turnState(invit.joinId, 1)" class="mr-2" variant="success">수락</b-button>
+                        <b-button @click="turnState(invit.joinId, 2)" variant="danger">거절</b-button>
                     </li>
-               </ul>
+                </ul>
+                </div>
                 <br/>
             </div>
         </div>
@@ -100,14 +104,25 @@ export default {
             this.items=info;
             //깃 닉네임으로 링크 생성
             this.gitUrl='https://github.com/'+response.data.github
-            this.tagArray=this.items.language.split(',')
-            console.log(this.items.Intro)
+            if(this.items.language)
+                this.tagArray=this.items.language.split(',')
+            console.log(this.items.intro)
         }).catch((erro)=> {
           console.error(erro);
         });
 
         axios.get('/api/user/inviteList')
-            .then(response => this.inviteList=response.data)
+            .then(response => {
+                //this.inviteList=response.data;
+                //초대 상태가 대기인 경우 보이게
+                for(let i in response.data){
+                    if(response.data[i].state==0){
+                        this.inviteList.push(response.data[i])
+                        console.log('상태')
+                        console.log(this.inviteList[i].state)
+                    }
+                }
+            })
             .catch((erro)=> {
                 console.error(erro);
             });
@@ -121,6 +136,19 @@ export default {
             let items=this.items
             console.log("정보수정으로 이동")
             console.log(items)
+        },
+        turnState(joinId, state){
+            console.log(joinId)
+            if(state==1)
+                console.log('수락함')
+            else
+                console.log('거절함')
+            axios.post('/api/turnjoinstate/'+joinId+'/'+state)
+            .then()
+            .catch((erro)=> {
+                console.error(erro);
+            });
+            location.reload();
         },
    }
 }
