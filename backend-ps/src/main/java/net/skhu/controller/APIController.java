@@ -75,7 +75,6 @@ public class APIController {
 
 	@RequestMapping(value = "professorSignUp", method = RequestMethod.POST)
 	public String professorSignUp(@RequestBody SignUpModel professorSignUpModel) {
-		System.out.println("student:" + professorSignUpModel);
 		// UserNum이 중복인지 확인하는 변수
 		User redundantUserNum = userRepository.findByUserNum(Integer.parseInt(professorSignUpModel.getUserNum()));
 		// Email이 중복인지 확인하는 변수

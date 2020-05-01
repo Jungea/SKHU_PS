@@ -55,11 +55,13 @@ public class Project {
 	public Project() {
 	}
 
-	public Project(String projectName,String theme,String content,String tag,boolean rcrtState) {
+	public Project(String projectName, String theme, String content, String tag, String github, boolean rcrtState) {
 	      this.projectName = projectName;
+	      this.memNum = 1;
 	      this.theme = theme;
 	      this.content = content;
 	      this.tag = tag;
+	      this.github = github;
 	      this.rcrtState = rcrtState;
 	      this.startDate=LocalDateTime.now();
 	}

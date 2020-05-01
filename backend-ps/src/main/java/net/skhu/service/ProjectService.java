@@ -49,7 +49,7 @@ public class ProjectService {
    @Transactional
    public String makeProject(MakeProjectModel makeProjectModel) {
       Project project = new Project(makeProjectModel.getProjectName(), makeProjectModel.getTheme(),
-            makeProjectModel.getContent(), makeProjectModel.getTag(), makeProjectModel.isRcrtState());
+            makeProjectModel.getContent(), makeProjectModel.getTag(),makeProjectModel.getGithub(), makeProjectModel.isRcrtState());
       Optional<User> u = userRepository.findById(1);
       User user = u.get();
       project.setUser(user);
@@ -72,7 +72,6 @@ public class ProjectService {
       public void update(int projectId, EditProjectModel editProjectModel) {
          Project project = findById(projectId);
          project.setProjectName(editProjectModel.getProjectName());
-         project.setMemNum(editProjectModel.getMemNum());
          project.setTheme(editProjectModel.getTheme());
          project.setContent(editProjectModel.getContent());
          project.setTag(editProjectModel.getTag());
@@ -97,7 +96,7 @@ public class ProjectService {
 	@Transactional
 	public String makeProject(MakeProjectModel makeProjectModel,int userId) {
 		Project project = new Project(makeProjectModel.getProjectName(), makeProjectModel.getTheme(),
-				makeProjectModel.getContent(), makeProjectModel.getTag(), makeProjectModel.isRcrtState());
+				makeProjectModel.getContent(), makeProjectModel.getTag(),makeProjectModel.getGithub(), makeProjectModel.isRcrtState());
 		Optional<User> u = userRepository.findById(userId);
 		User user = u.get();
 		project.setUser(user);
@@ -115,6 +114,7 @@ public class ProjectService {
 				return "authKey에 해당하는 subject가 있습니다.success";
 			}
 		}
+
 		projectRepository.save(project);
 		projectJoinRepository.save(projectJoin);
 		return "success";

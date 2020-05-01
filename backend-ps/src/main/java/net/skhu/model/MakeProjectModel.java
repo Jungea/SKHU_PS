@@ -8,6 +8,7 @@ public class MakeProjectModel {
 	String theme;
 	String content;
 	String tag;
+	String github;
 	boolean rcrtState;
 	String authKey;
 }

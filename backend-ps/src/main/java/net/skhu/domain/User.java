@@ -27,10 +27,9 @@ public class User {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    int userId;
 
-
 	int userNum;
 	String name;
-	int grade;
+	Integer grade;
 	String email;
 	String password;
 	LocalDateTime timelineTime;
@@ -56,17 +55,17 @@ public class User {
    public User() {
    }
 
-   public User(int userNum, String name, String email, String password, LocalDateTime timelineTime, boolean userType,
+   public User(int userNum, String name, Integer grade, String email, String password, LocalDateTime timelineTime, boolean userType,
          boolean emailCheck, String authKey, Detail detDepartment) {
       this.userNum = userNum;
       this.name = name;
+      this.grade = grade;
       this.email = email;
       this.password = password;
       this.timelineTime = timelineTime;
       this.userType = userType;
       this.emailCheck = emailCheck;
       this.authKey = authKey;
-      this.grade=1;
       this.detDepartment = detDepartment;
    }
 

@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public class EditProjectModel {
    String projectName;
-   int memNum;
    String theme;
    String content;
    String tag;

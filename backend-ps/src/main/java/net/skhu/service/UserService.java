@@ -37,10 +37,20 @@ public class UserService {
 	public void SignUp(SignUpModel studentSignUpModel, boolean userType) {
 //		 userType에서 학생은 false, 교수는 true
 		String auth_key = new TempAuth_key().getKey(44, false); // 이메일 인증 키 설정
-		Detail detDeptId = detailRepository.findById(Integer.parseInt(studentSignUpModel.getDetDeptId())).get();
-		User user = new User(Integer.parseInt(studentSignUpModel.getUserNum()), studentSignUpModel.getName(),
+		Detail detDeptId;
+		User user;
+		if(studentSignUpModel.getDetDeptId() != null) {
+			detDeptId = detailRepository.findById(Integer.parseInt(studentSignUpModel.getDetDeptId())).get();
+			user = new User(Integer.parseInt(studentSignUpModel.getUserNum()), studentSignUpModel.getName(), studentSignUpModel.getGrade(),
+					studentSignUpModel.getEmail(), studentSignUpModel.getPassword(), LocalDateTime.now(), userType, false,
+					auth_key, detDeptId);
+		}
+		else {
+		user = new User(Integer.parseInt(studentSignUpModel.getUserNum()), studentSignUpModel.getName(),null,
 				studentSignUpModel.getEmail(), studentSignUpModel.getPassword(), LocalDateTime.now(), userType, false,
-				auth_key, detDeptId);
+				auth_key, null);
+		System.out.println(user.getGrade());
+		}
 		SendEmail es = new SendEmail();
 		es.sendEmail(studentSignUpModel.getEmail(), auth_key);
 		userRepository.save(user);
