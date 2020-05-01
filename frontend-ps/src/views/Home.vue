@@ -51,7 +51,7 @@
             <form ref="form" @submit.stop.prevent="handleSubmit">
             <b-form-group
                 :state="projectState"
-                label="프로젝트 생성"
+                label=""
                 label-for="createProject"
                 invalid-feedback="입력하지 않은 필수 입력 사항이 있습니다."
             >
@@ -264,7 +264,7 @@ export default {
                 }
                 //console.log(this.authkeys)
                 if(this.authkeys.indexOf(this.authKey)==-1){
-                    alert('일치하는 과목이 없습니다.')
+                    alert('유효하지 않은 인증키입니다.')
                     this.authKey=''
                 }
                 else{
@@ -283,7 +283,6 @@ export default {
                this.stringTag+=this.tagArray[i]+",";
             }
             this.stringTag=this.stringTag.slice(0,this.stringTag.length-1);
-            alert(this.stringTag);
             axios.post('/api/makeProject',{
                 projectName:this.projectName,
                 theme:this.theme,
@@ -294,7 +293,6 @@ export default {
                 github: this.repoUrl
             }).then(response => { 
                 this.project = response.data;
-                alert('성공!');
                 location.reload();
                 // if(this.project=='authKey를 잘못 입력했습니다') {
                 //     alert('입력한 인증키와 일치하는 과목이 없습니다');
