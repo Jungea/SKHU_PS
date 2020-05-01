@@ -36,7 +36,7 @@
                         <tr>
                             <th scope="row">사용기술과 언어</th>
                             <td>
-                                {{ this.data.tag }}
+                                <b-badge variant="secondary" v-for="(tag,index) in tagArray" :key="index" style="margin-right:5px">{{tag}}</b-badge>
                             </td>
                         </tr>
                         <tr>
@@ -52,9 +52,8 @@
                                {{ this.state }}
                             </td>
                         <tr>
-                            <th scope="row">과목 여부</th>
+                            <th scope="row">과목</th>
                             <td>
-                                {{ subjectCheck() }}
                                  {{ this.subject }}
                             </td>
                         </tr>
@@ -75,15 +74,16 @@ export default {
         axios.get('/api/project/'+this.$route.params.projectId)
         .then(response => {
             this.data = response.data
+            if(this.data.tag)
+                this.tagArray=this.data.tag.split(',')
+            if(this.data.subject == null)
+                this.subject = '과목없음'
+            else
+                this.subject = this.data.subject.title
         })        
      },
      methods: {
-        subjectCheck() {
-            if(this.data.subjectId == null )
-                this.subject = '과목없음'
-            else
-                this.subject = '과목있음'
-        },
+       
         rcrtStateCheck() {
            if(this.data.rcrtState == 0)
                 this.state = '모집중'
@@ -100,7 +100,8 @@ export default {
         return { 
             data: {},
             subject: '',
-            state: ''
+            state: '',
+            tagArray:[]
         }
     }
 }

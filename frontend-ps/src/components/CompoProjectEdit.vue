@@ -58,12 +58,6 @@
                                <b-form-select v-model="state" :options="stateArray" value-field="item" text-field="name"></b-form-select>
                             </td>
                         </tr>
-                        <tr>
-                             <th scope="row">과목 여부</th>
-                            <td>
-                              
-                            </td>
-                        </tr>
                     </tbody>    
                 </table>
                 <div style="text-align: right">
@@ -147,13 +141,13 @@ export default {
     },
     computed: {
         nameValidation() {
-            return this.data.projectName.length > 0
+            return !this.data.projectName == ''
         },
         themeValidation() {
-            return this.data.theme.length > 0
+            return !this.data.theme == ''
         },
         contentValidation() {
-            return this.data.content.length > 0
+            return !this.data.content == ''
         },
         tagValidation() {
             return this.tagArray.length > 0
