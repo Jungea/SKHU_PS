@@ -62,5 +62,6 @@ public class Project {
 	      this.tag = tag;
 	      this.rcrtState = rcrtState;
 	      this.startDate=LocalDateTime.now();
+	      this.memNum=1;
 	}
 }
