@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import net.skhu.domain.Detail;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
+import net.skhu.domain.Subject;
 import net.skhu.domain.User;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
@@ -25,6 +26,7 @@ import net.skhu.model.ProfileModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.repository.ProjectJoinRepository;
+import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.service.DetailService;
 import net.skhu.service.ProjectJoinService;
@@ -46,6 +48,8 @@ public class APIController {
 	ProjectJoinService projectJoinService;
 	@Autowired
 	DetailService detailService;
+	@Autowired
+	SubjectRepository subjectRepository;
 
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -127,7 +131,7 @@ public class APIController {
 		}
 		return u;
 	}
-	
+
 	@RequestMapping(value = "user/logout", method = RequestMethod.GET)
 	public void logout(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -151,7 +155,7 @@ public class APIController {
 		System.out.println(profileModel);
 		userService.update(getLoginUserId(request), profileModel);
 	}
-	
+
 	@RequestMapping(value = "user/inviteList", method = RequestMethod.GET)
 	public List<ProjectJoin> userInviteList(HttpServletRequest request) {
 		return userService.inviteList(getLoginUserId(request));
@@ -169,20 +173,20 @@ public class APIController {
 		System.out.println("tag:" + makeProjectModel.getTag());
 		return projectService.makeProject(makeProjectModel,getLoginUserId(request));
 	}
-	
+
 	// 프로젝트 개요가 수정되고 저장되었을 때
-    @RequestMapping(value = "project/{projectId}/edit", method = RequestMethod.POST)
-    public void editProject(@RequestBody EditProjectModel editProjectModel, @PathVariable("projectId") String projectId) {
-       projectService.update(Integer.parseInt(projectId), editProjectModel);
-    }
-    
+	@RequestMapping(value = "project/{projectId}/edit", method = RequestMethod.POST)
+	public void editProject(@RequestBody EditProjectModel editProjectModel, @PathVariable("projectId") String projectId) {
+		projectService.update(Integer.parseInt(projectId), editProjectModel);
+	}
+
 	// 핀 바꾸기
 	@RequestMapping(value = "changePin", method = RequestMethod.POST)
 	public List<MyProjectListModel> changePin(@RequestBody MyProjectListModel myProjectListModel,HttpServletRequest request) {
 		System.out.println("changePin");
 		return projectJoinService.changePin(myProjectListModel,getLoginUserId(request));
 	}
-	
+
 	@RequestMapping(value = "pinList", method = RequestMethod.GET)
 	public List<MyPinProjectModel> pinList(HttpServletRequest request) {
 		System.out.println("pinList");
@@ -202,15 +206,15 @@ public class APIController {
 
 		int intUserNum = Integer.parseInt(userNum);
 		int intProjectId = Integer.parseInt(projectId);
-		
+
 		User user = userService.findByUserNum(intUserNum);
-		
+
 		if (user == null)
 			return "잘못된 학번을 입력하였습니다.";
-		
+
 		if (user.getUserType() == true)
 			return "초대하려는 사람이 교수입니다.";
-		
+
 		if (user.isEmailCheck() == false)
 			return "메일 인증이 안된 유저입니다.";
 
@@ -235,51 +239,57 @@ public class APIController {
 	public List<ProjectJoin> projectMember(@PathVariable("projectId") String projectId) {
 		return projectService.member(Integer.parseInt(projectId));
 	}
-	
+
 	@RequestMapping(value = "project/{projectId}/inviteList", method = RequestMethod.GET)
 	public List<ProjectJoin> projectInviteList(@PathVariable("projectId") String projectId) {
 		return projectService.inviteList(Integer.parseInt(projectId));
 	}
 	@RequestMapping(value = "project/{projectId}")
-	   public Project project(@PathVariable("projectId") String projectId) {
-	      return projectService.findById(Integer.parseInt(projectId));
+	public Project project(@PathVariable("projectId") String projectId) {
+		return projectService.findById(Integer.parseInt(projectId));
 	}
 	@RequestMapping(value = "/project/projectName/{projectId}")
-	   public Project projectName2(@PathVariable("projectId") String projectId) {
+	public Project projectName2(@PathVariable("projectId") String projectId) {
 		System.out.println("projectName2");
-	      return projectService.findByProjectId(Integer.parseInt(projectId));
+		return projectService.findByProjectId(Integer.parseInt(projectId));
 	}
-	
+
 	//0430 추가
 	@RequestMapping(value = "/turnjoinstate/{joinId}/{state}", method = RequestMethod.POST)
 	public void turnState(@PathVariable("joinId") int joinId, @PathVariable("state") int state) {
 		projectJoinService.turnState(joinId, state);
 	}
-	
+
 	//0501 추가
 	@RequestMapping(value = "/increaseMember/{projectId}",  method = RequestMethod.POST)
 	public void increaseMember(@PathVariable("projectId") int projectId) {
 		System.out.println("멤버수가증가합니다");
 		projectService.increaseMember(projectId);
 	}
-	
+
 	//0501 초대 취소
 	@RequestMapping(value = "/deletejoin/{joinId}",  method = RequestMethod.POST)
 	public void deleteWaiting(@PathVariable("joinId") int joinId) {
 		System.out.println("초대 기록을 삭제합니다");
 		projectJoinService.deleteWaiting(joinId);
 	}
-	
+
 	//0501 멤버삭제
 	@RequestMapping(value = "/exile/{memId}/{projectId}",  method = RequestMethod.POST)
 	public void exileMember(@PathVariable("projectId") int projectId, @PathVariable("memId") int memId) {
 		System.out.println("멤버를 추방합니다");
 		projectJoinService.exileMember(memId,projectId);
 	}
-	
-//	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
-//	public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
-//		return projectService.allProjectsList(getLoginUserId(request));
-//	}
+
+	//0501 과목정보
+	@RequestMapping(value = "/subjects",  method = RequestMethod.POST)
+	public List<Subject> findAllSubject() {
+		return subjectRepository.findAll();
+	}
+
+	//	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
+	//	public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
+	//		return projectService.allProjectsList(getLoginUserId(request));
+	//	}
 
 }

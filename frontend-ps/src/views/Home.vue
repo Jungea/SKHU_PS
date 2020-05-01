@@ -140,12 +140,19 @@
                         <tr v-if="subjectChecked">
                             <th scope="row">과목 인증키</th>
                             <td>
-                                <b-form-input id="input-default3" v-model="authKey" placeholder="인증키를 입력하세요"></b-form-input>
+                                <b-form-input style="width:75%; margin-right:10px; float:left;" id="input-default3" v-model="authKey" placeholder="인증키를 입력하세요" :disabled="authCheck==true"></b-form-input>
+                                <b-button style="width:15%; clear:both" @click="checkAuth()">검사</b-button>
                                 <b-form-text id="input-live-help5">해당 수업의 인증키를 입력하세요.</b-form-text>
                                 <b-form-valid-feedback :state="subjectValidation">
                                 </b-form-valid-feedback>
                                 <b-form-invalid-feedback :state="subjectValidation">
                                     인증키를 입력하세요.
+                                </b-form-invalid-feedback>
+                                <b-form-valid-feedback :state="authValidation">
+                                    올바른 인증키입니다.
+                                </b-form-valid-feedback>
+                                <b-form-invalid-feedback :state="authValidation">
+                                    인증키 검사를 완료해주세요.
                                 </b-form-invalid-feedback>
                             </td>
                         </tr>
@@ -187,6 +194,8 @@ export default {
             project:null,
             subjectChecked:false,
             repoUrl:'',
+            authkeys:[],
+            authCheck:false
         };
     },
     mounted() { 
@@ -225,7 +234,7 @@ export default {
         },
         handleSubmit() {
             if (!this.nameValidation || !this.themeValidation || !this.contentValidation
-                || !this.tagValidation || !this.subjectValidation) {
+                || !this.tagValidation || !this.subjectValidation || !this.authValidation) {
                 return 
             }
             
@@ -247,6 +256,26 @@ export default {
             //this.projectState=false;
         },
 
+        checkAuth(){
+            axios.post('/api/subjects')
+            .then(response => {
+                for (var i in response.data){
+                    this.authkeys.push(response.data[i].authKey)
+                }
+                //console.log(this.authkeys)
+                if(this.authkeys.indexOf(this.authKey)==-1){
+                    alert('일치하는 과목이 없습니다.')
+                    this.authKey=''
+                }
+                else{
+                    alert('올바른 인증키입니다.')
+                    this.authCheck=true
+                }
+            }).catch((erro)=> {
+                console.error(erro);
+            });
+        },
+
         submit() {
             console.log('눌렀다')
             console.log('name:'+this.projectName);
@@ -265,12 +294,15 @@ export default {
                 github: this.repoUrl
             }).then(response => { 
                 this.project = response.data;
-                if(this.project=='authKey를 잘못 입력했습니다') {
-                    alert('입력한 인증키와 일치하는 과목이 없습니다');
-                    return;
-                } else {
-                    alert('성공!');
-                }
+                alert('성공!');
+                location.reload();
+                // if(this.project=='authKey를 잘못 입력했습니다') {
+                //     alert('입력한 인증키와 일치하는 과목이 없습니다');
+                //     return;
+                // } else {
+                //     alert('성공!');
+                //     location.reload();
+                // }
             });
         },
     },
@@ -294,9 +326,20 @@ export default {
             else
                 return true
          },
+         authValidation(){
+            if(this.subjectChecked==true){
+                if(this.authCheck==true)
+                    return true
+                else
+                    return false
+            }
+            else
+                return true
+             
+         },
          projectState(){
              return this.nameValidation&&this.themeValidation&&this.contentValidation
-                    &&this.tagValidation&&this.subjectValidation
+                    &&this.tagValidation&&this.subjectValidation&&this.authValidation
         },
     }
 }
