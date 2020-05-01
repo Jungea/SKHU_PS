@@ -56,8 +56,8 @@
                 <ul style="list-style:none">
                     <li v-for="invit in inviteList" :key="invit.joinId">
                         {{invit.project.projectName}} (초대자: {{invit.project.user.name}})
-                        <b-button @click="turnState(invit.joinId, 1)" class="mr-2" variant="success">수락</b-button>
-                        <b-button @click="turnState(invit.joinId, 2)" variant="danger">거절</b-button>
+                        <b-button @click="turnState(invit, 1)" class="mr-2" variant="success">수락</b-button>
+                        <b-button @click="turnState(invit, 2)" variant="danger">거절</b-button>
                     </li>
                 </ul>
                 </div>
@@ -137,17 +137,26 @@ export default {
             console.log("정보수정으로 이동")
             console.log(items)
         },
-        turnState(joinId, state){
-            console.log(joinId)
-            if(state==1)
+        turnState(invite, state){
+            console.log(invite.joinId)
+            console.log(invite.project.projectName+'의 초대에 대해')
+            if(state==1){
                 console.log('수락함')
-            else
+                axios.post('/api/increaseMember/'+invite.project.projectId)
+                .then()
+                .catch((erro)=> {
+                    console.error(erro);
+                });
+            }
+            else{
                 console.log('거절함')
-            axios.post('/api/turnjoinstate/'+joinId+'/'+state)
+            }
+            axios.post('/api/turnjoinstate/'+invite.joinId+'/'+state)
             .then()
             .catch((erro)=> {
                 console.error(erro);
             });
+            
             location.reload();
         },
    }

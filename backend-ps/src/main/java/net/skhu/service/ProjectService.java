@@ -185,5 +185,18 @@ public class ProjectService {
 	public Project findByProjectId(int projectId) {
 		return projectRepository.findByProjectId(projectId);
 	}
+	
+	//0501 멤버수 증가
+	public void increaseMember(int projectId) {
+		Project project=projectRepository.findByProjectId(projectId);
+		project.setMemNum(project.getMemNum()+1);
+		projectRepository.save(project);
+	}
+	//0501 멤버수 감소
+	public void decreaseMember(int projectId) {
+		Project project=projectRepository.findByProjectId(projectId);
+		project.setMemNum(project.getMemNum()-1);
+		projectRepository.save(project);
+	}
 
 }

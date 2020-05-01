@@ -64,5 +64,6 @@ public class Project {
 	      this.github = github;
 	      this.rcrtState = rcrtState;
 	      this.startDate=LocalDateTime.now();
+	      this.memNum=1;
 	}
 }

@@ -20,5 +20,7 @@ public interface ProjectJoinRepository extends JpaRepository<ProjectJoin, Intege
 	
 	//유저가 초대받은 현황
 	List<ProjectJoin> findByUser_UserIdAndTypeAndState(int userId, int type, int state);
+	
+	void deleteByUser_UserIdAndProject_ProjectId(int userId, int projectId);
 
 }
