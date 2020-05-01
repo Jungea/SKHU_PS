@@ -5,7 +5,7 @@
       <b-icon-house-fill  style="cursor:pointer" class="mr-3" font-scale="1.5" @click="home"></b-icon-house-fill>
       {{name}} 님
       <b-icon-bell style="cursor:pointer" class="ml-3" font-scale="1.4" ></b-icon-bell>
-      <b-icon-person-fill style="cursor:pointer" class="ml-3" font-scale="1.4" @click="profile"></b-icon-person-fill>
+      <b-icon-person-fill style="cursor:pointer" class="ml-3" font-scale="1.8" @click="profile"></b-icon-person-fill>
       </p>
     <b-nav-item disabled><hr></b-nav-item>
     <b-nav-item disabled>내가 pin한 프로젝트</b-nav-item>
