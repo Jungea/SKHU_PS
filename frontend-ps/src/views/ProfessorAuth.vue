@@ -32,7 +32,8 @@ export default {
     data() {
       return {
         form: {
-          password: ''
+          password: '',
+          professorPass: 'open123'
         },
         show: true
       }
@@ -40,7 +41,10 @@ export default {
     methods: {
         onSubmit(evt) {
             evt.preventDefault()
-            location.href="/professorSignUp"
+            if(this.form.password == this.form.professorPass)
+                location.href="/professorSignUp"
+            else
+                alert("교수 비밀번호가 틀렸습니다.")
         },
         /*
         findPassalert() {
