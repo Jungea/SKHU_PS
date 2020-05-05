@@ -17,7 +17,7 @@
       class="mb-1"
       value-field="projectId"
       text-field="projectName"
-      @change="changeSelect(pinProjectId)"></b-form-select>
+      @change="changeSelect()"></b-form-select>
     </b-nav-item>
     <b-nav-item><hr></b-nav-item>
 
@@ -39,7 +39,7 @@
     <b-nav-item >커뮤니티 게시판</b-nav-item>
     <b-nav-item> <!-- 233px -->
       <hr>
-      <b-button variant="dark" style="margin-left: 124px" @click="logout">Logout</b-button>
+      <b-button variant="dark" @click="logout">Logout</b-button>
     </b-nav-item>
     </b-nav>
 </div>
@@ -98,7 +98,10 @@ export default {
       },
       home(evt) {
         evt.preventDefault()
-        location.href="/home"
+        // location.href="/home"
+        this.$router.push({
+          path: '/home'
+        })
       },
       profile(evt){
         evt.preventDefault()
@@ -123,8 +126,14 @@ export default {
           path: '/project/'+this.$route.params.projectId+'/manager'
         })
       },
-      changeSelect(pinProjectId) {
-        location.href='/project/'+pinProjectId+'/summary'
+      changeSelect() {
+        this.$router.push({
+          name: 'Summary',
+          params: {
+            projectId: this.pinProjectId
+          }
+        })
+        // location.href='/project/'+pinProjectId+'/summary'
       }
     }
 }

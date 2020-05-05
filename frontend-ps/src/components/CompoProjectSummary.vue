@@ -70,7 +70,21 @@
 <script>
 import axios from 'axios';
 export default {
-     mounted() {
+    watch: {
+        '$route' () {
+            axios.get('/api/project/'+this.$route.params.projectId)
+            .then(response => {
+                this.data = response.data
+                if(this.data.tag)
+                    this.tagArray=this.data.tag.split(',')
+                if(this.data.subject == null)
+                    this.subject = '과목없음'
+                else
+                    this.subject = this.data.subject.title
+            })    
+        }
+    },
+    mounted() {
         axios.get('/api/project/'+this.$route.params.projectId)
         .then(response => {
             this.data = response.data
@@ -81,8 +95,8 @@ export default {
             else
                 this.subject = this.data.subject.title
         })        
-     },
-     methods: {
+    },
+    methods: {
        
         rcrtStateCheck() {
            if(this.data.rcrtState == 0)
