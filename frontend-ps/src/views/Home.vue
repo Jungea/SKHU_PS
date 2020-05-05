@@ -1,11 +1,8 @@
 <template>
-  <div class="home h-100">
+  <div class="home">
     <b-row class="h-100">
-      <b-col class="myNav overflow-auto" cols="200px">
-        <Sidebar/>
-      </b-col>
-      <b-col>
-         <div>
+        <b-col>
+        <div>
         <center>    
             <b-container class="bv-row">    
                 <b-row class="m-4">    
@@ -170,11 +167,11 @@
 
 <script>
 import axios from 'axios';
-import Sidebar from '@/components/Sidebar.vue'
+// import Sidebar from '@/components/Sidebar.vue'
 export default {
   name: 'Home',
   components: {
-    Sidebar,
+    // Sidebar,
   },
     data() {
         return {

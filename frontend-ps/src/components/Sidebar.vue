@@ -1,38 +1,39 @@
 <template>
 <div>
-  <b-nav vertical class="w-25" style="min-width: 200px">
-    <p class="mt-4 ml-3">
-      <b-icon-house-fill  style="cursor:pointer" class="mr-3" font-scale="1.5" @click="home"></b-icon-house-fill>
+  <b-nav vertical>
+    <p class="mt-4 ml-1">
+      <b-icon-house-fill  style="cursor:pointer" class="mr-1" font-scale="1.4" @click="home"></b-icon-house-fill>
       {{name}} 님
-      <b-icon-bell style="cursor:pointer" class="ml-3" font-scale="1.4" ></b-icon-bell>
-      <b-icon-person-fill style="cursor:pointer" class="ml-3" font-scale="1.8" @click="profile"></b-icon-person-fill>
-      </p>
+      <b-icon-bell style="cursor:pointer" class="ml-2" font-scale="1.3" ></b-icon-bell>
+      <b-icon-person-fill style="cursor:pointer" class="ml-2" font-scale="1.3" @click="profile"></b-icon-person-fill>
+    </p>
     <b-nav-item disabled><hr></b-nav-item>
+
     <b-nav-item disabled>내가 pin한 프로젝트</b-nav-item>
     <b-nav-item> 
-      <b-form-select style="width:200px" 
+      <b-form-select 
       v-model="pinProjectId"
       :options="this.myProjects"
-      class="mb-1 "
+      class="mb-1"
       value-field="projectId"
       text-field="projectName"
-      @change="changeSelect(pinProjectId)"
-    ></b-form-select>
-
+      @change="changeSelect(pinProjectId)"></b-form-select>
     </b-nav-item>
-     <b-nav-item><hr></b-nav-item>
-      <div disabled v-show="this.pinProjectId">
-        <ul style="list-style-type: none ; padding: 0px">
-            <b-nav-item><strong>{{ this.projectName }}</strong></b-nav-item>
-            <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
-            <li><b-nav-item>캘린더</b-nav-item></li>
-            <li><b-nav-item>주차별 목표(to-do-list)</b-nav-item></li>
-            <li><b-nav-item>토론 게시판</b-nav-item></li>
-            <li><b-nav-item>자유 게시판</b-nav-item></li>
-            <li><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
-        </ul>
-        <hr>
-      </div>
+    <b-nav-item><hr></b-nav-item>
+
+    <div disabled v-show="this.pinProjectId">
+      <ul style="list-style-type: none ; padding: 0px">
+        <b-nav-item><strong>{{ this.projectName }}</strong></b-nav-item>
+        <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
+        <li><b-nav-item>캘린더</b-nav-item></li>
+        <li><b-nav-item>주차별 목표(to-do-list)</b-nav-item></li>
+        <li><b-nav-item>토론 게시판</b-nav-item></li>
+        <li><b-nav-item>자유 게시판</b-nav-item></li>
+        <li><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
+      </ul>
+      <hr>
+    </div>
+    
     <b-nav-item>it 경진대회</b-nav-item>
     <b-nav-item @click="projectBoard">프로젝트 게시판</b-nav-item>
     <b-nav-item >커뮤니티 게시판</b-nav-item>
