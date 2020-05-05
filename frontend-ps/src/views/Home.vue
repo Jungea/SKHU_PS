@@ -1,40 +1,35 @@
 <template>
-  <div class="home">
-    <b-row class="h-100">
-        <b-col>
-        <div>
+    <div class="home">
         <center>    
-            <b-container class="bv-row">    
-                <b-row class="m-4">    
-                    <b-col>  
-                            <h4>내 프로젝트</h4>      
-                    </b-col>    
-                </b-row>    
-                <b-row style="padding-left: 94%">    
-                    <b-button v-b-modal.modal-xl variant="outline-secondary" style="min-width: 100px ; height: 70px;">프로젝트 생성</b-button>    
+            <b-container class="bv-row">
+                <b-row class="m-4">
+                    <b-col><h4>내 프로젝트</h4></b-col>
                 </b-row>
-                <p style="color:silver; margin:300px auto;" v-if="data.length==0?true:false">프로젝트가 비었습니다.</p>     
-                <b-row cols="2">    
-                    <b-col :key="index" v-for="(item, index) in data">
-                    <b-card @click="viewSummary(item.projectId)" align="left" bg-variant="dark" text-variant="white" style="width: 30rem; height: 15rem; margin: 60px;"> <!-- 30rem == 480px -->
-                        <div>
-                            <b-card-header style="padding: 0 0 10px 0">
-                                <table>
-                                    <tr>
-                                        <td style="width: 100%">{{item.projectName}}</td>
-                                        <td><b-button @click="changePin(item.projectId)" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="item.pin==true?'star-fill':'star'"></b-icon></b-button></td>
 
-                                    </tr>
-                                </table>
-                            </b-card-header>
-                       </div>
-                        <b-card-text style="margin-top: 10px">
-                            <p style="font-size:17px">인원 :{{item.memNum}}명</p>
-                            <b-button variant="success" style="cursor:default;" v-show="item.progState==false">진행중</b-button>
-                            <b-button variant="danger"  style="cursor:default" v-show="item.progState==true">진행완료</b-button>
-                        </b-card-text>    
-                    </b-card>  
+                <b-row class="text-right mb-4">
+                    <b-col><b-button v-b-modal.modal-xl variant="outline-secondary" style="height: 70px;">프로젝트 생성</b-button></b-col>
+                </b-row>
 
+                <p style="color:silver; margin:300px auto;" v-if="data.length==0?true:false">프로젝트가 비었습니다.</p>
+                <b-row cols-md="2" cols="1">
+                    <b-col class="mb-5" :key="index" v-for="(item, index) in data">
+                        <b-card @click="viewSummary(item.projectId)" align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
+                            <div>
+                                <b-card-header style="padding: 0 0 10px 0">
+                                    <table>
+                                        <tr>
+                                            <td style="width: 100%">{{item.projectName}}</td>
+                                            <td><b-button @click="changePin(item.projectId)" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="item.pin==true?'star-fill':'star'"></b-icon></b-button></td>
+                                        </tr>
+                                    </table>
+                                </b-card-header>
+                            </div>
+                            <b-card-text style="margin-top: 10px">
+                                <p style="font-size:17px">인원 :{{item.memNum}}명</p>
+                                <b-button variant="success" style="cursor:default;" v-show="item.progState==false">진행중</b-button>
+                                <b-button variant="danger"  style="cursor:default" v-show="item.progState==true">진행완료</b-button>
+                            </b-card-text>    
+                        </b-card>  
                     </b-col>
                 </b-row>    
             </b-container>    
@@ -50,8 +45,7 @@
                 :state="projectState"
                 label=""
                 label-for="createProject"
-                invalid-feedback="입력하지 않은 필수 입력 사항이 있습니다."
-            >
+                invalid-feedback="입력하지 않은 필수 입력 사항이 있습니다.">
                 <table class="table table-bordered" id="createProject">
                     <tbody>
                         <tr>
@@ -160,19 +154,12 @@
             </form>
         </b-modal>
     </div>
-      </b-col>
-    </b-row>
-  </div>
 </template>
 
 <script>
 import axios from 'axios';
-// import Sidebar from '@/components/Sidebar.vue'
 export default {
-  name: 'Home',
-  components: {
-    // Sidebar,
-  },
+    name: 'Home',
     data() {
         return {
             data:{},
@@ -205,21 +192,21 @@ export default {
     },
 
      methods: {
-                changePin(itemProjectId) {   // pin이 바뀌었을때
-                    axios.post('/api/changePin', {
-                        projectId:itemProjectId
-                    })
-                    .then(response => {
-                        this.data = response.data
-                    })
-                    
-                    event.stopPropagation()
-                    location.reload()
-                },
-                viewSummary(projectId) {
-                    this.$router.push({
-                    path: '/project/'+projectId+'/summary'
-                })
+        changePin(itemProjectId) {   // pin이 바뀌었을때
+            axios.post('/api/changePin', {
+                projectId:itemProjectId
+            })
+            .then(response => {
+                this.data = response.data
+            })
+            
+            event.stopPropagation()
+            location.reload()
+        },
+        viewSummary(projectId) {
+            this.$router.push({
+                path: '/project/'+projectId+'/summary'
+            })
         },
         
         //모달메소드
