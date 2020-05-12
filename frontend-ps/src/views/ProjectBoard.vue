@@ -12,12 +12,10 @@
 </template>
 
 <script>
-import Sidebar from '@/components/Sidebar.vue'
+//import Sidebar from '@/components/Sidebar.vue'
 export default {
   name: 'PojectBoard',
-  components: {
-    Sidebar, 
-  },
+
   methods: {
     click1() {
         alert('pin2:'+this.$store.state.selectedPinProjectId)

@@ -1,7 +1,7 @@
 <template>
   <b-container id="app" fluid>
-      <b-row class="h-100">
-        <b-col xl="2" class="mySidebar" v-show="this.array.includes(this.$route.name) == false"><Sidebar/></b-col>
+      <b-row no-gutters class="h-100">
+        <b-col xl="2" class="mySidebar" v-if="this.array.includes(this.$route.name) == false"><Sidebar/></b-col>
         <b-col class="content"><router-view/></b-col>
       </b-row>
   </b-container>
@@ -13,7 +13,7 @@ export default {
   name: 'App',
   data() {
     return {
-      array: ["Login", 'UserSelect', 'studentSignUp', 'ProfessorAuth', 'ProfessorSignUp'],
+      array: ["Login", 'UserSelect', 'studentSignUp', 'ProfessorAuth', 'ProfessorSignUp' ,'AuthAlert','FindPass','FindPassAlert','ChangePw', 'Test', 'Test2'],
     }
   },
   components: {
@@ -24,9 +24,10 @@ export default {
 
 <style>
 html, body, #app {
+  padding:0;
   height: 100%
 }
 .mySidebar {
-  border-right: 1px solid lightgray;
+  border:1px solid silver;
 }
 </style>

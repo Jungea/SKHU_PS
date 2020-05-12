@@ -1,117 +1,107 @@
 <template>
-  <div class="home h-100">
-    <b-row class="h-100">
-      <b-col class="myNav overflow-auto" cols="200px">
-        <Sidebar/>
-      </b-col>
-      <b-col>
-        <div class="profileContainer">
-            <h3>정보 수정</h3>
-            <hr style="margin:30px 0;">
-            <div class="infoContainer">
-                <div style="margin:auto; max-width:700px; padding: 30px;">
-                    <b-form @submit="onSubmit" v-if="show" class="editForm">
-                      <!--intro-->
-                      <b-form-group style="text-align:left"
-                        id="input-group-1"
-                        label="한 줄 소개"
-                        label-for="intro"
-                      >
-                        <b-form-input 
-                        id="intro" 
-                        v-model="input.intro" 
-                        type="text"
-                        placeholder="한 줄 소개 없음"
-                        ></b-form-input>
-                      </b-form-group>
+  <div>
+    <div class="profileContainer">
+      <h3>정보 수정</h3>
+      <hr style="margin:30px 0;">
+      <div>
+        <div style="margin:auto; max-width:700px; padding: 30px;">
+            <b-form @submit="onSubmit" v-if="show" class="editForm">
+              <!--intro-->
+              <b-form-group style="text-align:left"
+                id="input-group-1"
+                label="한 줄 소개"
+                label-for="intro"
+              >
+                <b-form-input 
+                id="intro" 
+                v-model="input.intro" 
+                type="text"
+                placeholder="한 줄 소개 없음"
+                ></b-form-input>
+              </b-form-group>
 
-                      <!--grade-->
-                      <b-form-group style="text-align:left"
-                        id="input-group-2"
-                        label="학년"
-                        label-for="grade"
-                      >
-                        <b-form-select
-                          id="grade"
-                          v-model="input.grade"
-                          :options="gradeOptions"
-                          value-field="item"
-                          text-field="value"
-                        ></b-form-select>
-                      </b-form-group>
+              <!--grade-->
+              <b-form-group style="text-align:left"
+                id="input-group-2"
+                label="학년"
+                label-for="grade"
+              >
+                <b-form-select
+                  id="grade"
+                  v-model="input.grade"
+                  :options="gradeOptions"
+                  value-field="item"
+                  text-field="value"
+                ></b-form-select>
+              </b-form-group>
 
-                      <!--department-->
-                      <b-form-group style="text-align:left"
-                        id="input-group-3"
-                        label="학과"
-                        label-for="department"
-                      >
-                        <b-form-select
-                          v-model="input.department"
-                          :options="deptOptions"
-                          value-field="detId"
-                          text-field="detName"
-                        ></b-form-select>
-                      </b-form-group>
+              <!--department-->
+              <b-form-group style="text-align:left"
+                id="input-group-3"
+                label="학과"
+                label-for="department"
+              >
+                <b-form-select
+                  v-model="input.department"
+                  :options="deptOptions"
+                  value-field="detId"
+                  text-field="detName"
+                ></b-form-select>
+              </b-form-group>
 
-                      <!--github-->
-                      <b-form-group style="text-align:left"
-                        id="input-group-4"
-                        label="깃허브 닉네임"
-                        label-for="github"
-                      >
-                        <b-form-input 
-                        id="github" 
-                        v-model="input.github" 
-                        type="text"
-                        ></b-form-input>
-                        <b-form-text id="input-live-help">깃허브 계정이 있다면 입력하세요.</b-form-text>
-                      </b-form-group>
+              <!--github-->
+              <b-form-group style="text-align:left"
+                id="input-group-4"
+                label="깃허브 닉네임"
+                label-for="github"
+              >
+                <b-form-input 
+                id="github" 
+                v-model="input.github" 
+                type="text"
+                ></b-form-input>
+                <b-form-text id="input-live-help">깃허브 계정이 있다면 입력하세요.</b-form-text>
+              </b-form-group>
 
-                      <!--Language-->
-                      <b-form-group style="text-align:left"
-                        id="input-group-5"
-                        label="주요 분야"
-                        label-for="language"
-                      >
-                        <b-form-tags
-                          input-id="language"
-                          :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
-                          v-model="tagArray"
-                          separator=" ,;"
-                          placeholder="태그를 입력하세요"
-                          remove-on-delete
-                          add-on-enter
-                          class="mb-2"
-                      ></b-form-tags>
-                        <b-form-text id="input-live-help">주로 사용하는 프로그래밍 언어나 기술이 있다면 입력하세요.</b-form-text>
-                      </b-form-group>
+              <!--Language-->
+              <b-form-group style="text-align:left"
+                id="input-group-5"
+                label="주요 분야"
+                label-for="language"
+              >
+                <b-form-tags
+                  input-id="language"
+                  :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
+                  v-model="tagArray"
+                  separator=" ,;"
+                  placeholder="태그를 입력하세요"
+                  remove-on-delete
+                  add-on-enter
+                  class="mb-2"
+              ></b-form-tags>
+                <b-form-text id="input-live-help">주로 사용하는 프로그래밍 언어나 기술이 있다면 입력하세요.</b-form-text>
+              </b-form-group>
 
-                      <div style="text-align: right">
-                        <b-button class="btStyle" type="submit">수정</b-button>
-                        <b-button class="btStyle" variant="danger" @click="cancle">취소</b-button>
-                      </div>
-                    </b-form>
+              <div style="text-align: right; margin-top:15px">
+                <b-button style="margin-right:10px" type="submit">수정</b-button>
+                <b-button variant="danger" @click="cancle">취소</b-button>
+              </div>
+            </b-form>
 
-                    <!-- {{tagArray}}
-                    {{tagArray.join(',')}} -->
-                </div>
-            </div>
+            <!-- {{tagArray}}
+            {{tagArray.join(',')}} -->
         </div>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import Sidebar from '@/components/Sidebar.vue'
+//import Sidebar from '@/components/Sidebar.vue'
 
 export default {
   name: 'EditProfile',
-  components: {
-    Sidebar
-  },
   data() {
       return {
         show: true,
@@ -185,21 +175,10 @@ export default {
     .infoContainer h5{
         font-weight: bold;
     }
-    .profileCard{
-        max-width: 300px;
-        min-width: 200px;
-        padding: 20px;
-    }
     .editForm label{
       font-weight: bold;
     }
     .editForm input::placeholder{
       color:silver;
-    }
-
-    .btStyle {
-      margin-top: 15px;
-      margin-left: 5px;
-      margin-right: 5px;
     }
 </style>

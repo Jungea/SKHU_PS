@@ -127,6 +127,7 @@ export default {
 }
 
 .containerStyle {
-    margin: 100px
+    margin: 100px;
+    min-width: 350px;
 }
 </style>
