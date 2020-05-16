@@ -29,7 +29,7 @@
                         <tr>
                             <th scope="row">내용</th>
                             <td>
-                                <b-form-input v-model="data.content"></b-form-input>
+                                <b-form-textarea v-model="data.content"></b-form-textarea>
                                 <b-form-invalid-feedback :state="contentValidation">
                                     프로젝트 내용을 입력해주세요.
                                 </b-form-invalid-feedback>

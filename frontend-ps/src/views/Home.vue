@@ -148,7 +148,6 @@
                             </td>
                         </tr>
                     </tbody>
-    
                 </table>
             </b-form-group>
             </form>
