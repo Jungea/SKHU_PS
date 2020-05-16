@@ -15,6 +15,8 @@ import ProfessorSignUp from '../views/ProfessorSignUp.vue';
 import SignUpAlert from '../views/SignUpAlert.vue';
 import AuthAlert from '../views/AuthAlert.vue';
 import ChangePw from '../views/ChangePw.vue';
+import ProfessorHome from '../views/ProfessorHome.vue'
+import ProfessorProfile from '../views/ProfessorProfile.vue'
 
 import MyProjectEdit from '../views/MyProjectEdit';
 import Summary from '../views/summary.vue';
@@ -107,7 +109,17 @@ Vue.use(VueRouter)
     path: '/project/:projectId/edit',
     name: 'ProjectEdit',
     component: MyProjectEdit
-},
+  },
+  {
+    path: '/professorHome',
+    name: 'professorHome',
+    component: ProfessorHome
+  },
+  {
+    path: '/professorProfile',
+    name: 'professorProfile',
+    component: ProfessorProfile
+  }
 ]
 
 const router = new VueRouter({
