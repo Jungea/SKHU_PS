@@ -19,10 +19,16 @@ import ChangePw from '../views/ChangePw.vue';
 import MyProjectEdit from '../views/MyProjectEdit';
 import Summary from '../views/summary.vue';
 
+import WeeklyGoal from '../views/WeeklyGoal.vue'
+
+// import test from '../views/test.vue';
+// import test2 from '../views/test2.vue';
 
 Vue.use(VueRouter)
 
   const routes = [
+    //{path:'/test', name:'Test',component:test},
+    //{path:'/test2', name:'Test2',component:test2},
   {
     path: '/',
     name: 'Login',
@@ -107,7 +113,13 @@ Vue.use(VueRouter)
     path: '/project/:projectId/edit',
     name: 'ProjectEdit',
     component: MyProjectEdit
-},
+  },
+  {
+    path: '/project/:projectId/wg/',
+    name: 'WG',
+    component: WeeklyGoal
+  },
+
 ]
 
 const router = new VueRouter({
