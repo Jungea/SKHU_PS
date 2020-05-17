@@ -60,7 +60,12 @@ import axios from 'axios';
                 if(this.user.emailCheck==false) {
                   alert('이메일 인증을 완료해주세요.');
                 } else {
-                  location.href="/home" 
+                  if(this.user.userType==false) {
+                    location.href="/home"
+                  } else {
+                    location.href="/professorHome"
+                  }
+
                 }
               } else {        
                 alert("학번/교번 또는 비밀번호를 확인해주세요.");

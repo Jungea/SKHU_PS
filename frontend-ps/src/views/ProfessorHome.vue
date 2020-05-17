@@ -19,6 +19,7 @@
                                     <table>
                                         <tr>
                                             <td style="width: 100%">{{item.title}}</td>
+                                            <td><b-button @click="changePin(item.subjectId)" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="item.pin==true?'star-fill':'star'"></b-icon></b-button></td>
                                         </tr>
                                     </table>
                                 </b-card-header>
@@ -64,9 +65,12 @@
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">과목 비밀번호</th>
+                            <th scope="row">과목 인증번호</th>
                             <td>
-                                <b-form-input type="password" id="input-default3" v-model="authKey" required trim placeholder="과목 비밀번호를 입력하세요"></b-form-input>
+                                <b-form-input style="width:75%; margin-right:10px; float:left;" id="input-default3" v-model="authKey" placeholder="인증키를 입력하세요" :disabled="authCheck==true"></b-form-input>
+                                <b-button style="width:15%; clear:both" @click="checkAuthKey()">검사</b-button>
+                                <b-form-text id="input-live-help5">해당 수업의 인증키를 입력하세요.</b-form-text>
+                                <!-- <b-form-valid-feedback :state="subjectValidation"> -->
                             </td>
                         </tr>
                     </tbody>
@@ -87,7 +91,8 @@ export default {
             title: '',
             year: '',
             semester: '',
-            authKey: ''
+            authKey: '',
+            authCheck:false,
         };
     },
     mounted() { 
@@ -98,22 +103,53 @@ export default {
     },
 
      methods: {
+         changePin(subjectId) {   // pin이 바뀌었을때
+            axios.post('/api/changeSubjectPin', {
+                subjectId:subjectId
+            })
+            .then(response => {
+                this.data = response.data
+            })
+            event.stopPropagation()
+            location.reload()
+        },
+         checkAuthKey(){
+             console.log("authKey:"+this.authKey)
+            axios.post('/api/checkAuthKey',{
+                authKey:this.authKey
+            }).then(response => {
+                this.check = response.data;
+                if(this.check==false) {
+                    alert('이미 존재하는 인증 번호입니다.다른 번호를 입력해주세요')
+                    this.authCheck=false;
+                } else {
+                    alert('올바른 인증 번호 입니다.')
+                    this.authCheck=true;
+                }
+            }).catch((erro)=> {
+                console.error(erro);
+            });
+        },
         submit() {
-            alert(this.authKey)
             if(!parseInt(this.year))
                 alert("연도 항목에는 숫자만 작성 가능합니다.")
             else if(!parseInt(this.semester))
                 alert("학기 항목에는 숫자만 작성 가능합니다.")
             else {
-                axios.post('/api/url',{
-                    title:this.subjectName,
-                    year:this.year,
-                    semester:this.semester,
-                    authKey:this.authKey
-                }).then(response => { 
-                    this.subject = response.data;
-                    location.reload()
-                });
+                if(this.authCheck==true) { // 인증 번호 검사가 true면(validation으로 안해서 false일때 모달 창 꺼지는 문제 발생->validation으로 바꿔줘~~~)
+                    axios.post('/api/makeSubject',{
+                        title:this.title,
+                        year:this.year,
+                        semester:this.semester,
+                        authKey:this.authKey
+                    }).then(response => { 
+                        this.subject = response.data;
+                        location.reload()
+                        this.authCheck=false;
+                    });
+                } else { 
+                    alert('인증 번호 검사가 완료되지 않았습니다.')
+                }
             }
         },
         resetModal() {

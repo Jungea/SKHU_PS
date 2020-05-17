@@ -55,6 +55,7 @@ export default {
         pinProjectId:null, // 현재 셀렉트 된 projectId
         myProjects:[],
         allProjects:[],
+        userType:null,
       }
     },
    
@@ -62,6 +63,7 @@ export default {
       axios.get('/api/user')
         .then(response => {
           this.name = response.data.name
+          this.userType=response.data.userType;
         }).catch((erro)=> {
           console.error(erro);
         });
@@ -101,9 +103,15 @@ export default {
         evt.preventDefault()
         // location.href="/home"
         this.pinProjectId = null;
-        this.$router.push({
-          path: '/home'
-        })
+        if(this.userType==false) {
+          this.$router.push({
+            path: '/home'
+          })
+        } else {
+          this.$router.push({
+            path: '/professorHome'
+          })
+        }
       },
       profile(evt){
         evt.preventDefault()

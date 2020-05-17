@@ -31,6 +31,7 @@ import net.skhu.repository.UserRepository;
 import net.skhu.service.DetailService;
 import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
+import net.skhu.service.SubjectService;
 import net.skhu.service.UserService;
 
 @RestController
@@ -50,6 +51,8 @@ public class APIController {
 	DetailService detailService;
 	@Autowired
 	SubjectRepository subjectRepository;
+	@Autowired
+	SubjectService subjectService;
 
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -286,9 +289,39 @@ public class APIController {
 		return subjectRepository.findAll();
 	}
 
+
 	//	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
 	//	public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
 	//		return projectService.allProjectsList(getLoginUserId(request));
 	//	}
 
+	// 교수의 자기 과목  가져오기
+	@RequestMapping(value = "/subjects",  method = RequestMethod.GET)
+	public List<Subject> getSubjects(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		int userId = (int) session.getAttribute("userId");
+		return subjectRepository.findSubjectByUser_userId(userId);
+	}
+
+	// 교수의 과목 생성시 인증 번호 검사
+	@RequestMapping(value = "checkAuthKey",  method = RequestMethod.POST)
+	public boolean checkAuthKey(@RequestBody Subject subject) {
+
+		System.out.println("authKey:"+subject.getAuthKey());
+		return subjectService.checkAuthKey(subject);
+	}
+	
+	// 교수의 과목 만들기
+	@RequestMapping(value = "makeSubject",  method = RequestMethod.POST)
+	public void makeSubject(@RequestBody Subject subject,HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		int userId = (int) session.getAttribute("userId");
+		subjectService.makeSubject(subject,userId);
+	}
+	// 교수의 과목 핀 여부 바꾸기
+	@RequestMapping(value = "changeSubjectPin",  method = RequestMethod.POST)
+	public void changeSubjectPin(@RequestBody Subject subject) {
+		System.out.println("subjectId:"+subject.getSubjectId());
+		subjectService.changeSubjectPin(subject);
+	}
 }

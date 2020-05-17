@@ -30,6 +30,7 @@ public class Subject {
 	   int semester;
 	   String title;
 	   String authKey;
+	   boolean pin;
 	   
 	   @ManyToOne(fetch = FetchType.EAGER)
 	   @JoinColumn(name = "userId")
