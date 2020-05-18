@@ -87,11 +87,11 @@ export default {
             this.project = response.data
         }),
 
-        //주간 목표 목록 구현하면 주석해제
-        // axios.get('/api/project/'+this.$route.params.projectId+'/weeklyGoal')
-        // .then(response => {
-        //     this.goals.push(response.data)
-        // }),
+        // 주간 목표 목록 구현하면 주석해제
+        axios.get('/api/project/'+this.$route.params.projectId+'/weeklyGoal')
+        .then(response => {
+            console.log(response.data)
+        }),
         
         this.title=this.goals.length+1+"주차 목표 생성"
 
@@ -184,15 +184,15 @@ export default {
         submit() {
             alert('시작날짜'+this.context.selectedYMD+'상세'+this.detail)
             //구현하면 주석해제
-            // axios.post('/api/createGoal',{
-            //     projectId:this.project.projectId,
-            //     start_time:this.context.selectedYMD,  //시작 연월일
-            //     detail:this.detail,
-            //     week:this.goals.length+1  //하나 생성하면 주 수 증가
-            // }).then(response => { 
-            //     this.project = response.data;
-            //     location.reload();
-            // });
+            axios.post('/api/createGoal',{
+                projectId:this.project.projectId,
+                startTime:this.context.selectedYMD,  //시작 연월일
+                detail:this.detail,
+                week:this.goals.length+1  //하나 생성하면 주 수 증가
+            }).then(response => { 
+                this.project = response.data;
+                location.reload();
+            });
         },
     }
 }
