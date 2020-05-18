@@ -17,6 +17,8 @@ import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Subject;
 import net.skhu.domain.User;
+import net.skhu.domain.Weekly;
+import net.skhu.model.WeekGoalModel;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
@@ -171,22 +173,24 @@ public class APIController {
 
 	// 프로젝트 생성
 	@RequestMapping(value = "makeProject", method = RequestMethod.POST)
-	public String makeProject(@RequestBody MakeProjectModel makeProjectModel,HttpServletRequest request) {
+	public String makeProject(@RequestBody MakeProjectModel makeProjectModel, HttpServletRequest request) {
 		System.out.println("tag:" + makeProjectModel.getTag());
-		return projectService.makeProject(makeProjectModel,getLoginUserId(request));
+		return projectService.makeProject(makeProjectModel, getLoginUserId(request));
 	}
 
 	// 프로젝트 개요가 수정되고 저장되었을 때
 	@RequestMapping(value = "project/{projectId}/edit", method = RequestMethod.POST)
-	public void editProject(@RequestBody EditProjectModel editProjectModel, @PathVariable("projectId") String projectId) {
+	public void editProject(@RequestBody EditProjectModel editProjectModel,
+			@PathVariable("projectId") String projectId) {
 		projectService.update(Integer.parseInt(projectId), editProjectModel);
 	}
 
 	// 핀 바꾸기
 	@RequestMapping(value = "changePin", method = RequestMethod.POST)
-	public List<MyProjectListModel> changePin(@RequestBody MyProjectListModel myProjectListModel,HttpServletRequest request) {
+	public List<MyProjectListModel> changePin(@RequestBody MyProjectListModel myProjectListModel,
+			HttpServletRequest request) {
 		System.out.println("changePin");
-		return projectJoinService.changePin(myProjectListModel,getLoginUserId(request));
+		return projectJoinService.changePin(myProjectListModel, getLoginUserId(request));
 	}
 
 	@RequestMapping(value = "pinList", method = RequestMethod.GET)
@@ -246,57 +250,58 @@ public class APIController {
 	public List<ProjectJoin> projectInviteList(@PathVariable("projectId") String projectId) {
 		return projectService.inviteList(Integer.parseInt(projectId));
 	}
+
 	@RequestMapping(value = "project/{projectId}")
 	public Project project(@PathVariable("projectId") String projectId) {
 		return projectService.findById(Integer.parseInt(projectId));
 	}
+
 	@RequestMapping(value = "/project/projectName/{projectId}")
 	public Project projectName2(@PathVariable("projectId") String projectId) {
 		System.out.println("projectName2");
 		return projectService.findByProjectId(Integer.parseInt(projectId));
 	}
 
-	//0430 추가
+	// 0430 추가
 	@RequestMapping(value = "/turnjoinstate/{joinId}/{state}", method = RequestMethod.POST)
 	public void turnState(@PathVariable("joinId") int joinId, @PathVariable("state") int state) {
 		projectJoinService.turnState(joinId, state);
 	}
 
-	//0501 추가
-	@RequestMapping(value = "/increaseMember/{projectId}",  method = RequestMethod.POST)
+	// 0501 추가
+	@RequestMapping(value = "/increaseMember/{projectId}", method = RequestMethod.POST)
 	public void increaseMember(@PathVariable("projectId") int projectId) {
 		System.out.println("멤버수가증가합니다");
 		projectService.increaseMember(projectId);
 	}
 
-	//0501 초대 취소
-	@RequestMapping(value = "/deletejoin/{joinId}",  method = RequestMethod.POST)
+	// 0501 초대 취소
+	@RequestMapping(value = "/deletejoin/{joinId}", method = RequestMethod.POST)
 	public void deleteWaiting(@PathVariable("joinId") int joinId) {
 		System.out.println("초대 기록을 삭제합니다");
 		projectJoinService.deleteWaiting(joinId);
 	}
 
-	//0501 멤버삭제
-	@RequestMapping(value = "/exile/{memId}/{projectId}",  method = RequestMethod.POST)
+	// 0501 멤버삭제
+	@RequestMapping(value = "/exile/{memId}/{projectId}", method = RequestMethod.POST)
 	public void exileMember(@PathVariable("projectId") int projectId, @PathVariable("memId") int memId) {
 		System.out.println("멤버를 추방합니다");
-		projectJoinService.exileMember(memId,projectId);
+		projectJoinService.exileMember(memId, projectId);
 	}
 
-	//0501 과목정보
-	@RequestMapping(value = "/subjects",  method = RequestMethod.POST)
+	// 0501 과목정보
+	@RequestMapping(value = "/subjects", method = RequestMethod.POST)
 	public List<Subject> findAllSubject() {
 		return subjectRepository.findAll();
 	}
 
+	// @RequestMapping(value = "allProjects", method = RequestMethod.GET)
+	// public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
+	// return projectService.allProjectsList(getLoginUserId(request));
+	// }
 
-	//	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
-	//	public List<AllProjectsListModel> allProjects(HttpServletRequest request) {
-	//		return projectService.allProjectsList(getLoginUserId(request));
-	//	}
-
-	// 교수의 자기 과목  가져오기
-	@RequestMapping(value = "/subjects",  method = RequestMethod.GET)
+	// 교수의 자기 과목 가져오기
+	@RequestMapping(value = "/subjects", method = RequestMethod.GET)
 	public List<Subject> getSubjects(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		int userId = (int) session.getAttribute("userId");
@@ -304,30 +309,46 @@ public class APIController {
 	}
 
 	// 교수의 과목 생성시 인증 번호 검사
-	@RequestMapping(value = "checkAuthKey",  method = RequestMethod.POST)
+	@RequestMapping(value = "checkAuthKey", method = RequestMethod.POST)
 	public boolean checkAuthKey(@RequestBody Subject subject) {
 
-		System.out.println("authKey:"+subject.getAuthKey());
+		System.out.println("authKey:" + subject.getAuthKey());
 		return subjectService.checkAuthKey(subject);
 	}
-	
+
 	// 교수의 과목 만들기
-	@RequestMapping(value = "makeSubject",  method = RequestMethod.POST)
-	public void makeSubject(@RequestBody Subject subject,HttpServletRequest request) {
+	@RequestMapping(value = "makeSubject", method = RequestMethod.POST)
+	public void makeSubject(@RequestBody Subject subject, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		int userId = (int) session.getAttribute("userId");
-		subjectService.makeSubject(subject,userId);
+		subjectService.makeSubject(subject, userId);
 	}
+
 	// 교수의 과목 핀 여부 바꾸기
-	@RequestMapping(value = "changeSubjectPin",  method = RequestMethod.POST)
+	@RequestMapping(value = "changeSubjectPin", method = RequestMethod.POST)
 	public void changeSubjectPin(@RequestBody Subject subject) {
-		System.out.println("subjectId:"+subject.getSubjectId());
+		System.out.println("subjectId:" + subject.getSubjectId());
 		subjectService.changeSubjectPin(subject);
 	}
+
 	@RequestMapping(value = "/subject/subjectName/{subjectId}")
 	public Subject subjecttName(@PathVariable("subjectId") String subjectId) {
 		System.out.println("subjectName");
 		return subjectRepository.findBySubjectId(Integer.parseInt(subjectId));
+	}
+
+	// 프로젝트의 주간 목표 목록.
+	@RequestMapping(value = "/project/{projectId}/weeklyGoal", method = RequestMethod.GET)
+	public List<Weekly> getWeeklyGoals(@PathVariable("projectId") String projectId, HttpServletRequest request) {
+		return projectService.getWeeklyGoals(Integer.parseInt(projectId));
+	}
+
+	// 주간 목표 생성
+	@RequestMapping(value = "createGoal", method = RequestMethod.POST)
+	public void createWeekGoal(@RequestBody WeekGoalModel weekGoalModel) {
+		System.out.println(weekGoalModel);
+		projectService.createWeekGoal(weekGoalModel);
+
 	}
 
 }

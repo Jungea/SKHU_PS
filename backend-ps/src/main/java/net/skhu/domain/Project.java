@@ -19,8 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@ToString(exclude = { "projectJoins" })
-@EqualsAndHashCode(exclude = { "projectJoins" })
+@ToString(exclude = { "projectJoins", "weeklies" })
+@EqualsAndHashCode(exclude = { "projectJoins", "weeklies" })
 @Entity
 public class Project {
 	@Id
@@ -51,19 +51,23 @@ public class Project {
 	@JsonIgnore
 	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
 	List<ProjectJoin> projectJoins;
-	
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+	List<Weekly> weeklies;
+
 	public Project() {
 	}
 
 	public Project(String projectName, String theme, String content, String tag, String github, boolean rcrtState) {
-	      this.projectName = projectName;
-	      this.memNum = 1;
-	      this.theme = theme;
-	      this.content = content;
-	      this.tag = tag;
-	      this.github = github;
-	      this.rcrtState = rcrtState;
-	      this.startDate=LocalDateTime.now();
-	      this.memNum=1;
+		this.projectName = projectName;
+		this.memNum = 1;
+		this.theme = theme;
+		this.content = content;
+		this.tag = tag;
+		this.github = github;
+		this.rcrtState = rcrtState;
+		this.startDate = LocalDateTime.now();
+		this.memNum = 1;
 	}
 }
