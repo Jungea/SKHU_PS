@@ -17,11 +17,13 @@ import AuthAlert from '../views/AuthAlert.vue';
 import ChangePw from '../views/ChangePw.vue';
 import ProfessorHome from '../views/ProfessorHome.vue'
 import ProfessorProfile from '../views/ProfessorProfile.vue'
+import EditProfessorProfile from '../views/EditProfessorProfile.vue'
 
 import MyProjectEdit from '../views/MyProjectEdit';
 import Summary from '../views/summary.vue';
 
 import WeeklyGoal from '../views/WeeklyGoal.vue'
+
 
 // import test from '../views/test.vue';
 // import test2 from '../views/test2.vue';
@@ -130,6 +132,11 @@ Vue.use(VueRouter)
     path: '/professorProfile',
     name: 'professorProfile',
     component: ProfessorProfile
+  }, 
+  {
+    path: '/editProfessorProfile',
+    name: 'editProfessorProfile',
+    component: EditProfessorProfile
   }
 ]
 

@@ -85,6 +85,7 @@ public class UserService {
 	}
 
 	// 프로필 수정후 저장
+	@Transactional
 	public void update(int userId, ProfileModel profileModel) {
 		User user = findById(userId);
 		user.setIntro(profileModel.getIntro());
@@ -109,4 +110,12 @@ public class UserService {
 		return userRepository.findByUserNum(userNum);
 	}
 	
+	// 교수 프로필 수정후 저장
+	@Transactional
+	public void updateProfessor(int userId, ProfileModel profileModel) {
+		User user = findById(userId);
+		// user.setIntro(profileModel.getIntro());
+		user.setGithub(profileModel.getGithub());
+		userRepository.save(user);
+	}
 }

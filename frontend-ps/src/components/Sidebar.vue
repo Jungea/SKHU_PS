@@ -132,24 +132,14 @@ export default {
             });
           } 
         } else { // 교수일때 
-          console.log('교수')
-           axios.get('/api/subject/subjectName/'+this.pinSubjectId).then(response => { // 과목 이름 가져오기
-                let subject = response.data
-                this.subjectName=subject.title
+          if(this.$route.params.subjectId != undefined) { 
+            this.pinSubjectId = this.$route.params.subjectId
+            axios.get('/api/subject/subjectName/'+this.pinSubjectId).then(response => { // 과목 이름 가져오기
+                this.subjectName=response.data.title
               }).catch((erro) => {
               console.error(erro);
             });
-          // if(this.$route.params.subjectId != undefined) { // 과목을 선택한 상태일때
-          //   console.log('1')
-          //   this.pinSubjectId = this.$route.params.subjectId
-          //   axios.get('/api/subject/subjectName/'+this.pinSubjectId).then(response => { // 과목 이름 가져오기
-          //       let subject = response.data
-          //       this.subjectName=subject.title
-          //     }).catch((erro) => {
-          //     console.error(erro);
-          //   });
-          //   console.log('2')
-          // } 
+          }
         }
       }   
     },

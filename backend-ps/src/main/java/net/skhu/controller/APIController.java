@@ -329,5 +329,10 @@ public class APIController {
 		System.out.println("subjectName");
 		return subjectRepository.findBySubjectId(Integer.parseInt(subjectId));
 	}
+	// 교수 마이페이지 프로필이 수정되고 저장되었을 때
+	@RequestMapping(value = "user/professorProfile", method = RequestMethod.POST)
+	public void professorProfile(@RequestBody ProfileModel profileModel, HttpServletRequest request) {
+		userService.updateProfessor(getLoginUserId(request), profileModel);
+	}
 
 }
