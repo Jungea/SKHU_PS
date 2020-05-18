@@ -324,4 +324,10 @@ public class APIController {
 		System.out.println("subjectId:"+subject.getSubjectId());
 		subjectService.changeSubjectPin(subject);
 	}
+	@RequestMapping(value = "/subject/subjectName/{subjectId}")
+	public Subject subjecttName(@PathVariable("subjectId") String subjectId) {
+		System.out.println("subjectName");
+		return subjectRepository.findBySubjectId(Integer.parseInt(subjectId));
+	}
+
 }
