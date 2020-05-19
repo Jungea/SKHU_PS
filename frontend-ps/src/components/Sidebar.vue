@@ -26,7 +26,7 @@
           <b-nav-item><strong>{{ this.projectName }}</strong></b-nav-item>
           <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
           <li><b-nav-item>캘린더</b-nav-item></li>
-          <li><b-nav-item @click="projectInfoChange('WG')">주차별 목표(to-do-list)</b-nav-item></li>
+          <li><b-nav-item @click="projectInfoChange('weekly')">주차별 목표(to-do-list)</b-nav-item></li>
           <li><b-nav-item>토론 게시판</b-nav-item></li>
           <li><b-nav-item>자유 게시판</b-nav-item></li>
           <li><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>

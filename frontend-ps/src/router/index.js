@@ -22,6 +22,7 @@ import MyProjectEdit from '../views/MyProjectEdit';
 import Summary from '../views/summary.vue';
 
 import WeeklyGoal from '../views/WeeklyGoal.vue'
+import Todo from '../views/Todo.vue'
 
 // import test from '../views/test.vue';
 // import test2 from '../views/test2.vue';
@@ -117,9 +118,14 @@ Vue.use(VueRouter)
     component: MyProjectEdit
   },
   {
-    path: '/project/:projectId/wg/',
-    name: 'WG',
+    path: '/project/:projectId/weekly/',
+    name: 'WeeklyGoal',
     component: WeeklyGoal
+  },
+  {
+    path: '/project/:projectId/weekly/:week/todo',
+    name: 'Todo',
+    component: Todo
   },
   {
     path: '/professorHome',
@@ -130,7 +136,7 @@ Vue.use(VueRouter)
     path: '/professorProfile',
     name: 'professorProfile',
     component: ProfessorProfile
-  }
+  },
 ]
 
 const router = new VueRouter({
