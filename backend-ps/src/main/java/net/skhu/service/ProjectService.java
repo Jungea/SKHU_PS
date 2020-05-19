@@ -5,24 +5,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
+import net.skhu.domain.ProjectStar;
 import net.skhu.domain.Subject;
 import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.MakeProjectModel;
 import net.skhu.model.MyProjectListModel;
+import net.skhu.model.ProjectBoardModel;
 import net.skhu.model.SidebarModel;
 import net.skhu.model.WeekGoalModel;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
+import net.skhu.repository.ProjectStarRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.repository.WeeklyRepository;
@@ -40,6 +41,8 @@ public class ProjectService {
 	ProjectJoinRepository projectJoinRepository;
 	@Autowired
 	WeeklyRepository weeklyRepository;
+	@Autowired
+	ProjectStarRepository projectStarRepository;
 
 	// userId 유저의 프로젝트 목록
 	public List<Project> findProjectByUserId(int userId) {
@@ -163,26 +166,6 @@ public class ProjectService {
 		}
 		return myProjectsList;
 	}
-
-//	public List<AllProjectsListModel> allProjectsList(int userId) {
-//		List<Project> allProjects=projectRepository.findAll(); // 모든 프로젝트
-//		List<ProjectJoin> myProjects=projectJoinRepository.findAllByUser_UserId(userId); // 내가 참여하고있는 프로젝트
-//	
-//		List<AllProjectsListModel> allProjectsListModel = new ArrayList<>();
-//		
-//		for(int i=0;i<allProjects.size();i++) {
-//			if(myProjects.get(i).getState()==1) { // 초대가 승인인 상태일 때
-//				AllProjectsListModel myProject=new AllProjectsListModel();
-//				
-//				myProject.setProjectId(myProjects.get(i).getProject().getProjectId());
-//				myProject.setProjectName(myProjects.get(i).getProject().getProjectName());
-//				myProject.setPin(myProjects.get(i).isPin());
-//				allProjectsListModel.add(myProject);
-//			}
-//		}
-//		return myProjectsList;
-//	}
-
 	public Project findById(int userId) {
 		Optional<Project> p = projectRepository.findById(userId);
 		return p.get();
@@ -223,5 +206,21 @@ public class ProjectService {
 
 		weeklyRepository.save(weekly);
 	}
+	
+	public List<ProjectBoardModel> projectBoard(int userId) {
+		List<Project> project=projectRepository.findAll();
+		List<ProjectBoardModel> board=new ArrayList<>();
+		
+		for(Project p:project) {
+			ProjectBoardModel model=new ProjectBoardModel();
+			model.setProject(p);
+			ProjectStar ps=projectStarRepository.findByUser_userIdAndProject_ProjectId(userId, p.getProjectId());
+			model.setStar(ps!=null?true:false);
+			model.setSubjectName(p.getSubject()!=null?p.getSubject().getTitle():null);
+			model.setCreateName(p.getUser().getName());
+			List<ProjectJoin> pj=projectJoinRepository.findByProject_ProjectId(p.getProjectId());
+			//model.setAllMemGrade();
 
+		}
+	}
 }

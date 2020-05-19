@@ -9,11 +9,9 @@
                 <b-row class="text-right mb-4">
                     <b-col><b-button v-b-modal.modal-xl variant="outline-secondary" style="height: 70px;">프로젝트 검색</b-button></b-col>
                 </b-row>
-
-                <p style="color:silver; margin:300px auto;" v-if="data.length==0?true:false">프로젝트가 비었습니다.</p>
-                <b-row cols-md="3" cols="1">
+                   <b-row cols-md="3" cols="1">
                     <b-col class="mb-5" :key="index" v-for="(item, index) in paginatedItems">
-                        <b-card id="my-table" v-b-modal.modal-xl align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
+                        <b-card id="my-table"  @click="sendInfo(index)" v-b-modal.modal-xl align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
                             <div>
                                 <b-card-header style="padding: 0 0 10px 0">
                                     <table>
@@ -51,7 +49,7 @@
                         <tr>
                             <th scope="row" style="width:28%">프로젝트명</th>
                             <td>
-                                {{ this.data.projectName }}
+                                {{ this.summaryData.projectName }}
                             </td>
                         </tr>
                          <tr>
@@ -130,6 +128,7 @@ export default {
       tagArray:[],
       rcrtState:false,
       projectName:'',
+      summaryData:{},
     }
   },
   mounted() { 
@@ -173,6 +172,9 @@ export default {
             // Trigger submit handler
             this.handleSubmit()
     },
+    sendInfo(index) {
+      this.summaryData=this.data[index]
+    }
   },
 
 

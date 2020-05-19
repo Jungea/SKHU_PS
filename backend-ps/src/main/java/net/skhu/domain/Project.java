@@ -19,8 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@ToString(exclude = { "projectJoins", "weeklies" })
-@EqualsAndHashCode(exclude = { "projectJoins", "weeklies" })
+@ToString(exclude = { "projectJoins", "weeklies","projectStars" })
+@EqualsAndHashCode(exclude = { "projectJoins", "weeklies","projectStars" })
 @Entity
 public class Project {
 	@Id
@@ -55,6 +55,10 @@ public class Project {
 	@JsonIgnore
 	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
 	List<Weekly> weeklies;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+	List<ProjectStar> projectStars;
 
 	public Project() {
 	}

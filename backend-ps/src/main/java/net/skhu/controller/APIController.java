@@ -18,15 +18,16 @@ import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Subject;
 import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
-import net.skhu.model.WeekGoalModel;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
 import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProfileModel;
+import net.skhu.model.ProjectBoardModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
+import net.skhu.model.WeekGoalModel;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
@@ -34,6 +35,7 @@ import net.skhu.repository.UserRepository;
 import net.skhu.service.DetailService;
 import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
+import net.skhu.service.ProjectStarService;
 import net.skhu.service.SubjectService;
 import net.skhu.service.UserService;
 
@@ -58,6 +60,8 @@ public class APIController {
 	SubjectService subjectService;
 	@Autowired
 	ProjectRepository projectRepository;
+	@Autowired
+	ProjectStarService projectStarService;
 
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -361,12 +365,12 @@ public class APIController {
 
 	// 전체 프로젝트 반환
 	@RequestMapping(value = "all/projects", method = RequestMethod.GET)
-	public List<Project> allProjects() {
-		return projectRepository.findAll();
+	public List<ProjectBoardModel> allProjects(HttpServletRequest request) {
+		return projectService.projectBoard(getLoginUserId(request));
 	}
 	// project_star 변경
-	@RequestMapping(value = "changeStar", method = RequestMethod.GET)
+	@RequestMapping(value = "changeStar", method = RequestMethod.POST)
 	public void changeStar(@RequestBody Project project,HttpServletRequest request) {
-		// projectJoinService.changePin(project, getLoginUserId(request));
+		projectStarService.changeStar(project.getProjectId(), getLoginUserId(request));
 	}
 }
