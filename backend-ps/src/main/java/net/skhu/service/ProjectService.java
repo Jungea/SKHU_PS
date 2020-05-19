@@ -2,8 +2,10 @@ package net.skhu.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -218,9 +220,18 @@ public class ProjectService {
 			model.setStar(ps!=null?true:false);
 			model.setSubjectName(p.getSubject()!=null?p.getSubject().getTitle():null);
 			model.setCreateName(p.getUser().getName());
-			List<ProjectJoin> pj=projectJoinRepository.findByProject_ProjectId(p.getProjectId());
-			//model.setAllMemGrade();
-
+			List<ProjectJoin> projectJoin=projectJoinRepository.findByProject_ProjectId(p.getProjectId());
+			Set<Integer> allGrade=new HashSet<>();
+			for(ProjectJoin pj:projectJoin) {
+				allGrade.add(pj.getUser().getGrade());
+			}
+			model.setAllMemGrade(allGrade);
+			ProjectJoin pj=projectJoinRepository.findByUser_userIdAndProject_projectId(userId,p.getProjectId());
+			if(pj==null) model.setState(2); // 프로젝트 신청할수 있는 상태
+			else if(pj.getState()==0) model.setState(0); // 승인대기 상태
+			else if(pj.getState()==1) model.setState(1); // 참가하고있는 상태
+			board.add(model);
 		}
+		return board;
 	}
 }

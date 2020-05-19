@@ -24,5 +24,6 @@ public interface ProjectJoinRepository extends JpaRepository<ProjectJoin, Intege
 	void deleteByUser_UserIdAndProject_ProjectId(int userId, int projectId);
 	
 	List<ProjectJoin> findByProject_ProjectId(int projectId);
+	ProjectJoin findByUser_userIdAndProject_projectId(int userId, int projectId); 
 
 }

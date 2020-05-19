@@ -1,23 +1,19 @@
 package net.skhu.service;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
-import net.skhu.domain.User;
-import net.skhu.model.FindPassModel;
 import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
 import net.skhu.repository.ProjectJoinRepository;
+import net.skhu.repository.ProjectRepository;
+import net.skhu.repository.UserRepository;
 
 @Service
 public class ProjectJoinService {
@@ -25,7 +21,11 @@ public class ProjectJoinService {
 	ProjectJoinRepository projectJoinRepository;
 	@Autowired
 	ProjectService projectService;
-
+	@Autowired
+	UserRepository userRepository;
+	@Autowired
+	ProjectRepository projectRepository;
+	
 	@Transactional
 	public List<MyProjectListModel> changePin(MyProjectListModel myProjectListModel,int userId) {
 		ProjectJoin projectJoin=projectJoinRepository.findByProject_ProjectIdAndUser_UserId(myProjectListModel.getProjectId(),userId);
@@ -68,5 +68,16 @@ public class ProjectJoinService {
 		projectJoinRepository.deleteByUser_UserIdAndProject_ProjectId(memId, projectId);
 		projectService.decreaseMember(projectId);
 	}
+	@Transactional
+	public void joinProject(int projectId, int userId) {
+		ProjectJoin projectJoin=new ProjectJoin();
+		projectJoin.setUser(userRepository.findById(userId).get());
+		projectJoin.setProject(projectRepository.findById(projectId).get());
+		projectJoin.setJoinTime(LocalDateTime.now());
+		projectJoin.setState(0);
+		projectJoin.setPin(false);
+		projectJoin.setType(2);
+	}
+
 
 }

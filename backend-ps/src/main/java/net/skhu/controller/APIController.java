@@ -373,4 +373,10 @@ public class APIController {
 	public void changeStar(@RequestBody Project project,HttpServletRequest request) {
 		projectStarService.changeStar(project.getProjectId(), getLoginUserId(request));
 	}
+	// project_star 변경
+	@RequestMapping(value = "joinProject", method = RequestMethod.POST)
+	public void joinProject(@RequestBody Project project,HttpServletRequest request) {
+		System.out.println("joinProject");
+		projectJoinService.joinProject(project.getProjectId(), getLoginUserId(request));
+	}
 }
