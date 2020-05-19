@@ -18,6 +18,9 @@ import ChangePw from '../views/ChangePw.vue';
 import ProfessorHome from '../views/ProfessorHome.vue'
 import ProfessorProfile from '../views/ProfessorProfile.vue'
 import EditProfessorProfile from '../views/EditProfessorProfile.vue'
+import TimeLine from '../views/timeline.vue'
+import Team from '../views/Team.vue'
+import ProfessorSummary from '../views/ProfessorSummary.vue'
 
 import MyProjectEdit from '../views/MyProjectEdit';
 import Summary from '../views/summary.vue';
@@ -137,6 +140,21 @@ Vue.use(VueRouter)
     path: '/editProfessorProfile',
     name: 'editProfessorProfile',
     component: EditProfessorProfile
+  },
+  {
+    path: '/timeLine',
+    name: 'timeLine',
+    component: TimeLine
+  },
+  {
+    path: '/Team',
+    name: 'team',
+    component: Team
+  },
+  {
+    path: '/Professor/:subjectId/summary',
+    name: 'professorSummary',
+    component: ProfessorSummary
   }
 ]
 

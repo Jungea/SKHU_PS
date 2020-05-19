@@ -13,7 +13,7 @@
                 <p style="color:silver; margin:300px auto;" v-if="data.length==0?true:false">과목이 없습니다.</p>
                 <b-row cols-md="2" cols="1">
                     <b-col class="mb-5" :key="index" v-for="(item, index) in data">
-                        <b-card align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
+                        <b-card @click="viewSummary(item.subjectId)" align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
                             <div>
                                 <b-card-header style="padding: 0 0 10px 0">
                                     <table>
@@ -111,6 +111,11 @@ export default {
     },
 
      methods: {
+         viewSummary(subjectId) {
+             this.$router.push({
+                 path: '/professor/' + subjectId + '/summary'
+             })
+         },         
          changePin(subjectId) {   // pin이 바뀌었을때
             axios.post('/api/changeSubjectPin', {
                 subjectId:subjectId
