@@ -17,6 +17,7 @@
                             <b-card-text style="height:50px;" v-if="(data.intro==null)?false:true">
                                 <span>{{data.intro}}</span>
                             </b-card-text>
+                            <b-button variant="dark" size="sm" @click="editProfile">정보 수정</b-button>
                         </b-card>
                     </b-col>
                     <b-col style="min-width:350px ;" class="mt-0">
@@ -70,6 +71,11 @@ export default {
         })
    },
    methods:{
+       editProfile() {
+            this.$router.push({
+                path: 'editProfessorProfile'
+            })
+       }
    }
 }
 </script>

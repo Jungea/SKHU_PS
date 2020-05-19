@@ -17,12 +17,14 @@ import AuthAlert from '../views/AuthAlert.vue';
 import ChangePw from '../views/ChangePw.vue';
 import ProfessorHome from '../views/ProfessorHome.vue'
 import ProfessorProfile from '../views/ProfessorProfile.vue'
+import EditProfessorProfile from '../views/EditProfessorProfile.vue'
 
 import MyProjectEdit from '../views/MyProjectEdit';
 import Summary from '../views/summary.vue';
 
 import WeeklyGoal from '../views/WeeklyGoal.vue'
 import Todo from '../views/Todo.vue'
+
 
 // import test from '../views/test.vue';
 // import test2 from '../views/test2.vue';
@@ -123,7 +125,7 @@ Vue.use(VueRouter)
     component: WeeklyGoal
   },
   {
-    path: '/project/:projectId/weekly/:week/todo',
+    path: '/project/:projectId/weekly/todo',
     name: 'Todo',
     component: Todo
   },
@@ -136,7 +138,12 @@ Vue.use(VueRouter)
     path: '/professorProfile',
     name: 'professorProfile',
     component: ProfessorProfile
-  },
+  }, 
+  {
+    path: '/editProfessorProfile',
+    name: 'editProfessorProfile',
+    component: EditProfessorProfile
+  }
 ]
 
 const router = new VueRouter({

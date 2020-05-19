@@ -19,6 +19,7 @@
                                     <table>
                                         <tr>
                                             <td style="width: 100%">{{item.title}}</td>
+                                            <td><b-button @click="changePin(item.subjectId)" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="item.pin==true?'star-fill':'star'"></b-icon></b-button></td>
                                         </tr>
                                     </table>
                                 </b-card-header>
@@ -33,10 +34,10 @@
             </b-container>    
         </center>    
 
-         <b-modal id="modal-xl" size="lg" title="과목 생성" 
+         <b-modal id="modal-xl" size="lg" title="과목 생성" no-close-on-backdrop 
             @show="resetModal"
             @hidden="resetModal"
-            @ok="submit" ref="modal" data-backdrop="static">
+            @ok="handleOk" ref="modal" data-backdrop="static">
             <form ref="form" @submit.stop.prevent="handleSubmit">
             <b-form-group
                 :state="subjectState"
@@ -60,13 +61,23 @@
                         <tr>
                             <th scope="row">학기</th>
                             <td>
-                                <b-form-input type="number" id="input-default2" v-model="semester" required trim placeholder="과목 생성 학기를 입력하세요"></b-form-input>
+                                <b-form-select type="number" id="input-default2" v-model="semester" :options="options"
+                                value-field="item" text-field="text"></b-form-select>
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">과목 비밀번호</th>
+                            <th scope="row">과목 인증번호</th>
                             <td>
-                                <b-form-input type="password" id="input-default3" v-model="authKey" required trim placeholder="과목 비밀번호를 입력하세요"></b-form-input>
+                                <b-form-input style="width:75%; margin-right:10px; float:left;" id="input-default3" required trim v-model="authKey" placeholder="인증키를 입력하세요" :disabled="authCheck==true"></b-form-input>
+                                <b-button style="width:15%; clear:both" @click="checkAuthKey()">검사</b-button>
+                                <!-- <b-form-text id="input-live-help5">해당 수업의 인증키를 입력하세요.</b-form-text> -->
+                                <b-form-invalid-feedback :state="authKeyCheckValidation">
+                                    인증키가 검사되지 않았습니다.
+                                </b-form-invalid-feedback>
+                                <b-form-valid-feedback :state="authKeyCheckValidation">
+                                    인증키가 검사되었습니다.
+                                </b-form-valid-feedback>
+                                
                             </td>
                         </tr>
                     </tbody>
@@ -86,8 +97,10 @@ export default {
             data:{},
             title: '',
             year: '',
-            semester: '',
-            authKey: ''
+            semester: 1,
+            authKey: '',
+            authCheck:false,
+            options: [ {item: 1, text: 1}, {item: 2, text: 2} ]
         };
     },
     mounted() { 
@@ -98,46 +111,95 @@ export default {
     },
 
      methods: {
-        submit() {
-            alert(this.authKey)
-            if(!parseInt(this.year))
-                alert("연도 항목에는 숫자만 작성 가능합니다.")
-            else if(!parseInt(this.semester))
-                alert("학기 항목에는 숫자만 작성 가능합니다.")
+         changePin(subjectId) {   // pin이 바뀌었을때
+            axios.post('/api/changeSubjectPin', {
+                subjectId:subjectId
+            })
+            .then(response => {
+                this.data = response.data
+            })
+            event.stopPropagation()
+            location.reload()
+        },
+         checkAuthKey(){
+             if(!this.authKey)
+                alert("인증 번호가 비어있습니다.")
             else {
-                axios.post('/api/url',{
-                    title:this.subjectName,
-                    year:this.year,
-                    semester:this.semester,
+                console.log("authKey:"+this.authKey)
+                axios.post('/api/checkAuthKey',{
                     authKey:this.authKey
-                }).then(response => { 
-                    this.subject = response.data;
-                    location.reload()
+                }).then(response => {
+                    this.check = response.data;
+                    if(this.check==false) {
+                        alert('이미 존재하는 인증 번호입니다.다른 번호를 입력해주세요')
+                        this.authCheck=false;
+                    } else {
+                        alert('올바른 인증 번호 입니다.')
+                        this.authCheck=true;
+                    }
+                }).catch((erro)=> {
+                    console.error(erro);
                 });
+            }
+        },
+             //모달메소드
+        handleOk(bvModalEvt) {
+            // Prevent modal from closing
+            bvModalEvt.preventDefault()
+            // Trigger submit handler
+            this.handleSubmit()
+        },
+        handleSubmit() {
+            if(!this.nameValidation || !this.yearValidation || !this.authKeyValidation || !this.authKeyCheckValidation) {
+                return
+            }
+            this.submit()
+            this.$nextTick(() => {
+                this.$bvModal.hide('modal-xl')
+            })
+        },
+        submit() {
+            if(!parseInt(this.year))
+                console.log("연도")
+                // alert("연도 항목에는 숫자만 작성 가능합니다.")
+            else {
+                if(this.authKeyCheckValidation==true) {
+                    axios.post('/api/makeSubject',{
+                        title:this.title,
+                        year:this.year,
+                        semester:this.semester,
+                        authKey:this.authKey
+                    }).then(response => { 
+                        this.subject = response.data;
+                        location.reload()
+                        this.authCheck=false;
+                    });
+                } 
             }
         },
         resetModal() {
                 this.title = '',
                 this.year = '',
-                this.semester = '',
+                this.semester = 1,
                 this.authKey = ''
+                this.authCheck = false;
         }
     },
     computed:{
-        nameValidation(){        //과목명 체크
+        nameValidation() {        //과목명 체크
             return this.title.replace(/ /g,"").length>0
         },
-        yearValidation(){        //년도 체크
+        yearValidation() {        //년도 체크
             return this.year.replace(/ /g,"").length>0
         },
-        semesterValidation(){        //학기 체크
-            return this.semester.replace(/ /g,"").length>0
-        },
-        authKeyValidation(){        //비밀번호 체크
+        authKeyValidation() {        //비밀번호 체크
             return this.authKey.replace(/ /g,"").length>0
         },
-        subjectState(){
-             return this.nameValidation&&this.yearValidation&&this.semesterValidation&&this.authKeyValidation
+        authKeyCheckValidation() {
+            return this.authCheck == true;
+        },
+        subjectState() {
+             return this.nameValidation&&this.yearValidation&&this.authKeyValidation
         }
     }
 }

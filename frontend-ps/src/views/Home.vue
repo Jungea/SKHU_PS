@@ -291,7 +291,7 @@ export default {
         nameValidation(){        //플젝명 체크
              return this.projectName.replace(/ /g,"").length>0
          },
-         themeValidation(){           //플젝 체크
+         themeValidation(){           //주제 체크
              return this.theme.replace(/ /g,"").length>0
          },
          contentValidation(){           //내용 체크
