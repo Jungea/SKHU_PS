@@ -28,6 +28,7 @@ import net.skhu.model.ProfileModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.repository.ProjectJoinRepository;
+import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.service.DetailService;
@@ -55,6 +56,8 @@ public class APIController {
 	SubjectRepository subjectRepository;
 	@Autowired
 	SubjectService subjectService;
+	@Autowired
+	ProjectRepository projectRepository;
 
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -356,4 +359,14 @@ public class APIController {
 
 	}
 
+	// 전체 프로젝트 반환
+	@RequestMapping(value = "all/projects", method = RequestMethod.GET)
+	public List<Project> allProjects() {
+		return projectRepository.findAll();
+	}
+	// project_star 변경
+	@RequestMapping(value = "changeStar", method = RequestMethod.GET)
+	public void changeStar(@RequestBody Project project,HttpServletRequest request) {
+		// projectJoinService.changePin(project, getLoginUserId(request));
+	}
 }
