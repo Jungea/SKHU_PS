@@ -34,7 +34,7 @@
 <script>
 import axios from 'axios';
 export default {
-    name: 'professorHome',
+    name: 'subjectTeam',
     data() {
         return {
             data:{},
@@ -42,7 +42,7 @@ export default {
         };
     },
     mounted() { 
-        axios.get('/api/alluser') // 프로젝트 팀(인원)
+        axios.get('/api/url') // 프로젝트 팀(인원)
         .then(response => {
             this.data = response.data
             
