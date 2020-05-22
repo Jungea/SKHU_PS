@@ -222,6 +222,7 @@ public class APIController {
 
 		User user = userService.findByUserNum(intUserNum);
 
+		//FIXME search selection 사용
 		if (user == null)
 			return "잘못된 학번을 입력하였습니다.";
 
@@ -275,12 +276,12 @@ public class APIController {
 		projectJoinService.turnState(joinId, state);
 	}
 
-	// 0501 추가
-	@RequestMapping(value = "/increaseMember/{projectId}", method = RequestMethod.POST)
-	public void increaseMember(@PathVariable("projectId") int projectId) {
-		System.out.println("멤버수가증가합니다");
-		projectService.increaseMember(projectId);
-	}
+//	// 0501 추가
+//	@RequestMapping(value = "/increaseMember/{projectId}", method = RequestMethod.POST)
+//	public void increaseMember(@PathVariable("projectId") int projectId) {
+//		System.out.println("멤버수가증가합니다");
+//		projectService.increaseMember(projectId);
+//	}
 
 	// 0501 초대 취소
 	@RequestMapping(value = "/deletejoin/{joinId}", method = RequestMethod.POST)
@@ -388,6 +389,7 @@ public class APIController {
 		
 	}
 	
+	//프로젝트 관리 페이지에 신청받은 이력들
 	@RequestMapping(value = "project/{projectId}/applicationList", method = RequestMethod.GET)
 	public List<ProjectJoin> projectApplicationList(@PathVariable("projectId") String projectId) {
 		return projectService.applicationList(Integer.parseInt(projectId));

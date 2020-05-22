@@ -133,16 +133,17 @@ public class ProjectService {
 
 	}
 
+	//팀장이 유저를 초대함.
 	public boolean inviteMember(int projectId, int userNum) {
-		ProjectJoin join = projectJoinRepository.findByProject_ProjectIdAndUser_UserNumAndStateNot(projectId, userNum,
-				1);
-		if (join != null) { // 이미 초대나 신청 행위를 함.
+		User user = userRepository.findByUserNum(userNum);
+		ProjectJoin join = projectJoinRepository.findByProject_ProjectIdAndUser_UserId(projectId, user.getUserId());
+		if (join != null) {
 			if (join.getType() == 2 && join.getState() == 0) // userNum이 프로젝트를 신청 후 대기 중일 때
 				return false;
 		} else
 			join = new ProjectJoin();
 
-		join.setUser(userRepository.findByUserNum(userNum));
+		join.setUser(user);
 		join.setProject(projectRepository.findById(projectId).get());
 		join.setJoinTime(LocalDateTime.now());
 		join.setColor("#000000");

@@ -168,24 +168,11 @@ export default {
             console.log(userInfo)
         },
         turnState(invite, state){
-            if(state==1){
-                console.log('수락함')
-                axios.post('/api/increaseMember/'+invite.project.projectId)
-                .then()
-                .catch((erro)=> {
-                    console.error(erro);
-                });
-            }
-            else{
-                console.log('거절함')
-            }
             axios.post('/api/turnjoinstate/'+invite.joinId+'/'+state)
-            .then()
+            .then(() => location.reload())
             .catch((erro)=> {
                 console.error(erro);
             });
-            
-            location.reload();
         },
         //초대 취소
         deleteWaiting(application){

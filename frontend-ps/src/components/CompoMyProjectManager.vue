@@ -301,18 +301,6 @@ export default {
 
         // 신청 수락,거절
         turnState(application, state){
-            if(state==1){
-                console.log('수락함')
-                axios.post('/api/increaseMember/'+application.project.projectId)
-                .then()
-                .catch((erro)=> {
-                    console.error(erro);
-                });
-            }
-            else{
-                console.log('거절함')
-            }
-
             axios.post('/api/turnjoinstate/'+application.joinId+'/'+state)
             .then(() => location.reload() )
             .catch((erro)=> {
