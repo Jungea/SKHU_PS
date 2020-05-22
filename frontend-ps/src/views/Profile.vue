@@ -191,8 +191,7 @@ export default {
         deleteWaiting(application){
             if(confirm("신청을 취소합니까?")){
                 axios.post('/api/deletejoin/'+application.joinId)
-                .then(response => {
-                    response
+                .then(() => {
                     alert('취소되었습니다.');
                     location.reload();
                 })

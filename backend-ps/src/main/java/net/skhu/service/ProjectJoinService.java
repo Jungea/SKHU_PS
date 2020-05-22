@@ -69,14 +69,17 @@ public class ProjectJoinService {
 		projectService.decreaseMember(projectId);
 	}
 	@Transactional
-	public void joinProject(int projectId, int userId) {
+	public boolean joinProject(int projectId, int userId) {
 		ProjectJoin projectJoin=new ProjectJoin();
 		projectJoin.setUser(userRepository.findById(userId).get());
 		projectJoin.setProject(projectRepository.findById(projectId).get());
 		projectJoin.setJoinTime(LocalDateTime.now());
+		projectJoin.setColor("#000000");
 		projectJoin.setState(0);
-		projectJoin.setPin(false);
 		projectJoin.setType(2);
+		
+		projectJoinRepository.save(projectJoin);
+		return true;
 	}
 
 

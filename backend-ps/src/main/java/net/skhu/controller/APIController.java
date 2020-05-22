@@ -241,7 +241,7 @@ public class APIController {
 			if (member.get(i).getUser().getUserNum() == intUserNum)
 				return "팀원의 번호입니다.";
 
-		Boolean result = projectService.inviteMember(intProjectId, intUserNum);
+		boolean result = projectService.inviteMember(intProjectId, intUserNum);
 		if (result == true)
 			return userNum + "님에게 초대 메세지를 보냈습니다.";
 		else
@@ -373,13 +373,15 @@ public class APIController {
 	public void changeStar(@RequestBody Project project,HttpServletRequest request) {
 		projectStarService.changeStar(project.getProjectId(), getLoginUserId(request));
 	}
-	// project_star 변경
+	
+	// 참가 신청하기
 	@RequestMapping(value = "joinProject", method = RequestMethod.POST)
-	public void joinProject(@RequestBody Project project,HttpServletRequest request) {
+	public boolean joinProject(@RequestBody Project project,HttpServletRequest request) {
 		System.out.println("joinProject");
-		projectJoinService.joinProject(project.getProjectId(), getLoginUserId(request));
+		return projectJoinService.joinProject(project.getProjectId(), getLoginUserId(request));
 	}
 	
+	// 마이페이지 신청한 이력들
 	@RequestMapping(value = "user/applicationList", method = RequestMethod.GET)
 	public List<ProjectJoin> userApplicationList(HttpServletRequest request) {
 		return userService.applicationList(getLoginUserId(request));

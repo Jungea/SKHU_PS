@@ -113,7 +113,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <b-button variant="danger" v-if="this.summaryData.state==2" @click="projectJoin(this.summaryData.project.projectId)">참가 신청하기</b-button>
+                <b-button variant="danger" v-if="this.summaryData.state==2" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
                 <b-button variant="warning" v-else-if="this.summaryData.state==0" >승인 대기</b-button>
                 <b-button variant="success" v-else-if="this.summaryData.state==1" >참가중</b-button>
         </b-modal>  
@@ -185,13 +185,18 @@ export default {
       this.summaryData=item
     },
     projectJoin(projectId) {
-      alert('클릭')
        axios.post('/api/joinProject', {
                 projectId:projectId
             })
-            .then(() => {
-                
-                alert('참가 신청이 완료되었습니다.')
+            .then((response) => {
+                if(response.data) {
+                    alert('참가 신청이 완료되었습니다.')
+                    this.summaryData.state=0;
+                    this.$refs['modal'].hide()
+                    this.$refs['modal'].show()
+                }
+                else
+                    alert('이미 초대받은 프로젝트입니다.\n 마이페이지를 확인하세요.')
                 // this.alertvariant='warning'
             })
       
