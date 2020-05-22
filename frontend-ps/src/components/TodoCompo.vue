@@ -73,7 +73,7 @@
                                     <!--수정, 이동 트리거-->
                                     <b-button size="sm" style="width:100px" @click="editShow(todo)">수정</b-button><br>
                                     <b-button @click="changeStatus(todo,1)" size="sm" class="mt-1" style="width:100px">
-                                        진행중
+                                        <b-icon-caret-right-fill></b-icon-caret-right-fill>
                                     </b-button>
                                 </b-popover>
                                 
@@ -222,7 +222,7 @@
                                     </template>
                                     <b-button size="sm" style="width:100px" @click="editShow(todo)">수정</b-button><br>
                                     <b-button @click="changeStatus(todo,1)" size="sm" class="mt-1" style="width:100px">
-                                        <b-icon-caret-left-fill></b-icon-caret-left-fill>이동
+                                        <b-icon-caret-left-fill></b-icon-caret-left-fill>
                                     </b-button>
                                 </b-popover>
                                 
