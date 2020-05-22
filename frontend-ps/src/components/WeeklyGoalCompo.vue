@@ -11,7 +11,7 @@
         <div style="margin-top:50px">
             <b-row cols-md="3" cols="1">
                 <b-col class="mb-5" :key="goal.weekly_id" v-for="goal in goals">
-                    <b-card bg-variant="dark" text-variant="white" v-bind:title="goal.week.toString()+'주차'" style="cursor:pointer; height:150px">
+                    <b-card @click="todo(project.projectId, goal.week)" bg-variant="dark" text-variant="white" v-bind:title="goal.week.toString()+'주차'" style="cursor:pointer; height:150px">
                         <b-card-text>
                             {{goal.start_time}} ~ {{getEndDate(goal.start_time)}}
                         </b-card-text>
@@ -112,6 +112,12 @@ export default {
         
     },
     methods:{
+        todo(projectId, week) {
+            this.$router.push({
+                path: '/project/'+projectId+'/weekly/'+week
+            })
+        },
+
         dateDisabled(ymd, date) {
             date.setDate(date.getDate()+1);
             let myDay=date.toISOString().slice(0, 10)

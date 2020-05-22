@@ -125,7 +125,7 @@ Vue.use(VueRouter)
     component: WeeklyGoal
   },
   {
-    path: '/project/:projectId/weekly/todo',
+    path: '/project/:projectId/weekly/:week/',
     name: 'Todo',
     component: Todo
   },
