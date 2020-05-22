@@ -4,7 +4,7 @@
       <p class="mt-4 ml-1">
         <b-icon-house-fill  style="cursor:pointer" class="mr-1" font-scale="1.4" @click="home"></b-icon-house-fill>
         {{name}} 님
-        <b-icon-bell style="cursor:pointer" class="ml-2" font-scale="1.3" ></b-icon-bell>
+        <b-icon-bell style="cursor:pointer" class="ml-2" font-scale="1.3" @click="timeLine"></b-icon-bell>
         <b-icon-person-fill style="cursor:pointer" class="ml-2" font-scale="1.3" @click="profile"></b-icon-person-fill>
       </p>
       <b-nav-item disabled><hr></b-nav-item>
@@ -174,7 +174,11 @@ export default {
           })
         }
       },
-
+      timeLine() {
+        this.$router.push({
+          path: '/timeLine'
+        })
+      },
       logout() {
         axios.get('/api/user/logout')
         .then().catch((erro)=> {
@@ -204,9 +208,9 @@ export default {
           })
         } else { // 교수일때
           this.$router.push({ // 교수 과목에 맞는 summary 라우터로 바꿔야함!!
-            name: 'Summary',
+            name: 'professorSummary',
             params: {
-              projectId: this.pinSubjectId
+              subjectId: this.pinSubjectId
             }
           })
         }
