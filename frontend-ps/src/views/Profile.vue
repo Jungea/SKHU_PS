@@ -57,7 +57,7 @@
         </div>
         <hr style="margin:30px 0;">
         <div class="infoContainer">
-            <h5>초대 이력</h5>
+            <h5>초대받은 이력</h5>
             <div style="margin-top:30px; padding: 30px;">
                 <b-row>
                     <b-col style="min-width:350px;" class="mt-0">
@@ -77,6 +77,21 @@
                 </b-row>
             </div>
         </div>
+
+        <hr style="margin:30px 0;">
+        <div style="padding:30px;">
+            <h5>신청한 이력</h5>
+            <ul style="list-style:none; padding:0;">
+                <li class="mt-3" v-for="application in applicationList" :key="application.JoinId">
+                    <span style="float:left">
+                        {{application.project.projectName}} ({{application.project.user.name}}) - {{state[application.state]}}
+                    </span>
+                    <b-button @click="deleteWaiting(application)" size="sm" style="clear:both; margin-left:20px">신청 취소</b-button>
+                </li>
+            </ul>
+        </div>
+
+        <hr style="margin:30px 0;">
     </div>
 </template>
 
@@ -93,7 +108,9 @@ export default {
         gitUrl:'',
         tagArray:[],
         myProjectPin:[],
-        inviteList:[]
+        inviteList:[],
+        applicationList:[],
+        state: ["대기", "수락", "거절"],
       }
    },
    mounted() {
@@ -134,6 +151,12 @@ export default {
                 console.error(erro);
             });
 
+        axios.get('/api/user/applicationList')
+            .then(response => {console.log(response.data); this.applicationList=response.data})
+            .catch((erro)=> {
+                console.error(erro);
+            });
+
    },
    methods:{
         editProfile() {
@@ -164,6 +187,23 @@ export default {
             
             location.reload();
         },
+        //초대 취소
+        deleteWaiting(application){
+            if(confirm("신청을 취소합니까?")){
+                axios.post('/api/deletejoin/'+application.joinId)
+                .then(response => {
+                    response
+                    alert('취소되었습니다.');
+                    location.reload();
+                })
+                .catch((erro)=>{
+                    console.error(erro);
+                })
+                
+                
+            }         
+            
+        }
    }
 }
 </script>

@@ -118,4 +118,8 @@ public class UserService {
 		user.setGithub(profileModel.getGithub());
 		userRepository.save(user);
 	}
+	
+	public List<ProjectJoin> applicationList(int userId) {
+		return projectJoinRepository.findByUser_UserIdAndTypeAndStateNot(userId, 2, 1);
+	}
 }

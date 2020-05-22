@@ -285,7 +285,7 @@ public class APIController {
 	// 0501 초대 취소
 	@RequestMapping(value = "/deletejoin/{joinId}", method = RequestMethod.POST)
 	public void deleteWaiting(@PathVariable("joinId") int joinId) {
-		System.out.println("초대 기록을 삭제합니다");
+		System.out.println("기록을 삭제합니다");
 		projectJoinService.deleteWaiting(joinId);
 	}
 
@@ -379,4 +379,12 @@ public class APIController {
 		System.out.println("joinProject");
 		projectJoinService.joinProject(project.getProjectId(), getLoginUserId(request));
 	}
+	
+	@RequestMapping(value = "user/applicationList", method = RequestMethod.GET)
+	public List<ProjectJoin> userApplicationList(HttpServletRequest request) {
+		return userService.applicationList(getLoginUserId(request));
+		
+	}
+	
+	
 }

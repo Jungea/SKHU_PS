@@ -25,5 +25,8 @@ public interface ProjectJoinRepository extends JpaRepository<ProjectJoin, Intege
 	
 	List<ProjectJoin> findByProject_ProjectId(int projectId);
 	ProjectJoin findByUser_userIdAndProject_projectId(int userId, int projectId); 
+	
+	//유저가 프로젝트 신청하고 마이페이지에서 신청 목록
+	List<ProjectJoin> findByUser_UserIdAndTypeAndStateNot(int userId, int type, int state);
 
 }
