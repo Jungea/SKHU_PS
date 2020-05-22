@@ -9,6 +9,7 @@ public class EditProjectModel {
    String content;
    String tag;
    String github;
+   boolean progState;
    boolean rcrtState;
    int subject;
 }
