@@ -87,6 +87,7 @@ public class ProjectService {
 		project.setContent(editProjectModel.getContent());
 		project.setTag(editProjectModel.getTag());
 		project.setGithub(editProjectModel.getGithub());
+		project.setProgState(editProjectModel.isProgState());
 		project.setRcrtState(editProjectModel.isRcrtState());
 
 		projectRepository.save(project);

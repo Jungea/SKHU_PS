@@ -2,6 +2,60 @@
     <div class="p-5">
         <h2 class="mb-4">프로젝트 관리</h2>
 
+        <div style="padding: 30px ; padding-bottom: 0">
+            <h4>설정</h4>
+            <hr>
+            <table class="table table-bordered" v-if="!edit">
+            <tbody>
+                <tr>
+                    <th style="width:28%">과목</th>
+                    <td>
+                        {{ subjectName }}
+                    </td>
+                </tr>
+                <tr>
+                    <th style="width:28%">진행 상태</th>
+                    <td>
+                        {{ progStateName }}
+                    </td>
+                </tr>
+                <tr>
+                    <th style="width:28%">모집 상태</th>
+                    <td>
+                        {{ rcrtStateName }}
+                    </td>
+                </tr>
+            </tbody>
+            </table>
+            <table class="table table-bordered" v-if="edit">
+            <tbody>
+                <tr>
+                    <th style="width:28%">과목</th>
+                    <td>
+                        <b-input v-model="subjectPass"></b-input>
+                    </td>
+                </tr>
+                <tr>
+                    <th style="width:28%">진행 상태</th>
+                    <td>
+                        <b-select v-model="projectInfo.progState" :options="progStateArray" value-field="item" text-field="text"></b-select>
+                    </td>
+                </tr>
+                <tr>
+                    <th style="width:28%">모집 상태</th>
+                    <td>
+                        <b-select v-model="projectInfo.rcrtState" :options="rcrtStateArray" value-field="item" text-field="text"></b-select>
+                    </td>
+                </tr>
+            </tbody>
+            </table>
+            <div class="mb-4" style="text-align: right" v-if="!edit">
+                <b-button variant="dark" @click="stateEdit()">수정</b-button>
+            </div>
+            <div class="mb-4" style="text-align: right" v-if="edit">
+                <b-button variant="dark" @click="stateEdit()">저장</b-button>
+            </div>
+        </div>
         <div style="padding:30px;">
             <h4>멤버 관리</h4>
             <hr>
@@ -69,11 +123,29 @@ export default {
             memberList: [],
             inviteList: [],
             state: ["대기", "수락", "거절"],
-            projectTitle:''
+            projectTitle:'',
+            
+            subjectArray: [ {item: '123', text: '과목1'}, {item: '1234', text: '과목2'}, {item: '12345', text: '과목3'}],
+            subjectPass: '',
+            subjectName: '123입력',
 
+            progStateArray: [ {item: false, text:'진행중'}, {item: true, text: '진행완료'}],
+            rcrtStateArray: [ {item: false, text:'모집중'}, {item: true, text: '모집완료'}],
+            progStateName: '',
+            rcrtStateName: '',
+            edit: false
         }
     },
     mounted() {
+        axios.get('/api/project/'+this.projectId)
+        .then(response => {
+            this.projectInfo = response.data
+            this.progStateCheck()
+            this.rcrtStateCheck()
+        }).catch((erro) => {
+            console.error(erro);
+        })        
+
         //로그인한 유저가 누구인지 확인
         axios.get('/api/user')
             .then(response => {
@@ -95,6 +167,54 @@ export default {
             });
     },
     methods: {
+        progStateCheck() {
+           if(this.projectInfo.progState == false) {
+                this.progStateName = '진행중'
+           }
+            else {
+                this.progStateName = '진행완료'
+            }
+        },
+        rcrtStateCheck() {
+           if(this.projectInfo.rcrtState == false) {
+                this.rcrtStateName = '모집중'
+           }
+            else {
+                this.rcrtStateName = '모집완료'
+            }
+        },
+        stateEdit() {
+            if(this.edit == false)
+                this.edit = true;
+            else
+            {
+                if(this.subjectPass != '') {
+                    for(var i = 0 ; i < this.subjectArray.length ; i++) {
+                        if(this.subjectPass == this.subjectArray[i].item)
+                            this.subjectName = this.subjectArray[i].text
+                    }
+                }
+                else
+                    this.subjectName = '';
+
+                axios.post('/api/project/'+this.$route.params.projectId+'/edit',{
+                    projectId: this.projectInfo.projectId,
+                    projectName: this.projectInfo.projectName,
+                    theme: this.projectInfo.theme,
+                    content: this.projectInfo.content,
+                    tag: this.projectInfo.tag,
+                    github: this.projectInfo.github,
+                    progState: this.projectInfo.progState,
+                    rcrtState: this.projectInfo.rcrtState
+                    })
+                .then().catch((erro)=> { console.error(erro);
+                });
+
+                this.progStateCheck()
+                this.rcrtStateCheck()
+                this.edit = false;
+            }
+        },
         invite(evt) {
             evt.preventDefault();
 

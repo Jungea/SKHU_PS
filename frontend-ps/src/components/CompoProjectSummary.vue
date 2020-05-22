@@ -22,6 +22,12 @@
                             </td>
                         </tr>
                         <tr>
+                            <th scope="row">팀원</th>
+                            <td>
+                                {{ this.memList.toString() }}
+                            </td>
+                        </tr>
+                        <tr>
                             <th scope="row">주제</th>
                             <td>
                                 {{ this.data.theme }}
@@ -48,15 +54,22 @@
                         <tr>
                             <th scope="row">인원 모집 상태</th>
                             <td>
-                                {{ rcrtStateCheck()}}
                                {{ this.state }}
                             </td>
+                        </tr>
                         <tr>
+                            <th scope="row">프로젝트 진행 상태</th>
+                            <td>
+                               {{ this.progState }}
+                            </td>
+                        </tr>
+                        <tr v-if="data.subject">
                             <th scope="row">과목</th>
                             <td>
                                  {{ this.subject }}
                             </td>
                         </tr>
+
                     </tbody>
                 </table>
                 <div class="mb-4" style="text-align: right">
@@ -94,15 +107,22 @@ export default {
                 this.subject = '과목없음'
             else
                 this.subject = this.data.subject.title
+            this.rcrtStateCheck()
+            this.progStateCheck()
         })        
     },
     methods: {
-       
         rcrtStateCheck() {
            if(this.data.rcrtState == 0)
                 this.state = '모집중'
             else
-                this.state = '모집완료'           
+                this.state = '모집완료'
+        },
+        progStateCheck() {
+           if(this.data.progState == 0)
+                this.progState = '진행중'
+            else
+                this.progState = '진행완료'
         },
         edit(projectId) {
             this.$router.push({
@@ -115,7 +135,9 @@ export default {
             data: {},
             subject: '',
             state: '',
-            tagArray:[]
+            progState: '',
+            tagArray:[],
+            memList: ['홍길동(4)', ' 임꺽정(4)', ' 정길이(4)']
         }
     }
 }

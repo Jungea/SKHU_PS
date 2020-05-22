@@ -52,12 +52,6 @@
                                <b-form-input v-model="data.github"></b-form-input>
                             </td>
                         </tr>
-                        <tr>
-                            <th scope="row">인원 모집 상태</th>
-                            <td>
-                               <b-form-select v-model="state" :options="stateArray" value-field="item" text-field="name"></b-form-select>
-                            </td>
-                        </tr>
                     </tbody>    
                 </table>
                 <div style="text-align: right">
@@ -77,20 +71,10 @@ export default {
         .then(response => {
             this.data = response.data
             this.tagArray = this.data.tag.split(',')
-
-            if (this.data.rcrtState == false)
-                this.state = 0
-            else
-                this.state = 1
         })
      },
      methods: {
         save() {
-            if(this.state == 0)
-                this.stateName = "false"
-            else
-                this.stateName = 'true'
-
             this.data.tag = this.tagArray.join(',')
             
             if(!this.nameValidation)
@@ -109,7 +93,8 @@ export default {
                     content: this.data.content,
                     tag: this.data.tag,
                     github: this.data.github,
-                    rcrtState: this.stateName
+                    progState: this.data.progState,
+                    rcrtState: this.data.rcrtState
                     })
                 .then().catch((erro)=> { console.error(erro);
                 });
@@ -135,8 +120,6 @@ export default {
             data: {},
             stateArray: [ { item: 0, name: '모집중'}, { item: 1, name: '모집완료'} ],
             tagArray: [],
-            state: 0,
-            stateName: '',
         } 
     },
     computed: {
