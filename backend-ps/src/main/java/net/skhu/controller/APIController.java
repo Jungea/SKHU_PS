@@ -388,5 +388,10 @@ public class APIController {
 		
 	}
 	
+	@RequestMapping(value = "project/{projectId}/applicationList", method = RequestMethod.GET)
+	public List<ProjectJoin> projectApplicationList(@PathVariable("projectId") String projectId) {
+		return projectService.applicationList(Integer.parseInt(projectId));
+	}
+	
 	
 }

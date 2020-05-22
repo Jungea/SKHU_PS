@@ -235,4 +235,9 @@ public class ProjectService {
 		}
 		return board;
 	}
+	
+	// 프로젝트 관리에 유저한테 신청받은 이력(대기중)
+	public List<ProjectJoin> applicationList(int projectId) {
+		return projectJoinRepository.findByProject_ProjectIdAndTypeAndState(projectId, 2, 0);
+	}
 }

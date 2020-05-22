@@ -95,9 +95,10 @@
                     </li>
                 </ul>
             </div>
+
             <hr>
             <div style="padding:30px;">
-                <h5>초대 이력</h5>
+                <h5>초대한 이력</h5>
                 <ul style="list-style:none; padding:0;">
                     <li class="mt-3" v-for="invit in inviteList" :key="invit.JoinId">
                         <span style="float:left">
@@ -107,6 +108,29 @@
                     </li>
                 </ul>
             </div>
+
+            <hr style="margin:30px 0;">
+            <div class="infoContainer">
+                <h5>신청받은 이력</h5>
+                <div style="margin-top:30px; padding: 30px;">
+                    <b-row>
+                        <b-col style="min-width:350px;" class="mt-0">
+                            <b-card>
+                                <ul style="list-style:none; padding:0 20px">
+                                    <b-media class="inviteList" tag="li" v-for="application in applicationList" :key="application.joinId">
+                                        <h5 style="display:inline;">{{application.user.name}}({{application.user.userNum}})</h5>
+                                        <span style="float:right">
+                                            <b-button size="sm" @click="turnState(application, 1)" class="mr-2" variant="success">수락</b-button>
+                                            <b-button size="sm" @click="turnState(application, 2)" variant="danger">거절</b-button>
+                                        </span>
+                                    </b-media>
+                                </ul>
+                            </b-card>
+                        </b-col>
+                    </b-row>
+                </div>
+            </div>
+
             <br/>
         </div>
     </div>
@@ -124,6 +148,7 @@ export default {
             inviteList: [],
             state: ["대기", "수락", "거절"],
             projectTitle:'',
+            applicationList: [],
             
             subjectArray: [ {item: '123', text: '과목1'}, {item: '1234', text: '과목2'}, {item: '12345', text: '과목3'}],
             subjectPass: '',
@@ -133,7 +158,7 @@ export default {
             rcrtStateArray: [ {item: false, text:'모집중'}, {item: true, text: '모집완료'}],
             progStateName: '',
             rcrtStateName: '',
-            edit: false
+            edit: false,
         }
     },
     mounted() {
@@ -162,6 +187,12 @@ export default {
 
         axios.get('/api/project/'+this.projectId+"/inviteList")
             .then(response => this.inviteList=response.data)
+            .catch((erro)=> {
+                console.error(erro);
+            });
+
+        axios.get('/api/project/'+this.projectId+"/applicationList")
+            .then(response => this.applicationList=response.data)
             .catch((erro)=> {
                 console.error(erro);
             });
@@ -266,7 +297,28 @@ export default {
                 console.error(erro);
             })
             
-        }
+        },
+
+        // 신청 수락,거절
+        turnState(application, state){
+            if(state==1){
+                console.log('수락함')
+                axios.post('/api/increaseMember/'+application.project.projectId)
+                .then()
+                .catch((erro)=> {
+                    console.error(erro);
+                });
+            }
+            else{
+                console.log('거절함')
+            }
+
+            axios.post('/api/turnjoinstate/'+application.joinId+'/'+state)
+            .then(() => location.reload() )
+            .catch((erro)=> {
+                console.error(erro);
+            });
+        },
     },
 }
 </script>
