@@ -51,7 +51,7 @@
           <div disabled v-show="this.pinSubjectId">
             <ul style="list-style-type: none ; padding: 0px">
               <b-nav-item><strong>{{ this.subjectName }}</strong></b-nav-item>
-              
+              <li><b-nav-item @click="viewScore()">점수 모아보기</b-nav-item></li>              
             </ul>
             <hr>
           </div>
@@ -233,6 +233,11 @@ export default {
       management(){
         this.$router.push({
           path: '/project/'+this.$route.params.projectId+'/manager'
+        })
+      },
+      viewScore(){
+        this.$router.push({
+          path: '/Score/'+this.pinSubjectId+'/'
         })
       },
       changeSelect() {

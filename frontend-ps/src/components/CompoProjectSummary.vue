@@ -2,11 +2,8 @@
     <div class="containerStyle">
         <h3>프로젝트 개요</h3>
         <hr>        
-        <form ref="form" @submit.stop.prevent="handleSubmit">
-            <b-form-group
-                label-for="ProjectSummary"
-                invalid-feedback="입력하지 않은 필수 입력 사항이 있습니다."
-            >
+        <form ref="form">
+            <b-form-group label-for="ProjectSummary">
                 <table class="table table-bordered" id="ProjectSummary" v-bind="this.data">
                     <tbody>
                         <tr>
