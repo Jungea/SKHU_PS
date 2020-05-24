@@ -241,7 +241,9 @@
                 </span></span>
             </b-card>
         </b-row>
-        
+        <ul v-for="t in todo" :key="t.todoId">
+            <li>[{{t.progState}}] {{t.detail}} -{{t.user.name}}</li>
+        </ul>
     </div>
 </template>>
 
@@ -268,13 +270,13 @@ export default {
             modalId:'',
             idcount:7,    //id 증가를 위한 임시 변수
             todo: [
-                {id:1, user_id:1, detail:'똥싸기', status:0,},
-                {id:2, user_id:2, detail:'밥먹기', status:0,},
-                {id:3, user_id:4, detail:'치킨시키기', status:1,},
-                {id:4, user_id:1, detail:'잠자기', status:1,},
-                {id:5, user_id:2, detail:'나루토보기', status:1,},
-                {id:6, user_id:1, detail:'메이플하기', status:2,},
-                {id:7, user_id:4, detail:'샤워하기', status:2,}
+                // {id:1, user_id:1, detail:'똥싸기', status:0,},
+                // {id:2, user_id:2, detail:'밥먹기', status:0,},
+                // {id:3, user_id:4, detail:'치킨시키기', status:1,},
+                // {id:4, user_id:1, detail:'잠자기', status:1,},
+                // {id:5, user_id:2, detail:'나루토보기', status:1,},
+                // {id:6, user_id:1, detail:'메이플하기', status:2,},
+                // {id:7, user_id:4, detail:'샤워하기', status:2,}
             ],
 
             member:[
@@ -305,13 +307,19 @@ export default {
         //todo 생성(create)
         createNewTodo(st){
             if(this.new_todo.detail!=''){
-                this.todo.push({id:this.idcount, detail:this.new_todo.detail, status:st})
-                this.idcount+=1
-                alert(this.new_todo.detail)
+                // this.todo.push({id:this.idcount, detail:this.new_todo.detail, status:st})
+                // this.idcount+=1
                 //axios
+                axios.post('/api/createTodo',{
+                    projectId:this.$route.params.projectId,
+                    detail:this.new_todo.detail,
+                    week:this.$route.params.week,
+                    progState:st
+                }).then(() => this.todoReload());
             }
             this.show=false; this.show2=false; this.show3=false
             this.new_todo.detail=''
+            
         },
         //수정 트리거
         editShow(todo){
@@ -382,6 +390,15 @@ export default {
         userIndex(userId){
             var index = this.member.findIndex(obj => obj.id==userId);
             return index;
+        },
+
+        todoReload() {
+            axios.get('/api/project/'+this.$route.params.projectId+'/weekly/'+this.$route.params.week)
+                .then(response => {
+                    if(response.data != null)
+                        this.todo = response.data;
+                    console.log(this.todo);
+                })
         }
 
     },
@@ -393,10 +410,7 @@ export default {
         })
 
         //todo 가져와 배열에 채우기
-        // axios.get('/api/project/'+this.$route.params.projectId+'/weekly'+this.$route.params.week)
-        // .then(response => {
-        //     this.todo.push(response.data)
-        // })
+        this.todoReload();
 
         //이 프로젝트에 참여중인 멤버 정보 가져오기??
 

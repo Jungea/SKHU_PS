@@ -1,7 +1,6 @@
 package net.skhu.domain;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,32 +9,30 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@ToString(exclude = { "todos" })
-@EqualsAndHashCode(exclude = { "todos" })
+@ToString(exclude = {})
+@EqualsAndHashCode(exclude = {})
 @Entity
-public class Weekly {
+public class Todo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	int weeklyId;
+	int todoId;
 
-	LocalDate startTime;
 	String detail;
-	int week;
+	int progState;
+	LocalDateTime createTime;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "projectId")
-	Project project;
+	@JoinColumn(name = "userId")
+	User user;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "weekly", fetch = FetchType.LAZY)
-	List<Todo> todos;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "weeklyId")
+	Weekly weekly;
+
 }

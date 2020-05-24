@@ -15,6 +15,7 @@ import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.ProjectStar;
 import net.skhu.domain.Subject;
+import net.skhu.domain.Todo;
 import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
 import net.skhu.model.EditProjectModel;
@@ -22,11 +23,13 @@ import net.skhu.model.MakeProjectModel;
 import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProjectBoardModel;
 import net.skhu.model.SidebarModel;
+import net.skhu.model.TodoModel;
 import net.skhu.model.WeekGoalModel;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.ProjectStarRepository;
 import net.skhu.repository.SubjectRepository;
+import net.skhu.repository.TodoRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.repository.WeeklyRepository;
 
@@ -45,6 +48,8 @@ public class ProjectService {
 	WeeklyRepository weeklyRepository;
 	@Autowired
 	ProjectStarRepository projectStarRepository;
+	@Autowired
+	TodoRepository todoRepository;
 
 	// userId 유저의 프로젝트 목록
 	public List<Project> findProjectByUserId(int userId) {
@@ -133,7 +138,7 @@ public class ProjectService {
 
 	}
 
-	//팀장이 유저를 초대함.
+	// 팀장이 유저를 초대함.
 	public boolean inviteMember(int projectId, int userNum) {
 		User user = userRepository.findByUserNum(userNum);
 		ProjectJoin join = projectJoinRepository.findByProject_ProjectIdAndUser_UserId(projectId, user.getUserId());
@@ -170,6 +175,7 @@ public class ProjectService {
 		}
 		return myProjectsList;
 	}
+
 	public Project findById(int userId) {
 		Optional<Project> p = projectRepository.findById(userId);
 		return p.get();
@@ -210,35 +216,58 @@ public class ProjectService {
 
 		weeklyRepository.save(weekly);
 	}
-	
+
 	public List<ProjectBoardModel> projectBoard(int userId) {
-		List<Project> project=projectRepository.findAll();
-		List<ProjectBoardModel> board=new ArrayList<>();
-		
-		for(Project p:project) {
-			ProjectBoardModel model=new ProjectBoardModel();
+		List<Project> project = projectRepository.findAll();
+		List<ProjectBoardModel> board = new ArrayList<>();
+
+		for (Project p : project) {
+			ProjectBoardModel model = new ProjectBoardModel();
 			model.setProject(p);
-			ProjectStar ps=projectStarRepository.findByUser_userIdAndProject_ProjectId(userId, p.getProjectId());
-			model.setStar(ps!=null?true:false);
-			model.setSubjectName(p.getSubject()!=null?p.getSubject().getTitle():null);
+			ProjectStar ps = projectStarRepository.findByUser_userIdAndProject_ProjectId(userId, p.getProjectId());
+			model.setStar(ps != null ? true : false);
+			model.setSubjectName(p.getSubject() != null ? p.getSubject().getTitle() : null);
 			model.setCreateName(p.getUser().getName());
-			List<ProjectJoin> projectJoin=projectJoinRepository.findByProject_ProjectId(p.getProjectId());
-			Set<Integer> allGrade=new HashSet<>();
-			for(ProjectJoin pj:projectJoin) {
+			List<ProjectJoin> projectJoin = projectJoinRepository.findByProject_ProjectId(p.getProjectId());
+			Set<Integer> allGrade = new HashSet<>();
+			for (ProjectJoin pj : projectJoin) {
 				allGrade.add(pj.getUser().getGrade());
 			}
 			model.setAllMemGrade(allGrade);
-			ProjectJoin pj=projectJoinRepository.findByUser_userIdAndProject_projectId(userId,p.getProjectId());
-			if(pj==null) model.setState(2); // 프로젝트 신청할수 있는 상태
-			else if(pj.getState()==0) model.setState(0); // 승인대기 상태
-			else if(pj.getState()==1) model.setState(1); // 참가하고있는 상태
+			ProjectJoin pj = projectJoinRepository.findByUser_userIdAndProject_projectId(userId, p.getProjectId());
+			if (pj == null)
+				model.setState(2); // 프로젝트 신청할수 있는 상태
+			else if (pj.getState() == 0)
+				model.setState(0); // 승인대기 상태
+			else if (pj.getState() == 1)
+				model.setState(1); // 참가하고있는 상태
 			board.add(model);
 		}
 		return board;
 	}
-	
+
 	// 프로젝트 관리에 유저한테 신청받은 이력(대기중)
 	public List<ProjectJoin> applicationList(int projectId) {
 		return projectJoinRepository.findByProject_ProjectIdAndTypeAndState(projectId, 2, 0);
+	}
+
+	// todoList 목록
+	public List<Todo> todoList(int projectId, int week) {
+		Weekly weekly = weeklyRepository.findByProject_ProjectIdAndWeek(projectId, week);
+		return todoRepository.findByWeekly_WeeklyId(weekly.getWeeklyId());
+	}
+
+	// 새로운 todo 추가
+	public void createTodo(int userId, TodoModel todoModel) {
+		Todo todo = new Todo();
+		
+		todo.setUser(userRepository.findById(userId).get());
+		Weekly weekly = weeklyRepository.findByProject_ProjectIdAndWeek(todoModel.getProjectId(), todoModel.getWeek());
+		todo.setWeekly(weekly);
+		todo.setDetail(todoModel.getDetail());
+		todo.setCreateTime(LocalDateTime.now());
+		todo.setProgState(todoModel.getProgState());
+		
+		todoRepository.save(todo);
 	}
 }
