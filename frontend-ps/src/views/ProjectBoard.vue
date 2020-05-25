@@ -38,7 +38,9 @@
                     </b-col>
                 </b-row>
                 <b-pagination  @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
-
+                  <b-form-select class="mt-4" v-model="selected" :options="options"></b-form-select>
+                <b-form-input  v-model="text"></b-form-input>
+                 <b-button @click="search()">검색</b-button>
             </b-container>  
               
         </center>  
@@ -140,17 +142,21 @@ export default {
       data:{},
       tagArray:[],
       rcrtState:false,
-      
       summaryData:{},
-      alertvariant:'danger',
+
+       text:'',
+       selected:null,
+       options: [
+          { value: '0', text: '프로젝트 이름' },
+          { value: '1', text: '조장 이름' },
+       ]
     }
   },
    watch: {
       '$route'(){
-        //   if (to.params.page) { 
-        //       this.value=parseInt(from.params.page)
-              
-        //   }
+          if (this.$route.query.type=='0') { 
+             alert('fdfdfdfdfdfdfdfdfd')
+          }
         //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
           console.log('query111:'+this.$route.query.page)
           axios.get('/api/projectBoard?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
@@ -161,6 +167,7 @@ export default {
       }
   },
   mounted() { 
+      this.text=''
       if(this.currentPage==1) {
           this.$router.push({
             path: '/projectBoard',
@@ -248,7 +255,21 @@ export default {
                 // this.alertvariant='warning'
             })
       
-    }
+    },
+    search() {
+      if(this.selected==null) {
+          alert('셀렉트를 선택해주세요.')
+          return;
+      } else if(this.text.length==0) {
+          alert('내용을 입력하세요')
+          return;
+      }
+        this.$router.push({
+                path: '/projectSearch',
+                query:{type:this.selected,text:this.text}
+            })
   },
+  },
+  
 }
 </script>

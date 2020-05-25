@@ -19,4 +19,7 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
 	@Query("SELECT p FROM Project p JOIN p.projectJoins pj WHERE pj.user.userId = ?1 AND pj.state = 1")
 	List<Project> findProjectByUserId(int userId);
 	Project findByProjectId(int projectId);
+	List<Project> findByProjectName(String text);
+	List<Project> findByUser_userId(int userId);
+	List<Project> findByProjectNameIgnoreCaseContaining(String text);
 }

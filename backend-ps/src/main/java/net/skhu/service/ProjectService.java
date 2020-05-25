@@ -235,7 +235,9 @@ public class ProjectService {
 			List<ProjectJoin> projectJoin = projectJoinRepository.findByProject_ProjectId(p.getProjectId());
 			Set<Integer> allGrade = new HashSet<>();
 			for (ProjectJoin pj : projectJoin) {
-				allGrade.add(pj.getUser().getGrade());
+				if(pj.getState()==1) {
+					allGrade.add(pj.getUser().getGrade());
+				}
 			}
 			model.setAllMemGrade(allGrade);
 			ProjectJoin pj = projectJoinRepository.findByUser_userIdAndProject_projectId(userId, p.getProjectId());
@@ -302,4 +304,43 @@ public class ProjectService {
 			model.setState(1); // 참가하고있는 상태
 		return model;
 	}
+	public List<ProjectBoardModel> search(int userId,String type,String text) {
+		List<Project> project = projectRepository.findAll();
+		List<ProjectBoardModel> board = new ArrayList<>();
+		if(type.equals("0")) { // 프로젝트 이름으로 검색할때
+			project=projectRepository.findByProjectNameIgnoreCaseContaining(text);
+		} else { // 팀장 이름으로 검색할 때
+			User u=userRepository.findByNameContaining(text);
+			if(u==null) {
+				return null;
+			}
+			project=projectRepository.findByUser_userId(u.getUserId());
+		}
+		for (Project p : project) {
+			ProjectBoardModel model = new ProjectBoardModel();
+			model.setProject(p);
+			ProjectStar ps = projectStarRepository.findByUser_userIdAndProject_ProjectId(userId, p.getProjectId());
+			model.setStar(ps != null ? true : false);
+			model.setSubjectName(p.getSubject() != null ? p.getSubject().getTitle() : null);
+			model.setCreateName(p.getUser().getName());
+			List<ProjectJoin> projectJoin = projectJoinRepository.findByProject_ProjectId(p.getProjectId());
+			Set<Integer> allGrade = new HashSet<>();
+			for (ProjectJoin pj : projectJoin) {
+				if(pj.getState()==1) {
+					allGrade.add(pj.getUser().getGrade());
+				}
+			}
+			model.setAllMemGrade(allGrade);
+			ProjectJoin pj = projectJoinRepository.findByUser_userIdAndProject_projectId(userId, p.getProjectId());
+			if (pj == null)
+				model.setState(2); // 프로젝트 신청할수 있는 상태
+			else if (pj.getState() == 0)
+				model.setState(0); // 승인대기 상태
+			else if (pj.getState() == 1)
+				model.setState(1); // 참가하고있는 상태
+			board.add(model);
+		}
+		return board;
+	}
+
 }

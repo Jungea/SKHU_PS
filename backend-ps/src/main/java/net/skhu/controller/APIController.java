@@ -423,5 +423,11 @@ public class APIController {
 		System.out.println("modal:"+projectId);
 		return projectService.getModal(projectId, getLoginUserId(request));
 	}
-	
+	// 프로젝트 게시판에서 검색 결과 
+	@RequestMapping(value = "projectBoard/search", method = RequestMethod.GET)
+	public List<ProjectBoardModel> projectBoard(@RequestParam("type") String type,@RequestParam("text") String text,HttpServletRequest request) {
+		//System.out.println("page:"+page);
+		System.out.println("text:"+text);
+		return projectService.search(getLoginUserId(request),type,text);
+	}
 }
