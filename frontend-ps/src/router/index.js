@@ -23,6 +23,9 @@ import ProfessorSummary from '../views/ProfessorSummary.vue'
 import Score from '../views/Score.vue'
 import ProjectSearch from '../views/ProjectSearch.vue'
 
+import NoticeBoard from '../views/NoticeBoard.vue'
+import NoticeContent from '../views/NoticeContent.vue'
+
 import MyProjectEdit from '../views/MyProjectEdit';
 import Summary from '../views/summary.vue';
 
@@ -158,7 +161,6 @@ Vue.use(VueRouter)
     name: 'professorSummary',
     component: ProfessorSummary
   },
-
   {
     path: '/Score/:subjectId',
     name: 'score',
@@ -169,6 +171,16 @@ Vue.use(VueRouter)
     name: 'projectSearch',
     component: ProjectSearch
   },
+  {
+    path: '/noticeBoard/:subjectId',
+    name: 'noticeBoard',
+    component: NoticeBoard
+  },
+  {
+    path: '/noticeContent/:postId',
+    name: 'noticeContent',
+    component: NoticeContent
+  }
 ]
 
 const router = new VueRouter({

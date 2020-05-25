@@ -8,16 +8,16 @@
                     <table class="table table-bordered" id="SubjectStudent" v-bind="this.data" style="width: 50%">
                         <tbody>
                             <tr>
-                                <th>학번</th>
-                                <th>학년</th>
-                                <th>이름</th>
-                                <th>학과</th>
+                                <th class="th1">학번</th>
+                                <th class="th1">학년</th>
+                                <th class="th1">이름</th>
+                                <th class="th1">학과</th>
                             </tr>
                             <tr @click="studentScore(item)" :key="index" v-for="(item, index) in data">
-                                <td> {{ item.userNum }} </td>
-                                <td> {{ item.grade }} </td>
-                                <td > {{ item.name }} </td>
-                                <td> {{ item.detDepartment.detName }} </td>
+                                <td class="td1"> {{ item.userNum }} </td>
+                                <td class="td1"> {{ item.grade }} </td>
+                                <td class="td1"> {{ item.name }} </td>
+                                <td class="td1"> {{ item.detDepartment.detName }} </td>
                             </tr>
                         </tbody>
                     </table>
@@ -33,15 +33,15 @@
                 <b-row>
                     <table class="table table-bordered">
                         <tr>
-                            <th>주차</th>
-                            <th>배점</th>
-                            <th>점수</th>
+                            <th class="th1">주차</th>
+                            <th class="th1">배점</th>
+                            <th class="th1">점수</th>
                         </tr>
-                        <tr :key="index" v-for="(data, index) in s">
-                            <td style="width: 60%"> {{ data.name }} </td>
-                            <td> {{ data.max }} </td>
-                            <td v-if="!editVisible"> {{ data.score }} </td>
-                            <td v-if="editVisible" style="padding: 5px 0 0 0 ; width: 20%">
+                        <tr style="text-align: center" :key="index" v-for="(data, index) in s">
+                            <td style="width: 60% ; text-align: center"> {{ data.name }} </td>
+                            <td class="td1"> {{ data.max }} </td>
+                            <td class="td1" v-if="!editVisible"> {{ data.score }} </td>
+                            <td class="td1" v-if="editVisible" style="padding: 5px 0 0 0 ; width: 20%">
                                 <center>
                                     <b-input v-model="data.score" style="width: 50% ; text-align: center"></b-input>
                                 </center>
@@ -108,6 +108,6 @@ export default {
 </script>
 
 <style>
-tr, td { text-align: center; }
-th { background-color: rgb(243,243,243) }
+    .th1 { background-color: rgb(243,243,243) ; text-align: center }
+    .td1 { text-align: center }
 </style>
