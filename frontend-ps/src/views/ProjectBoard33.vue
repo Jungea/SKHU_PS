@@ -37,12 +37,12 @@
                         </b-card>  
                     </b-col>
                 </b-row>
-                <b-pagination  @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
+                <b-pagination @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
 
             </b-container>  
               
         </center>  
-        <!-- <b-modal id="modal-xl" size="lg" title="프로젝트 개요" 
+        <b-modal id="modal-xl" size="lg" title="프로젝트 개요" 
             @ok="handleOk" ref="modal" data-backdrop="static">
           <table class="table table-bordered" id="ProjectSummary" v-bind="this.summaryData">
                     <tbody>
@@ -116,7 +116,7 @@
                 <b-button variant="danger" v-if="this.summaryData.state==2" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
                 <b-button variant="warning" v-else-if="this.summaryData.state==0" >승인 대기</b-button>
                 <b-button variant="success" v-else-if="this.summaryData.state==1" >참가중</b-button>
-        </b-modal>   -->
+        </b-modal>  
   </div>
 </template>
 
@@ -135,62 +135,32 @@ export default {
       rcrtState:false,
       
       summaryData:{},
-      alertvariant:'danger',
+      alertvariant:'danger'
     }
   },
-   watch: {
-      '$route'(){
-        //   if (to.params.page) { 
-        //       this.value=parseInt(from.params.page)
-              
-        //   }
-        //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
-          console.log('query:'+this.$route.query.page)
-        //   axios.get('/api/projectBoard?page='+this.value).then(response => { // 프로젝트 이름 가져오기
-        //         response.data
-        //       }).catch((erro) => {
-        //       console.error(erro);
-        //     });
-      }
-  },
   mounted() { 
-      if(this.currentPage==1) {
-          this.$router.push({
-            path: '/projectBoard',
-            query:{page:1}
-          })
-      }
-        axios.get('/api/all/projectsNum') // 내 프로젝트 모든 목록
+        axios.get('/api/all/projects') // 내 프로젝트 모든 목록
         .then(response => {
-            // this.data = response.data 
-            // this.totalRows=this.data.length
-            // this.paginatedItems=this.data
-            // this.summaryData=this.data[0]
-            this.totalRows=response.data
-            console.log("totalRows:"+this.totalRows)
-            //this.paginate(this.perPage, 0)
+            this.data = response.data 
+            this.totalRows=this.data.length
+            this.paginatedItems=this.data
+            this.summaryData=this.data[0]
+            this.paginate(this.perPage, 0)
         });
-        console.log("query:"+this.$route.query.page)
     },
   computed: {
-    // pageCount() {
-    //   let l = this.totalRows,
-    //     s = this.perPage;
-    //   return Math.floor(l / s);
-    // },
-    
+    pageCount() {
+      let l = this.totalRows,
+        s = this.perPage;
+      return Math.floor(l / s);
+    }
   },
   methods: {
      paginate (page_size, page_number) {
-         this.$router.push({
-            path: '/projectBoard',
-            query:{page:page_number+1}
-          })
-    //   let itemsToParse = this.data
-    //   this.paginatedItems = itemsToParse.slice(page_number * page_size, (page_number + 1) * page_size);
+      let itemsToParse = this.data
+      this.paginatedItems = itemsToParse.slice(page_number * page_size, (page_number + 1) * page_size);
     },
     onPageChanged(page){
-        this.currentPage=this.$route.query.page
       this.paginate(this.perPage, page - 1)
     },
     changeStar(projectId) {

@@ -79,7 +79,7 @@ Vue.use(VueRouter)
   {
     path: '/projectBoard',
     name: 'ProjectBoard',
-    component: ProjectBoard
+    component: ProjectBoard,
   },
   {
     path: '/project/:projectId/manage',
@@ -155,7 +155,8 @@ Vue.use(VueRouter)
     path: '/Professor/:subjectId/summary',
     name: 'professorSummary',
     component: ProfessorSummary
-  }
+  },
+ 
 ]
 
 const router = new VueRouter({

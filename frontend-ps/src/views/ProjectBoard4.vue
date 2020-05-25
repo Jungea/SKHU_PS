@@ -37,8 +37,8 @@
                         </b-card>  
                     </b-col>
                 </b-row>
-                <b-pagination  @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
-
+                <!-- <b-pagination @change="onPageChanged(currentPage)" :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" /> -->
+                <b-pagination-nav v-model="value" :link-gen="linkGen" :number-of-pages="totalRows" use-router></b-pagination-nav>
             </b-container>  
               
         </center>  
@@ -130,68 +130,65 @@ export default {
       currentPage: 1,
       totalRows: null,
       paginatedItems:{},
+
       data:{},
       tagArray:[],
       rcrtState:false,
       
       summaryData:{},
       alertvariant:'danger',
+      value:1,
     }
   },
-   watch: {
+  mounted() { 
+        axios.get('/api/all/projectsNum') // 내 프로젝트 모든 목록
+        .then(response => {
+            // this.data = response.data 
+            this.totalRows=Math.ceil(response.data/this.perPage)
+            // this.paginatedItems=this.data
+            // this.summaryData=this.data[0]
+            // this.paginate(this.perPage, 0)
+        });
+        axios.get('/api/projectBoard?page='+this.currentPage) // 내 프로젝트 모든 목록
+        .then(response => {
+            console.log(response.data)
+        });
+        
+    },
+  computed: {
+    pageCount() {
+      let l = this.totalRows,
+        s = this.perPage;
+      return Math.floor(l / s);
+    },
+    
+  },
+  watch: {
       '$route'(){
         //   if (to.params.page) { 
         //       this.value=parseInt(from.params.page)
               
         //   }
         //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
-          console.log('query:'+this.$route.query.page)
-        //   axios.get('/api/projectBoard?page='+this.value).then(response => { // 프로젝트 이름 가져오기
-        //         response.data
-        //       }).catch((erro) => {
-        //       console.error(erro);
-        //     });
+          console.log(this.value)
+          axios.get('/api/projectBoard?page='+this.value).then(response => { // 프로젝트 이름 가져오기
+                response.data
+              }).catch((erro) => {
+              console.error(erro);
+            });
       }
-  },
-  mounted() { 
-      if(this.currentPage==1) {
-          this.$router.push({
-            path: '/projectBoard',
-            query:{page:1}
-          })
-      }
-        axios.get('/api/all/projectsNum') // 내 프로젝트 모든 목록
-        .then(response => {
-            // this.data = response.data 
-            // this.totalRows=this.data.length
-            // this.paginatedItems=this.data
-            // this.summaryData=this.data[0]
-            this.totalRows=response.data
-            console.log("totalRows:"+this.totalRows)
-            //this.paginate(this.perPage, 0)
-        });
-        console.log("query:"+this.$route.query.page)
-    },
-  computed: {
-    // pageCount() {
-    //   let l = this.totalRows,
-    //     s = this.perPage;
-    //   return Math.floor(l / s);
-    // },
-    
   },
   methods: {
+      linkGen(pageNum) {
+        return pageNum === 1 ? '?' : `?page=${pageNum}`
+      },
      paginate (page_size, page_number) {
-         this.$router.push({
-            path: '/projectBoard',
-            query:{page:page_number+1}
-          })
-    //   let itemsToParse = this.data
-    //   this.paginatedItems = itemsToParse.slice(page_number * page_size, (page_number + 1) * page_size);
+      let itemsToParse = this.data
+      this.paginatedItems = itemsToParse.slice(page_number * page_size, (page_number + 1) * page_size);
     },
-    onPageChanged(page){
-        this.currentPage=this.$route.query.page
-      this.paginate(this.perPage, page - 1)
+    onPageChanged(){
+        // this.paginate(this.perPage, page - 1)
+        
     },
     changeStar(projectId) {
       axios.post('/api/changeStar', {
@@ -231,5 +228,7 @@ export default {
       
     }
   },
+
+
 }
 </script>

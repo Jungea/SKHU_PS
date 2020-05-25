@@ -188,7 +188,10 @@ export default {
       },
       projectBoard(evt) {
         evt.preventDefault()
-        location.href="/projectBoard"
+        this.$router.push({
+            path: '/projectBoard',
+            query:{page:1}
+          })
       },
       home(evt) {
         evt.preventDefault()

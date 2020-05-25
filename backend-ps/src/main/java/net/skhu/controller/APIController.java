@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.skhu.domain.Detail;
@@ -364,10 +365,11 @@ public class APIController {
 
 	}
 
-	// 전체 프로젝트 반환
-	@RequestMapping(value = "all/projects", method = RequestMethod.GET)
-	public List<ProjectBoardModel> allProjects(HttpServletRequest request) {
-		return projectService.projectBoard(getLoginUserId(request));
+	// 전체 프로젝트 개수 반환
+	@RequestMapping(value = "all/projectsNum", method = RequestMethod.GET)
+	public int allProjects(HttpServletRequest request) {
+		return projectRepository.findAll().size();
+		//return projectService.projectBoard(getLoginUserId(request));
 	}
 	// project_star 변경
 	@RequestMapping(value = "changeStar", method = RequestMethod.POST)
@@ -395,5 +397,10 @@ public class APIController {
 		return projectService.applicationList(Integer.parseInt(projectId));
 	}
 	
-	
+	// 해당 페이지에 해당하는 프로젝트 데이터 전달
+	@RequestMapping(value = "projectBoard", method = RequestMethod.GET)
+	public void projectBoard(@RequestParam("page") int page) {
+		System.out.println("page:"+page);
+		//return projectService.projectBoard(getLoginUserId(request));
+	}
 }
