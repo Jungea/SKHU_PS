@@ -7,8 +7,31 @@
                 </b-row>
 
                 <b-row class="text-right mb-4">
-                    <b-col><b-button v-b-modal.modal-xl2 variant="outline-secondary" style="height: 70px;">프로젝트 검색</b-button></b-col>
+                    <b-col><b-button v-b-toggle.my-collapse variant="outline-secondary" style="height: 70px;">프로젝트 검색</b-button></b-col>
+                
                 </b-row>
+                <b-collapse id="my-collapse">
+                    <b-card title="필터 검색" class="mb-5">
+                        학년
+                        <b-form-select v-model="selectedGrade" :options="grades"></b-form-select>
+                        and 연도
+                        <b-form-select v-model="selectedYear" :options="years"></b-form-select>
+                        and 강좌
+                        <b-form-select v-model="selectedSubject" :options="subjects"></b-form-select>
+                        and 언어
+                         <b-form-tags
+                  input-id="language"
+                  :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
+                  v-model="tags"
+                  separator=" ,;"
+                  placeholder="태그를 입력하세요"
+                  remove-on-delete
+                  add-on-enter
+                  class="mb-2"
+              ></b-form-tags>
+                <b-button @click="filter()">검색</b-button>
+                    </b-card>
+                </b-collapse>
                    <b-row cols-md="3" cols="1">
                     <b-col class="mb-5" :key="index" v-for="(item, index) in paginatedItems">
                         <b-card id="my-table"  @click="sendInfo(item.project.projectId)" v-b-modal.modal-xl align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
@@ -119,13 +142,7 @@
                 <b-button variant="warning" v-else-if="this.summaryData.state==0" >승인 대기</b-button>
                 <b-button variant="success" v-else-if="this.summaryData.state==1" >참가중</b-button>
         </b-modal>  
-        <b-modal id="modal-xl2" size="lg" title="프로젝트 검색" 
-            @ok="handleOk" ref="modal" data-backdrop="static" >
-          <table class="table table-bordered" id="ProjectSummary" v-bind="this.summaryData">
-                    
-                </table>
-                <b-button variant="warning" >검색</b-button>
-        </b-modal>  
+
   </div>
 </template>
 
@@ -149,14 +166,23 @@ export default {
        options: [
           { value: '0', text: '프로젝트 이름' },
           { value: '1', text: '조장 이름' },
-       ]
+       ],
+        grades: [
+          { value: '1', text: '1학년' },
+          { value: '2', text: '2학년' },
+          { value: '3', text: '3학년' },
+          { value: '4', text: '4학년' },
+       ],
+       years: [],
+       subjects:[],
+       tags:[],
+       selectedGrade:null,
+       selectedYear:null,
+       selectedSubject:null,
     }
   },
    watch: {
       '$route'(){
-          if (this.$route.query.type=='0') { 
-             alert('fdfdfdfdfdfdfdfdfd')
-          }
         //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
           console.log('query111:'+this.$route.query.page)
           axios.get('/api/projectBoard?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
@@ -166,7 +192,14 @@ export default {
             });
       }
   },
-  mounted() { 
+  mounted() {
+       
+      for(let i=2019;i<=new Date().getFullYear();i++) {
+          let obj={}
+          obj.value=String(i)
+          obj.text=String(i)
+          this.years.push(obj)
+      }
       this.text=''
       if(this.currentPage==1) {
           this.$router.push({
@@ -174,6 +207,16 @@ export default {
             query:{page:1}
           })
       }
+       axios.get('/api/projectBoard/subjects') // 모든 과목 정보
+        .then(response => {
+            for(let i=0;i<response.data.length;i++) {
+                let obj={}
+                obj.value=String(response.data[i].subjectId)
+                obj.text=String(response.data[i].year)+"-"+String(response.data[i].semester)+" "+response.data[i].title
+                this.subjects.push(obj)
+            }
+            
+        });
         axios.get('/api/all/projectsNum') // 내 프로젝트 모든 목록
         .then(response => {
             // this.data = response.data 

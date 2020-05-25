@@ -430,4 +430,9 @@ public class APIController {
 		System.out.println("text:"+text);
 		return projectService.search(getLoginUserId(request),type,text);
 	}
+	// 0501 과목정보
+	@RequestMapping(value = "/projectBoard/subjects", method = RequestMethod.GET)
+	public List<Subject> allSubject() {
+		return subjectRepository.findAll();
+	}
 }
