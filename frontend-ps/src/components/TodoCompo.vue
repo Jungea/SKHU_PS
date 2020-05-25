@@ -44,7 +44,7 @@
                                     style="float:left" 
                                     v-if="deleteSelect"
                                 ></b-form-checkbox>
-                                <span :style="`float:left; color:${member[getIndexById(member,todo.user_id)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
+                                <span :style="`float:left; color:${member!=null?'black':member[getIndexById(member,'userId',todo.userId)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
                                     {{todo.detail}}
                                 </span>
                                 <!--수정#1-->
@@ -118,7 +118,7 @@
                                     style="float:left" 
                                     v-if="deleteSelect2"
                                 ></b-form-checkbox>
-                                <span :style="`float:left; color:${member[getIndexById(member,todo.user_id)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
+                                <span :style="`float:left; color:${member!=null?'black':member[getIndexById(member,'userId',todo.userId)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
                                     {{todo.detail}}
                                 </span>
                                 <!--수정#2-->
@@ -196,7 +196,7 @@
                                     style="float:left" 
                                     v-if="deleteSelect3"
                                 ></b-form-checkbox>
-                                <span :style="`float:left; color:${member[getIndexById(member,todo.user_id)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
+                                <span :style="`float:left; color:${member!=null?'black':member[getIndexById(member,'userId',todo.userId)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
                                     {{todo.detail}}
                                 </span>
                                 <!--수정#3-->
@@ -272,18 +272,18 @@ export default {
                 id:null,
                 detail:'',
                 prog:null,
-                user_id:null
+                userId:null
             },
             modalId:'',
             idcount:7,    //id 증가를 위한 임시 변수
             todo: [
-                {todoId:1, user_id:1, detail:'똥싸기', prog:0,},
-                {todoId:2, user_id:2, detail:'밥먹기', prog:0,},
-                {todoId:3, user_id:4, detail:'치킨시키기', prog:1,},
-                {todoId:4, user_id:1, detail:'잠자기', prog:1,},
-                {todoId:5, user_id:2, detail:'나루토보기', prog:1,},
-                {todoId:6, user_id:1, detail:'메이플하기', prog:2,},
-                {todoId:7, user_id:4, detail:'샤워하기', prog:2,}
+                // {todoId:1, userId:1, detail:'똥싸기', prog:0,},
+                // {todoId:2, userId:2, detail:'밥먹기', prog:0,},
+                // {todoId:3, userId:4, detail:'치킨시키기', prog:1,},
+                // {todoId:4, userId:1, detail:'잠자기', prog:1,},
+                // {todoId:5, userId:2, detail:'나루토보기', prog:1,},
+                // {todoId:6, userId:1, detail:'메이플하기', prog:2,},
+                // {todoId:7, userId:4, detail:'샤워하기', prog:2,}
             ],
 
             state1:[],
@@ -291,25 +291,30 @@ export default {
             state3:[],
 
             member:[
-                {id:1, color:'orange', name:'짱구'}, {id:2, color:'blue', name:'유리'}, {id:4, color:'green', name:'철수'}
+                //{id:1, color:'orange', name:'짱구'}, {id:2, color:'blue', name:'유리'}, {id:4, color:'green', name:'철수'}
             ]
         }
         
     },
     methods:{
         log(evt) {
-            console.log(evt)
+            //console.log(evt)
             if(evt.added){
-                let id=evt.added.element.id;
-                let index=this.getIndexById(this.todo,id)
+                let id=evt.added.element.todoId;
+                console.log(id)
+                let index;
                 if(this.state1.indexOf(evt.added.element)!=-1){
-                    this.changeStatus(this.todo[index],0)
+                    index=this.getIndexById(this.state1,'todoId',id)
+                    this.changeStatus(this.state1[index],0)
                 }
                 else if(this.state2.indexOf(evt.added.element)!=-1){
-                    this.changeStatus(this.todo[index],1)
+                    index=this.getIndexById(this.state2,'todoId',id)
+                    console.log(this.state2)
+                    this.changeStatus(this.state2[index],1)
                 }
                 else{
-                    this.changeStatus(this.todo[index],2)
+                    index=this.getIndexById(this.state3,'todoId',id)
+                    this.changeStatus(this.state3[index],2)
                 }
             }
         },
@@ -340,9 +345,9 @@ export default {
                 axios.post('/api/createTodo',{
                     projectId:this.$route.params.projectId,
                     detail:this.new_todo.detail,
-                    weekly_id:this.$route.params.week,//주간목표의 id를 저장해야함
-                    progState:st
-                }).then(() => this.todoReload());
+                    week:this.$route.params.week,
+                    progState:st,
+                }).then(() => this.todoReload());//불러온 배열이 기존 배열과 중첩됨
             }
             this.show=false; this.show2=false; this.show3=false
             this.new_todo.detail=''
@@ -415,16 +420,38 @@ export default {
         },
 
         //모든 배열에서 사용할 수 있도록 수정
-        getIndexById(arr,id){
-            var index = arr.findIndex(obj => obj.id==id);
+        //모든 칼럼으로 조회할 수 있도록 수정
+        getIndexById(arr,key,value){
+            var index = arr.findIndex(obj => obj[key]==value);
             return index;
         },
 
         todoReload() {
             axios.get('/api/project/'+this.$route.params.projectId+'/weekly/'+this.$route.params.week)
                 .then(response => {
-                    if(response.data != null)
-                        this.todo = response.data;
+                    if(response.data != null){
+                        let todoTemp=[]; let temp1=[]; let temp2=[]; let temp3=[];
+                        for(let i=0;i<response.data.length;i++){
+                            let data={
+                                'todoId':response.data[i].todoId,
+                                'userId':response.data[i].user.userId,
+                                'detail':response.data[i].detail,
+                                'created':response.data[i].createTime,
+                                'prog':response.data[i].progState,
+                                'weekly':response.data[i].weekly.weeklyId
+                            }
+                            todoTemp.push(data)
+                            if(data.prog==0)
+                                temp1.push(data)
+                            else if(data.prog==1)
+                                temp2.push(data)
+                            else
+                                temp3.push(data)
+                        }
+                        this.todo=todoTemp;
+                        this.state1=temp1; this.state2=temp2; this.state3=temp3;
+                    }
+                    console.log('todo 로드합니다')
                     console.log(this.todo);
                 })
         }
@@ -443,8 +470,6 @@ export default {
                 this.state3.push(this.todo[i])
             }
         }
-
-        console.log(this.state1)
 
         axios.get('/api/project/'+this.$route.params.projectId)
         .then(response => {
