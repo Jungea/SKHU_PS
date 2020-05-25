@@ -20,6 +20,7 @@ import ProfessorProfile from '../views/ProfessorProfile.vue'
 import EditProfessorProfile from '../views/EditProfessorProfile.vue'
 import Team from '../views/Team.vue'
 import ProfessorSummary from '../views/ProfessorSummary.vue'
+import Score from '../views/Score.vue'
 
 import MyProjectEdit from '../views/MyProjectEdit';
 import Summary from '../views/summary.vue';
@@ -156,7 +157,12 @@ Vue.use(VueRouter)
     name: 'professorSummary',
     component: ProfessorSummary
   },
- 
+
+  {
+    path: '/Score/:subjectId',
+    name: 'score',
+    component: Score
+  }
 ]
 
 const router = new VueRouter({

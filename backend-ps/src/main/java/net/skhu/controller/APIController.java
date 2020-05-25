@@ -17,6 +17,7 @@ import net.skhu.domain.Detail;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Subject;
+import net.skhu.domain.Todo;
 import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
 import net.skhu.model.EditProjectModel;
@@ -27,6 +28,7 @@ import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.ProjectBoardModel;
 import net.skhu.model.SignUpModel;
+import net.skhu.model.TodoModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.model.WeekGoalModel;
 import net.skhu.repository.ProjectJoinRepository;
@@ -403,4 +405,17 @@ public class APIController {
 		System.out.println("page:"+page);
 		//return projectService.projectBoard(getLoginUserId(request));
 	}
+	//프로젝트 해당 주차의 ToDoList 목록
+	@RequestMapping(value = "project/{projectId}/weekly/{week}", method = RequestMethod.GET)
+	public List<Todo> projectWeekTodoList(@PathVariable("projectId") String projectId, @PathVariable("week") String week) {
+		return projectService.todoList(Integer.parseInt(projectId), Integer.parseInt(week));
+	}
+	
+	// todo생성
+	@RequestMapping(value = "createTodo", method = RequestMethod.POST)
+	public void createTodo(@RequestBody TodoModel todoModel, HttpServletRequest request) {
+		projectService.createTodo(getLoginUserId(request), todoModel);
+
+	}
+	
 }
