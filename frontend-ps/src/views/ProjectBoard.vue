@@ -7,17 +7,17 @@
                 </b-row>
 
                 <b-row class="text-right mb-4">
-                    <b-col><b-button v-b-modal.modal-xl variant="outline-secondary" style="height: 70px;">프로젝트 검색</b-button></b-col>
+                    <b-col><b-button v-b-modal.modal-xl2 variant="outline-secondary" style="height: 70px;">프로젝트 검색</b-button></b-col>
                 </b-row>
                    <b-row cols-md="3" cols="1">
                     <b-col class="mb-5" :key="index" v-for="(item, index) in paginatedItems">
-                        <b-card id="my-table"  @click="sendInfo(item)" v-b-modal.modal-xl align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
+                        <b-card id="my-table"  @click="sendInfo(item.project.projectId)" v-b-modal.modal-xl align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
                             <div>
                                 <b-card-header style="padding: 0 0 10px 0">
                                     <table>
                                         <tr>
                                             <td style="width: 100%">{{item.project.projectName}}</td>
-                                            <td><b-button @click="changeStar(item.project.projectId)" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon scale=1.5 v-bind:icon="item.star==true?'heart-fill':'heart'"></b-icon></b-button></td>
+                                            <td><b-button @click="changeStar(item.project.projectId,item.star)" style="background-color: rgb(52,58,64) ; border-color: rgb(52,58,64) ; margin-top: -10px" ><b-icon id="star" scale=1.5 v-bind:icon="item.star==true?'heart-fill':'heart'"></b-icon></b-button></td>
                                         </tr>
                                     </table>
                                 </b-card-header>
@@ -42,8 +42,8 @@
             </b-container>  
               
         </center>  
-        <!-- <b-modal id="modal-xl" size="lg" title="프로젝트 개요" 
-            @ok="handleOk" ref="modal" data-backdrop="static">
+        <b-modal id="modal-xl" size="lg" title="프로젝트 개요" 
+            @ok="handleOk" ref="modal" data-backdrop="static" >
           <table class="table table-bordered" id="ProjectSummary" v-bind="this.summaryData">
                     <tbody>
                         <tr>
@@ -113,10 +113,17 @@
                         </tr>
                     </tbody>
                 </table>
-                <b-button variant="danger" v-if="this.summaryData.state==2" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
+                <b-button variant="danger" v-if="this.summaryData.state==2&& this.summaryData.project.rcrtState==false" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
                 <b-button variant="warning" v-else-if="this.summaryData.state==0" >승인 대기</b-button>
                 <b-button variant="success" v-else-if="this.summaryData.state==1" >참가중</b-button>
-        </b-modal>   -->
+        </b-modal>  
+        <b-modal id="modal-xl2" size="lg" title="프로젝트 검색" 
+            @ok="handleOk" ref="modal" data-backdrop="static" >
+          <table class="table table-bordered" id="ProjectSummary" v-bind="this.summaryData">
+                    
+                </table>
+                <b-button variant="warning" >검색</b-button>
+        </b-modal>  
   </div>
 </template>
 
@@ -145,12 +152,12 @@ export default {
               
         //   }
         //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
-          console.log('query:'+this.$route.query.page)
-        //   axios.get('/api/projectBoard?page='+this.value).then(response => { // 프로젝트 이름 가져오기
-        //         response.data
-        //       }).catch((erro) => {
-        //       console.error(erro);
-        //     });
+          console.log('query111:'+this.$route.query.page)
+          axios.get('/api/projectBoard?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+                this.paginatedItems=response.data
+              }).catch((erro) => {
+              console.error(erro);
+            });
       }
   },
   mounted() { 
@@ -165,12 +172,17 @@ export default {
             // this.data = response.data 
             // this.totalRows=this.data.length
             // this.paginatedItems=this.data
-            // this.summaryData=this.data[0]
             this.totalRows=response.data
             console.log("totalRows:"+this.totalRows)
             //this.paginate(this.perPage, 0)
         });
         console.log("query:"+this.$route.query.page)
+         axios.get('/api/projectBoard?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+                this.paginatedItems=response.data
+                this.summaryData=response.data[0]
+              }).catch((erro) => {
+              console.error(erro);
+            });
     },
   computed: {
     // pageCount() {
@@ -208,21 +220,28 @@ export default {
             // Prevent modal from closing
             bvModalEvt.preventDefault()
             // Trigger submit handler
-            this.handleSubmit()
     },
-    sendInfo(item) {
-      this.summaryData=item
+    sendInfo(projectId) {
+      //this.summaryData=item
+       axios.get('/api/projectBoard/modal/'+projectId).then(response => { // 프로젝트 이름 가져오기
+                this.summaryData=response.data
+                this.$refs['modal'].show()
+              }).catch((erro) => {
+              console.error(erro);
+            });
     },
     projectJoin(projectId) {
        axios.post('/api/joinProject', {
                 projectId:projectId
             })
             .then((response) => {
+                 this.sendInfo(projectId)
                 if(response.data) {
                     alert('참가 신청이 완료되었습니다.')
-                    this.summaryData.state=0;
-                    this.$refs['modal'].hide()
-                    this.$refs['modal'].show()
+                   // this.summaryData.state=0;
+                    // this.$refs['modal'].hide()
+                    // this.$refs['modal'].show()
+                   
                 }
                 else
                     alert('이미 초대받은 프로젝트입니다.\n 마이페이지를 확인하세요.')

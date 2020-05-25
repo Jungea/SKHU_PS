@@ -401,9 +401,9 @@ public class APIController {
 	
 	// 해당 페이지에 해당하는 프로젝트 데이터 전달
 	@RequestMapping(value = "projectBoard", method = RequestMethod.GET)
-	public void projectBoard(@RequestParam("page") int page) {
+	public List<ProjectBoardModel> projectBoard(@RequestParam("page") int page,HttpServletRequest request) {
 		System.out.println("page:"+page);
-		//return projectService.projectBoard(getLoginUserId(request));
+		return projectService.projectBoard(getLoginUserId(request),page);
 	}
 	//프로젝트 해당 주차의 ToDoList 목록
 	@RequestMapping(value = "project/{projectId}/weekly/{week}", method = RequestMethod.GET)
@@ -416,6 +416,12 @@ public class APIController {
 	public void createTodo(@RequestBody TodoModel todoModel, HttpServletRequest request) {
 		projectService.createTodo(getLoginUserId(request), todoModel);
 
+	}
+	// 프로젝트 게시판에서 해당 모달 정보 가져오기
+	@RequestMapping(value = "projectBoard/modal/{projectId}", method = RequestMethod.GET)
+	public ProjectBoardModel modal(@PathVariable("projectId") int projectId,HttpServletRequest request) {
+		System.out.println("modal:"+projectId);
+		return projectService.getModal(projectId, getLoginUserId(request));
 	}
 	
 }

@@ -211,16 +211,20 @@ public class ProjectService {
 		weekly.setStartTime(weekGoalModel.getStartTime());
 		weekly.setDetail(weekGoalModel.getDetail());
 		// FIXME 주차수 생각 필요
-//		weekly.setWeek(weekGoalModel.getWeek());
+		//		weekly.setWeek(weekGoalModel.getWeek());
 		weekly.setProject(projectRepository.findById(weekGoalModel.getProjectId()).get());
 
 		weeklyRepository.save(weekly);
 	}
 
-	public List<ProjectBoardModel> projectBoard(int userId) {
+	public List<ProjectBoardModel> projectBoard(int userId,int page) {
 		List<Project> project = projectRepository.findAll();
 		List<ProjectBoardModel> board = new ArrayList<>();
-
+		if(project.size()<page*6) {
+			project=project.subList((page-1)*6,project.size());
+		} else {
+			project=project.subList((page-1)*6,page*6);
+		}
 		for (Project p : project) {
 			ProjectBoardModel model = new ProjectBoardModel();
 			model.setProject(p);
@@ -260,14 +264,42 @@ public class ProjectService {
 	// 새로운 todo 추가
 	public void createTodo(int userId, TodoModel todoModel) {
 		Todo todo = new Todo();
-		
+
 		todo.setUser(userRepository.findById(userId).get());
 		Weekly weekly = weeklyRepository.findByProject_ProjectIdAndWeek(todoModel.getProjectId(), todoModel.getWeek());
 		todo.setWeekly(weekly);
 		todo.setDetail(todoModel.getDetail());
 		todo.setCreateTime(LocalDateTime.now());
 		todo.setProgState(todoModel.getProgState());
-		
+
 		todoRepository.save(todo);
+	}
+	public ProjectBoardModel getModal(int projectId,int userId) {
+//		List<Project> project = projectRepository.findAll();
+//		List<ProjectBoardModel> board = new ArrayList<>();
+
+		Project p=projectRepository.findById(projectId).get();
+		ProjectBoardModel model = new ProjectBoardModel();
+		model.setProject(p);
+		ProjectStar ps = projectStarRepository.findByUser_userIdAndProject_ProjectId(userId, p.getProjectId());
+		model.setStar(ps != null ? true : false);
+		model.setSubjectName(p.getSubject() != null ? p.getSubject().getTitle() : null);
+		model.setCreateName(p.getUser().getName());
+		List<ProjectJoin> projectJoin = projectJoinRepository.findByProject_ProjectId(p.getProjectId());
+		Set<Integer> allGrade = new HashSet<>();
+		for (ProjectJoin pj : projectJoin) {
+			if(pj.getState()==1) {
+				allGrade.add(pj.getUser().getGrade());
+			}
+		}
+		model.setAllMemGrade(allGrade);
+		ProjectJoin pj = projectJoinRepository.findByUser_userIdAndProject_projectId(userId, p.getProjectId());
+		if (pj == null)
+			model.setState(2); // 프로젝트 신청할수 있는 상태
+		else if (pj.getState() == 0)
+			model.setState(0); // 승인대기 상태
+		else if (pj.getState() == 1)
+			model.setState(1); // 참가하고있는 상태
+		return model;
 	}
 }
