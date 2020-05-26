@@ -29,7 +29,6 @@ public class Weekly {
 
 	LocalDate startTime;
 	String detail;
-	int week;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "projectId")

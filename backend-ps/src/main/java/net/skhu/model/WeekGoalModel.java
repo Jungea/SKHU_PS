@@ -9,5 +9,4 @@ public class WeekGoalModel {
 	int projectId;
 	LocalDate startTime;
 	String detail;
-	int week;
 }

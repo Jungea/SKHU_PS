@@ -211,8 +211,6 @@ public class ProjectService {
 		Weekly weekly = new Weekly();
 		weekly.setStartTime(weekGoalModel.getStartTime());
 		weekly.setDetail(weekGoalModel.getDetail());
-		// FIXME 주차수 생각 필요
-		//		weekly.setWeek(weekGoalModel.getWeek());
 		weekly.setProject(projectRepository.findById(weekGoalModel.getProjectId()).get());
 
 		weeklyRepository.save(weekly);
@@ -520,4 +518,20 @@ public class ProjectService {
 	public void deleteTodo(int todoId) {
 		todoRepository.deleteById(todoId);
 	}
+
+	// 주간 목표 수정
+	public void editWeekly(Weekly editWeekly) {
+		Weekly originWeekly = weeklyRepository.findById(editWeekly.getWeeklyId()).get();
+		originWeekly.setDetail(editWeekly.getDetail());
+		originWeekly.setStartTime(editWeekly.getStartTime());
+		
+		weeklyRepository.save(originWeekly);
+	}
+
+	// 주간 목표 삭제
+	public void deleteWeekly(int weeklyId) {
+		weeklyRepository.deleteById(weeklyId);
+	}
+	
+	
 }

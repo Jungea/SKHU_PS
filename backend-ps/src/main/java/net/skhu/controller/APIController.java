@@ -460,4 +460,17 @@ public class APIController {
 	public void deleteTodo(@PathVariable("todoId") int todoId) {
 		projectService.deleteTodo(todoId);
 	}
+	
+	// 주간 목표 수정
+	@RequestMapping(value = "editWeekly", method = RequestMethod.POST)
+	public void editWeekly(@RequestBody Weekly weekly) {
+		System.out.println(weekly);
+		projectService.editWeekly(weekly);
+	}
+	
+	// 주간 목표 삭제
+	@RequestMapping(value = "deleteWeekly/{weeklyId}", method = RequestMethod.GET)
+	public void deleteWeekly(@PathVariable("weeklyId") int weeklyId) {
+		projectService.deleteWeekly(weeklyId);
+	}
 }
