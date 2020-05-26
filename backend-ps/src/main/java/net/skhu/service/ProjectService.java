@@ -271,6 +271,7 @@ public class ProjectService {
 		todo.setDetail(todoModel.getDetail());
 		todo.setCreateTime(LocalDateTime.now());
 		todo.setProgState(todoModel.getProgState());
+		todo.setOrder(todoModel.getOrder());
 
 		todoRepository.save(todo);
 	}
@@ -339,6 +340,15 @@ public class ProjectService {
 			board.add(model);
 		}
 		return board;
+	}
+
+	// todo 순서 변경
+	public void moveTodo(int todoId, int progState, int order) {
+		Todo todo = todoRepository.findById(todoId).get();
+		todo.setProgState(progState);
+		todo.setOrder(order);
+		
+		todoRepository.save(todo);
 	}
 
 }

@@ -435,4 +435,11 @@ public class APIController {
 	public List<Subject> allSubject() {
 		return subjectRepository.findAll();
 	}
+	
+	// todo 위치 변경
+	// 프로젝트 게시판에서 해당 모달 정보 가져오기
+	@RequestMapping(value = "moveTodo/{todoId}/{progState}/{order}", method = RequestMethod.GET)
+	public void moveTodo(@PathVariable("todoId") int todoId, @PathVariable("progState") int progState, @PathVariable("order") int order) {
+		projectService.moveTodo(todoId, progState, order);
+	}
 }

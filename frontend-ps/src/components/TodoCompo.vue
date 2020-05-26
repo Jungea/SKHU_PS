@@ -35,7 +35,7 @@
                             </b-form>
                             <!--할 일 카드 목록-->
                             <b-form-checkbox-group v-model="selected">
-                            <draggable :list="state1"  group="people" @start="drag=true;deleteSelect=false" @end="drag=false" @change="log">
+                            <draggable :list="state1"  group="people" @start="drag=true;deleteSelect=false" @end="drag=false" @change="log(0, $event)">
                             <b-card :key="todo.todoId" v-for="todo in state1" draggable="true" class="mt-2">
                                 <!--삭제 체크박스-->
                                 <b-form-checkbox
@@ -109,7 +109,7 @@
                             </b-form>
                             <!--할 일 카드 목록-->
                             <b-form-checkbox-group v-model="selected">
-                            <draggable :list="state2"  group="people" @start="drag=true;deleteSelect=false" @end="drag=false" @change="log">
+                            <draggable :list="state2"  group="people" @start="drag=true;deleteSelect=false" @end="drag=false" @change="log(1, $event)">
                             <b-card :key="todo.todoId" v-for="todo in state2" draggable="true" class="mt-2">
                                 <!--삭제 체크박스-->
                                 <b-form-checkbox
@@ -187,7 +187,7 @@
                             </b-form>
                             <!--할 일 카드 목록-->
                             <b-form-checkbox-group v-model="selected">
-                            <draggable :list="state3"  group="people" @start="drag=true;deleteSelect=false" @end="drag=false" @change="log">
+                            <draggable :list="state3"  group="people" @start="drag=true;deleteSelect=false" @end="drag=false" @change="log(2, $event)">
                             <b-card :key="todo.todoId" v-for="todo in state3" draggable="true" class="mt-2">
                                 <!--삭제 체크박스-->
                                 <b-form-checkbox
@@ -297,26 +297,40 @@ export default {
         
     },
     methods:{
-        log(evt) {
-            //console.log(evt)
-            if(evt.added){
-                let id=evt.added.element.todoId;
-                console.log(id)
-                let index;
-                if(this.state1.indexOf(evt.added.element)!=-1){
-                    index=this.getIndexById(this.state1,'todoId',id)
-                    this.changeStatus(this.state1[index],0)
+        //일정 드래그 처리
+        log(prog, evt) {
+            //prog- evt가 발생한 리스트 위치(0,1,2)
+            if(evt.moved) {  //순서 변경
+                let oldIndex = evt.moved.oldIndex;
+                let newIndex = evt.moved.newIndex;
+                let start = oldIndex < newIndex? oldIndex : newIndex;
+                let end = start == oldIndex? newIndex : oldIndex;
+
+                for(let i = start; i <= end; ++i) {
+                    this.move(eval("this.state"+(prog+1))[i].todoId, prog, i, end);
                 }
-                else if(this.state2.indexOf(evt.added.element)!=-1){
-                    index=this.getIndexById(this.state2,'todoId',id)
-                    console.log(this.state2)
-                    this.changeStatus(this.state2[index],1)
+            } else if(evt.added) { //추가
+                let start = evt.added.newIndex;
+                let end = eval("this.state"+(prog+1)).length;
+
+                for(let i = start; i < end; ++i) {
+                    this.move(eval("this.state"+(prog+1))[i].todoId, prog, i, -1);
                 }
-                else{
-                    index=this.getIndexById(this.state3,'todoId',id)
-                    this.changeStatus(this.state3[index],2)
+
+            } else if(evt.removed) { //제거
+                let start = evt.removed.oldIndex;
+                let end = eval("this.state"+(prog+1)).length;
+
+                for(let i = start; i < end; ++i) {
+                    this.move(eval("this.state"+(prog+1))[i].todoId, prog, i, end-1);
                 }
+                
             }
+        },
+        //일정 이동 디비 등록
+        move(todoId, prog, order, end) {
+            axios.get('/api/moveTodo/'+todoId+'/'+prog+'/'+order)
+                .then(() => { if(end==order) {this.todoReload()} });
         },
         //todo 추가 트리거
         createShow(status){
@@ -346,6 +360,7 @@ export default {
                     weeklyId:this.$route.query.id,
                     detail:this.new_todo.detail,
                     progState:st,
+                    order: eval("this.state"+(st+1)).length
                 }).then(() => this.todoReload());//불러온 배열이 기존 배열과 중첩됨
             }
             this.show=false; this.show2=false; this.show3=false
@@ -429,6 +444,7 @@ export default {
             axios.get('/api/project/weekly/'+this.$route.query.id+'/todos')
                 .then(response => {
                     if(response.data != null){
+                        response.data.sort((x, y) => x.order-y.order);
                         let todoTemp=[]; let temp1=[]; let temp2=[]; let temp3=[];
                         for(let i=0;i<response.data.length;i++){
                             let data={
@@ -437,7 +453,8 @@ export default {
                                 'detail':response.data[i].detail,
                                 'created':response.data[i].createTime,
                                 'prog':response.data[i].progState,
-                                'weekly':response.data[i].weekly.weeklyId
+                                'weekly':response.data[i].weekly.weeklyId,
+                                'order':response.data[i].order
                             }
                             todoTemp.push(data)
                             if(data.prog==0)
@@ -451,7 +468,6 @@ export default {
                         this.state1=temp1; this.state2=temp2; this.state3=temp3;
                     }
                     console.log('todo 로드합니다')
-                    console.log(this.todo);
                 })
         }
 
