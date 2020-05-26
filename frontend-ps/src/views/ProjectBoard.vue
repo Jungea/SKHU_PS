@@ -18,7 +18,7 @@
                         <b-form-select v-model="selectedYear" :options="years"></b-form-select>
                         and 강좌
                         <b-form-select v-model="selectedSubject" :options="subjects"></b-form-select>
-                        and 언어
+                        and 기술
                          <b-form-tags
                   input-id="language"
                   :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
@@ -159,7 +159,22 @@ export default {
       data:{},
       tagArray:[],
       rcrtState:false,
-      summaryData:{},
+      summaryData:{
+          project: {
+              projectName:'',
+              memNum:null,
+              theme:'',
+              content:'',
+              tag:'',
+              github:null,
+              rcrtState:false,
+              progState:false,
+          },
+          createName:'',
+          allMemGrade:[],
+          subjectName:'',
+
+      },
 
        text:'',
        selected:null,
@@ -176,13 +191,17 @@ export default {
        years: [],
        subjects:[],
        tags:[],
-       selectedGrade:null,
-       selectedYear:null,
-       selectedSubject:null,
+       selectedGrade:'',
+       selectedYear:'',
+       selectedSubject:'',
     }
   },
    watch: {
       '$route'(){
+          this.tags=[]
+            this.selectedGrade=''
+            this.selectedYear=''
+            this.selectedSubject=''
         //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
           console.log('query111:'+this.$route.query.page)
           axios.get('/api/projectBoard?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
@@ -193,7 +212,6 @@ export default {
       }
   },
   mounted() {
-       
       for(let i=2019;i<=new Date().getFullYear();i++) {
           let obj={}
           obj.value=String(i)
@@ -311,7 +329,27 @@ export default {
                 path: '/projectSearch',
                 query:{type:this.selected,text:this.text}
             })
-  },
+    },
+    filter() {
+    //     tags:[],
+    //    selectedGrade:'',
+    //    selectedYear:'',
+    //    selectedSubject:'',
+        if(this.selectedGrade.length==0 && this.selectedYear.length==0 && this.selectedSubject.length==0 && this.tags.length==0) {
+            alert('검색 필터 내용을 하나 이상 채우세요')
+            return;
+        } 
+        this.$router.push({
+                path: '/projectSearch',
+                query:{
+                    grade:String(this.selectedGrade),
+                    year:String(this.selectedYear),
+                    subject:String(this.selectedSubject),
+                    tag:String(this.tags.toString())
+                }
+            })
+
+    },
   },
   
 }

@@ -435,4 +435,42 @@ public class APIController {
 	public List<Subject> allSubject() {
 		return subjectRepository.findAll();
 	}
+	
+	// 프로젝트 게시판에서 필터 결과 
+	@RequestMapping(value = "projectBoard/filter", method = RequestMethod.GET)
+	public List<ProjectBoardModel> projectBoard(@RequestParam("grade") String grade,@RequestParam("year") String year,@RequestParam("subject") String subject,@RequestParam("tag") String tag,HttpServletRequest request) {
+		System.out.println(subject.length()==0);
+		return projectService.filter(getLoginUserId(request),grade,year,subject,tag);
+	}
+	
+	// todo 위치 변경
+	@RequestMapping(value = "moveTodo/{todoId}/{progState}/{order}", method = RequestMethod.GET)
+	public void moveTodo(@PathVariable("todoId") int todoId, @PathVariable("progState") int progState, @PathVariable("order") int order) {
+		projectService.moveTodo(todoId, progState, order);
+	}
+	
+	// todo 디테일 수정
+	@RequestMapping(value = "editTodo", method = RequestMethod.POST)
+	public void editTodo(@RequestBody Todo todo, HttpServletRequest request) {
+		projectService.editTodo(todo);
+	}
+	
+	// todo 삭제
+	@RequestMapping(value = "deleteTodo/{todoId}", method = RequestMethod.GET)
+	public void deleteTodo(@PathVariable("todoId") int todoId) {
+		projectService.deleteTodo(todoId);
+	}
+	
+	// 주간 목표 수정
+	@RequestMapping(value = "editWeekly", method = RequestMethod.POST)
+	public void editWeekly(@RequestBody Weekly weekly) {
+		System.out.println(weekly);
+		projectService.editWeekly(weekly);
+	}
+	
+	// 주간 목표 삭제
+	@RequestMapping(value = "deleteWeekly/{weeklyId}", method = RequestMethod.GET)
+	public void deleteWeekly(@PathVariable("weeklyId") int weeklyId) {
+		projectService.deleteWeekly(weeklyId);
+	}
 }
