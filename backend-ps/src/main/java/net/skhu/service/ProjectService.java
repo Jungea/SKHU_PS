@@ -272,6 +272,7 @@ public class ProjectService {
 		todo.setDetail(todoModel.getDetail());
 		todo.setCreateTime(LocalDateTime.now());
 		todo.setProgState(todoModel.getProgState());
+		todo.setOrder(todoModel.getOrder());
 
 		todoRepository.save(todo);
 	}
@@ -498,4 +499,25 @@ public class ProjectService {
 		return board;
 	}
 
+	// todo 순서 변경
+	public void moveTodo(int todoId, int progState, int order) {
+		Todo todo = todoRepository.findById(todoId).get();
+		todo.setProgState(progState);
+		todo.setOrder(order);
+		
+		todoRepository.save(todo);
+	}
+
+	// todo 디테일 수정
+	public void editTodo(Todo editTodo) {
+		Todo originTodo = todoRepository.findById(editTodo.getTodoId()).get();
+		originTodo.setDetail(editTodo.getDetail());
+
+		todoRepository.save(originTodo);
+	}
+
+	// todo 삭제
+	public void deleteTodo(int todoId) {
+		todoRepository.deleteById(todoId);
+	}
 }
