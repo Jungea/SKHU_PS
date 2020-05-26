@@ -435,4 +435,10 @@ public class APIController {
 	public List<Subject> allSubject() {
 		return subjectRepository.findAll();
 	}
+	// 프로젝트 게시판에서 필터 결과 
+	@RequestMapping(value = "projectBoard/filter", method = RequestMethod.GET)
+	public List<ProjectBoardModel> projectBoard(@RequestParam("grade") String grade,@RequestParam("year") String year,@RequestParam("subject") String subject,@RequestParam("tag") String tag,HttpServletRequest request) {
+		System.out.println(subject.length()==0);
+		return projectService.filter(getLoginUserId(request),grade,year,subject,tag);
+	}
 }

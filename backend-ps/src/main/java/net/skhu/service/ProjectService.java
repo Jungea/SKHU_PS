@@ -2,6 +2,7 @@ package net.skhu.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -317,6 +318,162 @@ public class ProjectService {
 			project=projectRepository.findByUser_userId(u.getUserId());
 		}
 		for (Project p : project) {
+			ProjectBoardModel model = new ProjectBoardModel();
+			model.setProject(p);
+			ProjectStar ps = projectStarRepository.findByUser_userIdAndProject_ProjectId(userId, p.getProjectId());
+			model.setStar(ps != null ? true : false);
+			model.setSubjectName(p.getSubject() != null ? p.getSubject().getTitle() : null);
+			model.setCreateName(p.getUser().getName());
+			List<ProjectJoin> projectJoin = projectJoinRepository.findByProject_ProjectId(p.getProjectId());
+			Set<Integer> allGrade = new HashSet<>();
+			for (ProjectJoin pj : projectJoin) {
+				if(pj.getState()==1) {
+					allGrade.add(pj.getUser().getGrade());
+				}
+			}
+			model.setAllMemGrade(allGrade);
+			ProjectJoin pj = projectJoinRepository.findByUser_userIdAndProject_projectId(userId, p.getProjectId());
+			if (pj == null)
+				model.setState(2); // 프로젝트 신청할수 있는 상태
+			else if (pj.getState() == 0)
+				model.setState(0); // 승인대기 상태
+			else if (pj.getState() == 1)
+				model.setState(1); // 참가하고있는 상태
+			board.add(model);
+		}
+		return board;
+	}
+
+	public List<ProjectBoardModel> filter(int userId,String grade,String year,String subject,String tag) {
+		List<Project> project = projectRepository.findAll();
+		List<ProjectBoardModel> board = new ArrayList<>();
+		List<Project> p1=new ArrayList<Project>();
+		List<Project> p2=new ArrayList<Project>();
+		List<Project> p3=new ArrayList<Project>();
+		List<Project> p4=new ArrayList<Project>();
+		List<Project> p5=new ArrayList<Project>();
+		
+		if(subject.length()!=0) {
+			System.out.println("subject.length()!=0");
+			for(Project pr:project) {
+				if(pr.getSubject()!=null) {
+					if(pr.getSubject().getSubjectId()==Integer.parseInt(subject)) {
+						System.out.println(pr.getProjectName());
+						p1.add(pr);
+					}
+				} 
+			}
+			if(p1.size()==0) {
+				return null;
+			}
+		} 
+		if(tag.length()!=0) {
+			System.out.println("tag.length()!=0");
+			if(p1.size()==0) {
+				p1=project;
+			}
+			String[] tags=tag.split(",");
+			for(Project pr:p1) {
+				if(pr.getTag().length()!=0) {
+					String[] dbTags=pr.getTag().split(",");
+					int i=0;
+					for(String s:tags) {
+						if(Arrays.asList(dbTags).contains(s)) {
+							i++;
+						}
+					}
+					if(i==tags.length) {
+						p2.add(pr);
+					}
+				} 
+				
+			}
+			if(p2.size()==0) {
+				return null;
+			}
+		}
+		if(year.length()!=0) {
+			System.out.println("year.length()!=0");
+			if(p1.size()!=0 && p2.size()==0) { // p1만 값이 있을때
+				p2=p1;
+			}
+//			else if(p1.size()!=0 && p2.size()==0) { // // p2만 값이 있을때
+//				
+//			} else if(p1.size()!=0 && p2.size()!=0){ // 둘다 값이 있을때
+//				
+//			} 
+			else if(p1.size()==0 && p2.size()==0){ // 둘다 값이 없을때
+				p2=project;
+			}
+			for(Project pr:p2) {
+				if(pr.getStartDate().getYear()==Integer.parseInt(year)) {
+					p3.add(pr);
+				}
+			}
+			if(p3.size()==0) {
+				return null;
+			}
+		}
+		if(grade.length()!=0) {
+			System.out.println("grade.length()!=0");
+			if(p1.size()==0 && p2.size()==0 && p3.size()==0) {
+				p3=project;
+			}
+			else if(p1.size()!=0 && p2.size()==0 && p3.size()==0) { // p1만 값이 있을때
+				p3=p1;
+			} else if(p1.size()==0 && p2.size()!=0 && p3.size()==0) {
+				p3=p2;
+			} 
+//			else if(p1.size()==0 && p2.size()==0 && p3.size()!=0) {
+//				
+//			}
+			else if(p1.size()!=0 && p2.size()!=0 && p3.size()==0) {
+				p3=p2;
+			} 
+//			else if(p1.size()!=0 && p2.size()==0 && p3.size()!=0) {
+//				
+//			} 
+//			else if(p1.size()==0 && p2.size()!=0 && p3.size()!=0) {
+//				
+//			} 
+//			else if(p1.size()!=0 && p2.size()!=0 && p3.size()!=0) {
+//				
+//			}
+			
+			
+			for(Project pr:p3) {
+				List<ProjectJoin> pj=projectJoinRepository.findByProject_ProjectId(pr.getProjectId());
+				for(ProjectJoin j:pj) {
+					User u=userRepository.findById(j.getUser().getUserId()).get();
+					if(u.getGrade()==Integer.parseInt(grade) && j.getState()==1) { // 승인상태만
+						System.out.println("id:"+u.getUserId());
+						if(!p4.contains(pr)) {
+							System.out.println("year add");
+							p4.add(pr);
+						}
+						
+					}
+				}
+				
+			}
+			if(p4.size()==0) {
+				System.out.println("year null");
+				return null;
+			}
+		}
+		if(p1.size()!=0) {
+			p5=p1;
+		} 
+		if(p2.size()!=0) {
+			p5=p2;
+		}
+		if(p3.size()!=0) {
+			p5=p3;
+		}
+		if(p4.size()!=0) {
+			p5=p4;
+		}
+		for (Project p : p5) {
 			ProjectBoardModel model = new ProjectBoardModel();
 			model.setProject(p);
 			ProjectStar ps = projectStarRepository.findByUser_userIdAndProject_ProjectId(userId, p.getProjectId());
