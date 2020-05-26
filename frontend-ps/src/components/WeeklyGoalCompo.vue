@@ -5,30 +5,43 @@
                 <h4>{{project.projectName}}: 주간 목표</h4>
             </b-col>
             <b-col cols="4">
-                <b-button v-b-modal.modal-xl variant="outline-secondary" style="height: 70px; float:right;">목표 생성</b-button>
+                <b-button @click="openModal(0)" variant="outline-secondary" style="height: 70px; float:right;">목표 생성</b-button>
             </b-col>
         </b-row>
         <div style="margin-top:50px">
             <b-row cols-md="3" cols="1">
                 <b-col class="mb-5" :key="goal.weeklyId" v-for="(goal,index) in goals">
-                    <b-card @click="todo(project.projectId, index+1, goal.weeklyId)" bg-variant="dark" text-variant="white" v-bind:title="(index + 1)+' 주차'" style="cursor:pointer; height:150px">
+                    <b-card @click="todo(project.projectId, index+1, goal.weeklyId)" bg-variant="dark" text-variant="white" v-bind:title="(index + 1)+' 주차'" style="cursor:pointer;padding:10px">
                         <b-card-text>
                             {{goal.startTime}} ~ {{getEndDate(goal.startTime)}}
                         </b-card-text>
-                        <b-card-text>
+                        <b-card-text class="detail">
                             {{goal.detail}}
                         </b-card-text>
+                        <b-icon-three-dots :id="`popover-${goal.weeklyId}`" style="float:right"></b-icon-three-dots>
+                        <b-popover
+                            :target="`popover-${goal.weeklyId}`"
+                            placement="rightbottom"
+                            triggers="hover"
+                            boundary="viewport"
+                        >
+                            <template v-slot:title>
+                                menu
+                            </template>
+                            <b-button size="sm" style="width:100%" @click="openModal(1, goal);">수정</b-button>
+                            <b-button @click="deleteWeekly(goal)" size="sm" class="mt-1" style="width:100%">삭제</b-button>
+                        </b-popover>
                     </b-card>
                 </b-col>
             </b-row>
             
         </div>
 
-        <b-modal id="modal-xl" size="lg" title="목표 생성" 
+        <b-modal id="modal-xl" size="lg" :title="`주간 목표 ${modalState}`" 
             @show="resetModal"
             @hidden="resetModal"
             @ok="handleOk" ref="modal" data-backdrop="static">
-            <form ref="form" @submit.stop.prevent="handleSubmit">
+            <form ref="form" @submit.stop.prevent="handleSubmit()">
                 <b-form-group
                     :label=title.toString()
                     label-for="createWG"
@@ -68,6 +81,7 @@ import axios from 'axios';
 export default {
     data(){
         return{
+            modalState:'',
             project:{},
             context:{},
             detail:'',
@@ -77,7 +91,9 @@ export default {
                 // {weekly_id:2, week:2, detail:'아자차카타파하', start_time:'2020-05-16'},
                 // {weekly_id:3, week:3, detail:'abcdefg', start_time:'2020-05-02'}
             ],
-            days:[]
+            weekly:{},
+            days:[],
+            tempDays:[]
         }
         
     },
@@ -96,6 +112,19 @@ export default {
 
     },
     methods:{
+        openModal(temp, weekly){
+            if(temp==0)
+                this.modalState='생성'
+            else{
+                this.modalState='수정'
+                this.weekly=weekly
+                this.title=this.goals.indexOf(weekly)+1+"주차 목표 수정"
+                //수정할 거의 시작 날짜로부터 7일간에 해당하는 날짜들을 days배열에서 지우기
+                this.tempDays=this.days.splice(this.days.indexOf(weekly.startTime),7)
+                console.log(this.tempDays)
+            }
+            this.$bvModal.show('modal-xl')
+        },
         goalsReload() {
             axios.get('/api/project/'+this.$route.params.projectId+'/weeklyGoal')
                     .then(response => {
@@ -165,13 +194,15 @@ export default {
             for(let i=0;i<this.goals.length;i++){
                 this.addRange(this.goals[i].startTime, this.getEndDate(this.goals[i].startTime),this.days)
             }
-            console.log(this.days)
             return this.days;
         },
 
         resetModal() {
             this.context={}
             this.detail=''
+            if(this.modalState=='수정'){
+                this.days.concat(this.tempDays)
+            }
         },
 
         handleOk(bvModalEvt) {
@@ -180,8 +211,15 @@ export default {
         },
 
         handleSubmit() {
-            
-            this.submit()
+            if(this.modalState=='생성'){
+                this.submit()
+                this.modalState=''
+            }
+            else{
+                this.editWeekly(this.weekly)
+                this.modalState=''
+                this.weekly={}
+            }
             this.$nextTick(() => {
                 this.$bvModal.hide('modal-xl')
             })
@@ -194,15 +232,33 @@ export default {
                 projectId:this.project.projectId,
                 startTime:this.context.selectedYMD,  //시작 연월일
                 detail:this.detail,
-                week:this.goals.length+1  //하나 생성하면 주 수 증가
+                //week:this.goals.length+1  //하나 생성하면 주 수 증가
             }).then(response => { 
                 this.goals = response.data;
                 this.goalsReload();
             });
         },
+
+        //삭제
+        deleteWeekly(weekly) {
+            if(confirm('삭제합니까?')){
+                alert(weekly.id+'삭제합니다')
+            }
+        },
+
+        //수정
+        editWeekly(weekly){
+            alert('주차 아이디'+weekly.weeklyId+'수정')
+        }
     }
 }
 </script>
 
 <style scoped>
+.detail{
+    height:20px; overflow-y:scroll;
+}
+.detail::-webkit-scrollbar {
+    display:none;
+} 
 </style>
