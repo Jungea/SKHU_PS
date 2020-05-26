@@ -10,18 +10,24 @@
                         <th class="th1">제목</th>
                         <th class="th1">작성일</th>
                         <th class="th1">제출 마감일</th>
+                        <th class="th1">제출 연장일</th>
+                        <th class="th1">제출 여부</th>
                     </tr>
-                    <tr v-for="(item, index) in notice" :key="index" @click="viewContent(item.num)">
-                        <td class="td1" style="width: 8%"> {{ item.num }} </td>
+                    <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
+                        <td class="td1" style="width: 8%"> {{index}} </td>
                         <td> <b> {{ item.title }} </b> </td>
-                        <td class="td1" style="width: 20%"> {{ item.editDate }} </td>
-                        <td class="td1"> {{ item.date }} </td>
+                        <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
+                        <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
+                        <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
+                        <td class="td1"> {{item.deadlineTime=='1000-01-01T00:00:00'?'-':'X'}}  </td>
                     </tr>
                 </table>
                 <div style="text-align: right ; margin-right: 5%">
                     <b-button variant="dark" v-b-modal.modal-newBoard>게시글 작성</b-button>
                 </div>
             </b-form-group>
+             <b-pagination  @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
+
         </center>
 
 
@@ -41,15 +47,21 @@
                                 <b-form-textarea rows="9" v-model="content" placeholder="게시글 내용을 입력하세요."></b-form-textarea>
                             </td>
                     </tr>
+                     <tr>
+                       <th>파일 제출</th>
+                            <td>
+                                <b-form-file v-model="file" class="mt-3" plain></b-form-file>          
+                            </td>
+                    </tr>
                     <tr>
-                        <td>과제 제출</td>
+                        <th>과제 제출 기한</th>
                         <td>
                             <b-input v-model="deadline" disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
                             <b-button variant="dark" v-b-modal.calendar1 @click="newNowDate()">제출 기한 선택</b-button>
                         </td>
                     </tr>
                     <tr>
-                        <td>연장 기한</td>
+                        <th>연장 기한</th>
                         <td>
                             <b-input v-model="extention" disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
                             <b-button variant="dark" v-b-modal.calendar2 @click="newNowDate()">연장 기한 선택</b-button>
@@ -70,24 +82,51 @@
     </div>    
 </template>
 <script>
-// import axios from 'axios'
+import axios from 'axios'
 export default {
     name: 'noticeBoard',
     data() {
         return {
-           notice: [
-               { num: 5, title: '안녕하세요 공지입니다.', editDate: '2020-05-30 13:00', date: '-'},
-               { num: 4, title: '05/30일까지 프로젝트 진행현황 제출하세요.', editDate: '2020-05-29 13:00', date: '2020-05-30 23:59'},
-               { num: 3, title: '05/29일까지 프로젝트 진행현황 제출하세요.', editDate: '2020-05-28 13:00', date: '2020-05-29 23:59'},
-               { num: 2, title: '05/28일까지 프로젝트 진행현황 제출하세요.', editDate: '2020-05-27 13:00', date: '2020-05-28 23:59'},
-               { num: 1, title: '05/27일까지 프로젝트 진행현황 제출하세요.', editDate: '2020-05-26 13:00', date: '2020-05-27 23:59'}
-           ],
+            perPage: 6, // 각 페이지마다 보이는 리스트
+            currentPage: 1,
+            totalRows: null,
+           paginatedItems: {},
            title: '',
            content: '',
            nowDate: '',
            deadline: '',
-           extention: ''
+           extention: '',
+           file: null,
         } 
+    },
+    watch: {
+        '$route'(){
+            //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
+            console.log('query111:'+this.$route.query.page)
+             axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+                this.paginatedItems=response.data
+                }).catch((erro) => {
+                console.error(erro);
+             });
+        }
+    },
+    mounted() {
+        if(this.currentPage==1) {
+          this.$router.push({
+            path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+            query:{page:1}
+          })
+        }
+        axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+                this.paginatedItems=response.data
+              }).catch((erro) => {
+              console.error(erro);
+        });
+        axios.get('/api/noticeListNum?subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+                this.totalRows=response.data
+              }).catch((erro) => {
+              console.error(erro);
+        });
     },
     methods: {
         resetModal() {
@@ -98,7 +137,19 @@ export default {
             this.nowDate = ''
         },
         newBoard() {
-            alert("게시글 제목: " + this.title + " / 게시글 내용: " + this.content + ' / 제출 기한: ' + this.deadline)
+            if(this.title.length==0 || this.content.length==0) { 
+                alert('제목과 내용은 필수 입력입니다.')
+                return
+            }
+            axios.post('/api/writeNotice', {
+                subjectId:this.$route.params.subjectId
+                }).then(response => {
+                console.log(response.data)
+                this.$router.push({
+                    path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+                    query:{page:1}
+                })
+            })
         },
         dateDisabled1(ymd, date) {
             let d = date;
@@ -113,7 +164,6 @@ export default {
         leadingZeros(n, digits) {
             var zero = '';
             n = n.toString();
-
             if (n.length < digits) {
                 for (var i = 0; i < digits - n.length; i++)
                     zero += '0';
@@ -132,11 +182,23 @@ export default {
         onContext2(ctx) {
             this.extention = ctx.activeYMD;
         },
-        viewContent(num) {
+        viewContent(postId) {
             this.$router.push({
-                path: '/noticeContent/' + num
+                path: '/subject/'+this.$route.params.subjectId+'/noticeBoard/' + postId
             })
-        }
+        },
+        paginate (page_size, page_number) {
+         this.$router.push({
+            path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+            query:{page:page_number+1}
+          })
+        //   let itemsToParse = this.data
+        //   this.paginatedItems = itemsToParse.slice(page_number * page_size, (page_number + 1) * page_size);
+        },
+        onPageChanged(page){
+            this.currentPage=this.$route.query.page
+        this.paginate(this.perPage, page - 1)
+        },
     }
 }
-</script>
+</script> 

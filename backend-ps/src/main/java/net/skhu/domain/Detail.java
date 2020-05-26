@@ -36,5 +36,9 @@ public class Detail {
 	@JsonIgnore
 	@OneToMany(mappedBy = "detDepartment", fetch = FetchType.LAZY)
 	List<User> departmentUsers;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "detail", fetch = FetchType.LAZY)
+	List<Post> posts;
 
 }
