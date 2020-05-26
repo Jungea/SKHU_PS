@@ -10,10 +10,10 @@
         </b-row>
         <div style="margin-top:50px">
             <b-row cols-md="3" cols="1">
-                <b-col class="mb-5" :key="goal.weekly_id" v-for="goal in goals">
-                    <b-card @click="todo(project.projectId, goal.week)" bg-variant="dark" text-variant="white" v-bind:title="goal.week.toString()+'주차'" style="cursor:pointer; height:150px">
+                <b-col class="mb-5" :key="goal.weeklyId" v-for="(goal,index) in goals">
+                    <b-card @click="todo(project.projectId, index+1, goal.weeklyId)" bg-variant="dark" text-variant="white" v-bind:title="(index + 1)+' 주차'" style="cursor:pointer; height:150px">
                         <b-card-text>
-                            {{goal.start_time}} ~ {{getEndDate(goal.start_time)}}
+                            {{goal.startTime}} ~ {{getEndDate(goal.startTime)}}
                         </b-card-text>
                         <b-card-text>
                             {{goal.detail}}
@@ -73,9 +73,9 @@ export default {
             detail:'',
             title:'',
             goals:[
-                {weekly_id:1, week:1, detail:'가나다라마바사', start_time:'2020-05-09'}, 
-                {weekly_id:2, week:2, detail:'아자차카타파하', start_time:'2020-05-16'},
-                {weekly_id:3, week:3, detail:'abcdefg', start_time:'2020-05-02'}
+                // {weekly_id:1, week:1, detail:'가나다라마바사', start_time:'2020-05-09'}, 
+                // {weekly_id:2, week:2, detail:'아자차카타파하', start_time:'2020-05-16'},
+                // {weekly_id:3, week:3, detail:'abcdefg', start_time:'2020-05-02'}
             ],
             days:[]
         }
@@ -88,33 +88,33 @@ export default {
         }),
 
         // 주간 목표 목록 구현하면 주석해제
-        axios.get('/api/project/'+this.$route.params.projectId+'/weeklyGoal')
-        .then(response => {
-            console.log(response.data)
-        }),
-        
-        this.title=this.goals.length+1+"주차 목표 생성"
+        this.goalsReload();
 
-        this.days=this.getRange()
+        // for(let i=0;i<this.goals.length;i++){
+        //     this.goals[i].week=i+1
+        // }
 
-        this.goals.sort(function(a,b){
-            var date1 = new Date(a.start_time);
-            var date2 = new Date(b.start_time);
-            return date1-date2
-        })
-
-        for(let i=0;i<this.goals.length;i++){
-            this.goals[i].week=i+1
-        }
-
-    },
-    conputed(){
-        
     },
     methods:{
-        todo(projectId, week) {
+        goalsReload() {
+            axios.get('/api/project/'+this.$route.params.projectId+'/weeklyGoal')
+                    .then(response => {
+                        this.goals = response.data;
+                        this.title=this.goals.length+1+"주차 목표 생성"
+
+                        this.days=this.getRange()
+
+                        this.goals.sort(function(a,b){
+                            var date1 = new Date(a.startTime);
+                            var date2 = new Date(b.startTime);
+                            return date1-date2
+                        })
+                    })
+        },
+        todo(projectId, week, weeklyId) {
             this.$router.push({
-                path: '/project/'+projectId+'/weekly/'+week
+                path: '/project/'+projectId+'/weekly/'+week,
+                query: {id: weeklyId}
             })
         },
 
@@ -163,7 +163,7 @@ export default {
 
         getRange(){
             for(let i=0;i<this.goals.length;i++){
-                this.addRange(this.goals[i].start_time, this.getEndDate(this.goals[i].start_time),this.days)
+                this.addRange(this.goals[i].startTime, this.getEndDate(this.goals[i].startTime),this.days)
             }
             console.log(this.days)
             return this.days;
@@ -196,8 +196,8 @@ export default {
                 detail:this.detail,
                 week:this.goals.length+1  //하나 생성하면 주 수 증가
             }).then(response => { 
-                this.project = response.data;
-                location.reload();
+                this.goals = response.data;
+                this.goalsReload();
             });
         },
     }
