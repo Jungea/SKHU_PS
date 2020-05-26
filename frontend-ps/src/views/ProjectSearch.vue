@@ -8,7 +8,11 @@
                 
                  <b-row class="text-right mb-4">
                      <b-col v-if="$route.query.type!=null">{{$route.query.type==0?'프로젝트 이름으로':'조장 이름으로'}} "{{$route.query.text}}"를 검색한 결과입니다</b-col>
-                     <b-col v-if="$route.query.type==null"></b-col>
+                     <b-col v-if="$route.query.type==null">{{$route.query.grade!=''?'학년으로 "'+$route.query.grade+'"학년을':''}} 
+                         {{$route.query.year!=''?'연도로 "'+$route.query.year+'"년을':''}} 
+                         {{$route.query.subject!=''?'과목으로 "'+$route.query.subject+'"을(를)':''}} 
+                         {{$route.query.tag.length!=0?'태그로 "'+$route.query.tag+'"을(를)':''}} 검색한 결과입니다.
+                     </b-col>
                     <b-col><b-button v-b-toggle.my-collapse variant="outline-secondary" style="height: 70px;">프로젝트 검색</b-button></b-col>
                 </b-row>
                 <b-collapse id="my-collapse">
@@ -19,7 +23,7 @@
                         <b-form-select v-model="selectedYear" :options="years"></b-form-select>
                         and 강좌
                         <b-form-select v-model="selectedSubject" :options="subjects"></b-form-select>
-                        and 언어
+                        and 기술
                          <b-form-tags
                   input-id="language"
                   :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
@@ -35,6 +39,7 @@
                 </b-collapse>
                    <b-row cols-md="3" cols="1">
                         <b-col v-if="paginatedItems.length==0">검색 결과가 없습니다.</b-col>
+                
                     <b-col class="mb-5" :key="index" v-for="(item, index) in paginatedItems">
                         <b-card id="my-table"  @click="sendInfo(item.project.projectId)" v-b-modal.modal-xl align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
                             <div>
@@ -61,6 +66,7 @@
                             </b-card-text>    
                         </b-card>  
                     </b-col>
+                    
                 </b-row>
                  <b-form-select class="mt-4" v-model="selected" :options="options"></b-form-select>
                 <b-form-input  v-model="text"></b-form-input>
@@ -109,7 +115,7 @@
                         <tr>
                             <th scope="row">사용기술과 언어</th>
                             <td>
-                                <b-badge variant="secondary" v-for="(tag,index) in this.summaryData.project.tag.split(',')" :key="index" style="margin-right:5px">{{tag}}</b-badge>
+                                <b-badge variant="secondary" v-for="(tag,index) in summaryData.project.tag.split(',')" :key="index" style="margin-right:5px">{{tag}}</b-badge>
                             </td>
                         </tr>
                         <tr>
@@ -161,8 +167,23 @@ export default {
       data:{},
       tagArray:[],
       rcrtState:false,
-      summaryData:{},
+      summaryData:{
+          project: {
+              projectName:'',
+              memNum:null,
+              theme:'',
+              content:'',
+              tag:'',
+              github:null,
+              rcrtState:false,
+              progState:false,
+          },
+          createName:'',
+          allMemGrade:[],
+          subjectName:'',
 
+      },
+       
        text:'',
        selected:null,
        options: [
@@ -178,18 +199,29 @@ export default {
        years: [],
        subjects:[],
        tags:[],
-       selectedGrade:null,
-       selectedYear:null,
-       selectedSubject:null,
+       selectedGrade:'',
+       selectedYear:'',
+       selectedSubject:'',
     }
   },
   watch: {
       '$route'(){
+        this.tags=[]
+        this.selectedGrade=''
+        this.selectedYear=''
+        this.selectedSubject=''
+        this.text=''
+        this.selected=''
         //   console.log('query111:'+this.$route.query.page)
           if(this.$route.query.type!=null) {
          axios.get('/api/projectBoard/search?type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { 
                 this.paginatedItems=response.data
-                this.summaryData=response.data[0]
+              }).catch((erro) => {
+              console.error(erro);
+            });
+        } else {
+            axios.get('/api/projectBoard/filter?grade='+this.$route.query.grade+'&year='+this.$route.query.year+'&subject='+this.$route.query.subject+'&tag='+this.$route.query.tag).then(response => { 
+                this.paginatedItems=response.data
               }).catch((erro) => {
               console.error(erro);
             });
@@ -197,7 +229,12 @@ export default {
       }
   },
   mounted() { 
+      this.tags=[]
+       this.selectedGrade=''
+       this.selectedYear=''
+       this.selectedSubject=''
       this.text=''
+      this.selected=''
       for(let i=2019;i<=new Date().getFullYear();i++) {
           let obj={}
           obj.value=String(i)
@@ -225,7 +262,12 @@ export default {
         if(this.$route.query.type!=null) {
          axios.get('/api/projectBoard/search?type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { 
                 this.paginatedItems=response.data
-                this.summaryData=response.data[0]
+              }).catch((erro) => {
+              console.error(erro);
+            });
+        } else {
+            axios.get('/api/projectBoard/filter?grade='+this.$route.query.grade+'&year='+this.$route.query.year+'&subject='+this.$route.query.subject+'&tag='+this.$route.query.tag).then(response => { 
+                this.paginatedItems=response.data
               }).catch((erro) => {
               console.error(erro);
             });
@@ -289,6 +331,26 @@ export default {
                 // this.alertvariant='warning'
             })
       
+    },
+    filter() {
+    //     tags:[],
+    //    selectedGrade:'',
+    //    selectedYear:'',
+    //    selectedSubject:'',
+        if(this.selectedGrade.length==0 && this.selectedYear.length==0 && this.selectedSubject.length==0 && this.tags.length==0) {
+            alert('검색 필터 내용을 하나 이상 채우세요')
+            return;
+        } 
+        this.$router.push({
+                path: '/projectSearch',
+                query:{
+                    grade:String(this.selectedGrade),
+                    year:String(this.selectedYear),
+                    subject:String(this.selectedSubject),
+                    tag:String(this.tags.toString())
+                }
+            })
+
     },
     
   },
