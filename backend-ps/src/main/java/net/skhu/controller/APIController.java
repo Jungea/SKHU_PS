@@ -437,9 +437,20 @@ public class APIController {
 	}
 	
 	// todo 위치 변경
-	// 프로젝트 게시판에서 해당 모달 정보 가져오기
 	@RequestMapping(value = "moveTodo/{todoId}/{progState}/{order}", method = RequestMethod.GET)
 	public void moveTodo(@PathVariable("todoId") int todoId, @PathVariable("progState") int progState, @PathVariable("order") int order) {
 		projectService.moveTodo(todoId, progState, order);
+	}
+	
+	// todo 디테일 수정
+	@RequestMapping(value = "editTodo", method = RequestMethod.POST)
+	public void editTodo(@RequestBody Todo todo, HttpServletRequest request) {
+		projectService.editTodo(todo);
+	}
+	
+	// todo 삭제
+	@RequestMapping(value = "deleteTodo/{todoId}", method = RequestMethod.GET)
+	public void deleteTodo(@PathVariable("todoId") int todoId) {
+		projectService.deleteTodo(todoId);
 	}
 }

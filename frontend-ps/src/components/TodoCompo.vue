@@ -72,7 +72,7 @@
                                     </template>
                                     <!--수정, 이동 트리거-->
                                     <b-button size="sm" style="width:100px" @click="editShow(todo)">수정</b-button><br>
-                                    <b-button @click="changeStatus(todo,1)" size="sm" class="mt-1" style="width:100px">
+                                    <b-button @click="changeStatus(todo, 0, 1)" size="sm" class="mt-1" style="width:100px">
                                         <b-icon-caret-right-fill></b-icon-caret-right-fill>
                                     </b-button>
                                 </b-popover>
@@ -146,10 +146,10 @@
                                     </template>
                                     <b-button size="sm" style="width:100px" @click="editShow(todo)">수정</b-button>
                                     <div>
-                                        <b-button @click="changeStatus(todo,0)" size="sm" class="mt-1" style="width:48px">
+                                        <b-button @click="changeStatus(todo, 1, 0)" size="sm" class="mt-1" style="width:48px">
                                             <b-icon-caret-left-fill></b-icon-caret-left-fill>
                                         </b-button>
-                                        <b-button @click="changeStatus(todo,2)" size="sm" class="mt-1" style="width:48px;float:right">
+                                        <b-button @click="changeStatus(todo, 1, 2)" size="sm" class="mt-1" style="width:48px;float:right">
                                             <b-icon-caret-right-fill></b-icon-caret-right-fill>
                                         </b-button>
                                     </div>
@@ -223,7 +223,7 @@
                                         menu
                                     </template>
                                     <b-button size="sm" style="width:100px" @click="editShow(todo)">수정</b-button><br>
-                                    <b-button @click="changeStatus(todo,1)" size="sm" class="mt-1" style="width:100px">
+                                    <b-button @click="changeStatus(todo, 2, 1)" size="sm" class="mt-1" style="width:100px">
                                         <b-icon-caret-left-fill></b-icon-caret-left-fill>
                                     </b-button>
                                 </b-popover>
@@ -314,7 +314,7 @@ export default {
                 let end = eval("this.state"+(prog+1)).length;
 
                 for(let i = start; i < end; ++i) {
-                    this.move(eval("this.state"+(prog+1))[i].todoId, prog, i, -1);
+                    this.move(eval("this.state"+(prog+1))[i].todoId, prog, i, end-1);
                 }
 
             } else if(evt.removed) { //제거
@@ -329,8 +329,10 @@ export default {
         },
         //일정 이동 디비 등록
         move(todoId, prog, order, end) {
+            if(end == -1)
+                end = 0;
             axios.get('/api/moveTodo/'+todoId+'/'+prog+'/'+order)
-                .then(() => { if(end==order) {this.todoReload()} });
+                .then(() => { if(end == order) this.todoReload() });
         },
         //todo 추가 트리거
         createShow(status){
@@ -376,10 +378,14 @@ export default {
         },
         //todo detail 수정(update)
         editDetail(todo){
-            if(this.editText!=todo.detail){
-                todo.detail=this.editText
-                alert(JSON.stringify(todo))
-                //axios
+            if(this.editText.trim().length != 0) {
+                if(this.editText != todo.detail){
+                    todo.detail=this.editText;
+                    axios.post('/api/editTodo',{
+                        todoId:todo.todoId,
+                        detail:todo.detail
+                    }).then(() => this.todoReload());
+                }
             }
             this.editText='';
             this.activingEditId=null
@@ -396,21 +402,21 @@ export default {
             this.show=false; this.show2=false; this.show3=false
             if(status==0){
                 if(this.deleteSelect==true){
-                    this.delete(this.selected)
+                    this.delete(this.selected, status)
                 }
                 this.deleteSelect=(this.deleteSelect==false)?true:false
                 this.deleteSelect2=false; this.deleteSelect3=false
             }
             else if(status==1){
                 if(this.deleteSelect2==true){
-                    this.delete(this.selected)
+                    this.delete(this.selected, status)
                 }
                 this.deleteSelect2=(this.deleteSelect2==false)?true:false
                 this.deleteSelect=false; this.deleteSelect3=false
             }
             else{
                 if(this.deleteSelect3==true){
-                    this.delete(this.selected)
+                    this.delete(this.selected, status)
                 }
                 this.deleteSelect3=(this.deleteSelect3==false)?true:false
                 this.deleteSelect=false; this.deleteSelect2=false
@@ -418,19 +424,37 @@ export default {
             this.selected=[]
         },
         //todo 삭제(delete)
-        delete(arr){
-            if(arr.length>0){
-                alert('삭제:\n'+(JSON.stringify(arr)));
-                for(let i=0;i<arr.length;i++){
-                    this.todo.splice(this.todo.indexOf(arr[i]),1)
-                    //axios
+        delete(arr, prog){
+            if(arr.length > 0){
+                let start = 0;
+                for(let i = 0; i < arr.length; i++){
+                    start = start > arr[i].order? arr[i].order : start;
+
+                    eval("this.state"+(prog+1)).splice(arr[i].order-i, 1);
+                    axios.get('/api/deleteTodo/'+arr[i].todoId).then();
                 }
+                let end = eval("this.state"+(prog+1)).length;
+                    for(let i = start; i < end; ++i) 
+                        this.move(eval("this.state"+(prog+1))[i].todoId, prog, i, end-1);
+            } else {
+                alert("선택한 일정이 없습니다.")
             }
         },
         //status 변경(update)
-        changeStatus(todo,to){
-            todo.prog=to
-            //axios
+        changeStatus(todo, from, to){
+            eval("this.state"+(to+1)).push(todo);
+            eval("this.state"+(from+1)).splice(todo.order, 1);
+
+            //added
+            this.move(todo.todoId, to, eval("this.state"+(to+1)).length-1, -1);
+
+            //removed
+            let start = todo.order;
+            let end = eval("this.state"+(from+1)).length;
+            for(let i = start; i < end; ++i) {
+                this.move(eval("this.state"+(from+1))[i].todoId, from, i, end-1);
+            }
+
         },
 
         //모든 배열에서 사용할 수 있도록 수정

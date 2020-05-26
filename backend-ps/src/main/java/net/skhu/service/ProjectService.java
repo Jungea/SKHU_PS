@@ -351,4 +351,16 @@ public class ProjectService {
 		todoRepository.save(todo);
 	}
 
+	// todo 디테일 수정
+	public void editTodo(Todo editTodo) {
+		Todo originTodo = todoRepository.findById(editTodo.getTodoId()).get();
+		originTodo.setDetail(editTodo.getDetail());
+
+		todoRepository.save(originTodo);
+	}
+
+	// todo 삭제
+	public void deleteTodo(int todoId) {
+		todoRepository.deleteById(todoId);
+	}
 }
