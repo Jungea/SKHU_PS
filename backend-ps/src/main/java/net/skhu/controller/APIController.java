@@ -406,9 +406,9 @@ public class APIController {
 		return projectService.projectBoard(getLoginUserId(request),page);
 	}
 	//프로젝트 해당 주차의 ToDoList 목록
-	@RequestMapping(value = "project/{projectId}/weekly/{week}", method = RequestMethod.GET)
-	public List<Todo> projectWeekTodoList(@PathVariable("projectId") String projectId, @PathVariable("week") String week) {
-		return projectService.todoList(Integer.parseInt(projectId), Integer.parseInt(week));
+	@RequestMapping(value = "project/weekly/{weeklyId}/todos", method = RequestMethod.GET)
+	public List<Todo> projectWeekTodoList(@PathVariable("weeklyId") String weeklyId) {
+		return projectService.todoList(Integer.parseInt(weeklyId));
 	}
 	
 	// todo생성

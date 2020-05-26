@@ -343,9 +343,8 @@ export default {
                 // this.idcount+=1
                 //axios
                 axios.post('/api/createTodo',{
-                    projectId:this.$route.params.projectId,
+                    weeklyId:this.$route.query.id,
                     detail:this.new_todo.detail,
-                    week:this.$route.params.week,
                     progState:st,
                 }).then(() => this.todoReload());//불러온 배열이 기존 배열과 중첩됨
             }
@@ -427,7 +426,7 @@ export default {
         },
 
         todoReload() {
-            axios.get('/api/project/'+this.$route.params.projectId+'/weekly/'+this.$route.params.week)
+            axios.get('/api/project/weekly/'+this.$route.query.id+'/todos')
                 .then(response => {
                     if(response.data != null){
                         let todoTemp=[]; let temp1=[]; let temp2=[]; let temp3=[];
@@ -459,17 +458,17 @@ export default {
     },
 
     mounted() {
-        for(let i in this.todo){
-            if(this.todo[i].prog==0){
-                this.state1.push(this.todo[i])
-            }
-            else if(this.todo[i].prog==1){
-                this.state2.push(this.todo[i])
-            }
-            else{
-                this.state3.push(this.todo[i])
-            }
-        }
+        // for(let i in this.todo){
+        //     if(this.todo[i].prog==0){
+        //         this.state1.push(this.todo[i])
+        //     }
+        //     else if(this.todo[i].prog==1){
+        //         this.state2.push(this.todo[i])
+        //     }
+        //     else{
+        //         this.state3.push(this.todo[i])
+        //     }
+        // }
 
         axios.get('/api/project/'+this.$route.params.projectId)
         .then(response => {

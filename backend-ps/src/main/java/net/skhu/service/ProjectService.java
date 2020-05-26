@@ -258,9 +258,8 @@ public class ProjectService {
 	}
 
 	// todoList 목록
-	public List<Todo> todoList(int projectId, int week) {
-		Weekly weekly = weeklyRepository.findByProject_ProjectIdAndWeek(projectId, week);
-		return todoRepository.findByWeekly_WeeklyId(weekly.getWeeklyId());
+	public List<Todo> todoList(int weeklyId) {
+		return todoRepository.findByWeekly_WeeklyId(weeklyId);
 	}
 
 	// 새로운 todo 추가
@@ -268,8 +267,7 @@ public class ProjectService {
 		Todo todo = new Todo();
 
 		todo.setUser(userRepository.findById(userId).get());
-		Weekly weekly = weeklyRepository.findByProject_ProjectIdAndWeek(todoModel.getProjectId(), todoModel.getWeek());
-		todo.setWeekly(weekly);
+		todo.setWeekly(weeklyRepository.findById(todoModel.getWeeklyId()).get());
 		todo.setDetail(todoModel.getDetail());
 		todo.setCreateTime(LocalDateTime.now());
 		todo.setProgState(todoModel.getProgState());

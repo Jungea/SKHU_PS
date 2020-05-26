@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class TodoModel {
-	int projectId;
+	int weeklyId;
 	String detail;
-	int week;
 	int progState;
+	int order;
 }
