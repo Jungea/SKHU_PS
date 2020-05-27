@@ -1,5 +1,6 @@
 package net.skhu.controller;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,15 +8,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import net.skhu.domain.Comment;
 import net.skhu.domain.Detail;
+import net.skhu.domain.File;
 import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
@@ -45,6 +50,7 @@ import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.service.CommentService;
 import net.skhu.service.DetailService;
+import net.skhu.service.FileService;
 import net.skhu.service.PostService;
 import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
@@ -83,6 +89,8 @@ public class APIController {
 	CommentRepository commentRepository;
 	@Autowired
 	CommentService commentService;
+	@Autowired
+	FileService fileService;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -550,4 +558,45 @@ public class APIController {
 
 	}
 	
+	/*밑에부터 파일 업로드*/
+	@RequestMapping(value="file1/list",method= RequestMethod.GET)
+    public List<File> list() {
+        return fileService.findAll();
+    }
+	// 공지 생성시 파일 업로드
+    @RequestMapping(value="/file1/upload/{postId}", method=RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
+    public void upload(@PathVariable("postId") int postId,@RequestParam("file")  MultipartFile[] multipartFiles) throws IOException {
+        System.out.println("fileupload");
+        System.out.println("크기:"+multipartFiles[0].getOriginalFilename());
+    	for(MultipartFile multipartFile : multipartFiles) {
+    		System.out.println("for문");
+            if (multipartFile.getSize() <= 0) continue;
+//            if(fileModel.getProjectId()==null) { // 교수가 올릴때
+//            	fileService.save(multipartFile,fileModel.getPostId(),null);
+//            } else { // 학생이 올릴때
+//            	fileService.save(multipartFile,fileModel.getPostId(),null);
+//            }
+            fileService.save(multipartFile,postId,null);
+
+        }
+    }
+
+//    @RequestMapping("file1/delete")
+//    public String delete(@RequestParam("id") int id) throws Exception {
+//        uploadedFile1Service.delete(id);
+//        return "redirect:list";
+//    }
+//
+//    @RequestMapping("file1/download")
+//    public void download(@RequestParam("id") int id, HttpServletResponse response) throws Exception {
+//        UploadedFile uploadedfile = uploadedFile1Service.getUploadedFile(id);
+//       if (uploadedfile == null) return;
+//        String fileName = URLEncoder.encode(uploadedfile.getFileName(),"UTF-8");
+//        response.setContentType("application/octet-stream");
+//        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ";");
+//        try (BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream())) {
+//            output.write(uploadedfile.getData());
+//        }
+//    }
+    
 }

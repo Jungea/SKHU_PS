@@ -33,7 +33,7 @@
 
      <b-modal id="modal-newBoard" size="lg"  @show="resetModal" @hidden="resetModal" title="게시글 작성" @ok="newBoard">
         <center>
-            <b-form-group label-for="newNotice">
+            <b-form-group label-for="newNotice" enctype="multipart/form-data">
                 <table class="table table-bordered" id="newNotice" >
                     <tr>
                        <th style="width:20%">제목</th>
@@ -50,7 +50,9 @@
                      <tr>
                        <th>파일 제출</th>
                             <td>
-                                <b-form-file v-model="file" class="mt-3" plain></b-form-file>          
+                                <b-form-file  multiple v-model="files" class="mt-3" plain ></b-form-file>          
+                                <!-- <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/> -->
+
                             </td>
                     </tr>
                     <tr>
@@ -96,7 +98,7 @@ export default {
            nowDate: '',
            deadline: '',
            extention: '',
-           file: null,
+           files: '',
         } 
     },
     watch: {
@@ -141,6 +143,14 @@ export default {
                 alert('제목과 내용은 필수 입력입니다.')
                 return
             }
+            let formData = new FormData();
+                // for( var i = 0; i < this.files.length; i++ ){
+                //     alert('i:'+i)
+                //     let f = this.files[i];
+                //     formData.append('file[' + i + ']', f);
+                // }
+            formData.append("file", this.files[0]);
+
             axios.post('/api/writeNotice', {
                 subjectId:this.$route.params.subjectId,
                 title:this.title,
@@ -149,15 +159,34 @@ export default {
                 extensionTime:this.extention,
                 }).then(response => {
                 console.log(response.data)
-                if(this.$route.query.page!=1) {
-                    this.$router.push({
-                        path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
-                        query:{page:1}
-                    })
-                } else {
-                    this.$router.go()
-                }
+
+                axios.post('/api/file1/upload/'+18, 
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                )
+                .then(response => {
+                    console.log(response.data)
+                })
+            
+
+
+
+                // if(this.$route.query.page!=1) {
+                //     this.$router.push({
+                //         path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+                //         query:{page:1}
+                //     })
+                // } else {
+                //     this.$router.go()
+                // }
             })
+        },
+        handleFilesUpload(){
+            this.files  = this.$refs.files.files;
         },
         dateDisabled1(ymd, date) {
             let d = date;
