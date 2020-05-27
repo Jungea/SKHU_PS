@@ -21,6 +21,7 @@ import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.ManagerSettingModel;
 import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProjectBoardModel;
 import net.skhu.model.SidebarModel;
@@ -531,6 +532,17 @@ public class ProjectService {
 	// 주간 목표 삭제
 	public void deleteWeekly(int weeklyId) {
 		weeklyRepository.deleteById(weeklyId);
+	}
+
+	public void editProjectManagerSetting(int projectId, ManagerSettingModel settingModel) {
+		Project project = projectRepository.findById(projectId).get();
+		
+		project.setProgState(settingModel.isProgState());
+		project.setRcrtState(settingModel.isRcrtState());
+		
+		project.setSubject(subjectRepository.findByAuthKey(settingModel.getSubjectAuthKey()));
+		
+		projectRepository.save(project);
 	}
 	
 	

@@ -20,7 +20,7 @@ import lombok.ToString;
 
 @Data
 @ToString(exclude = { "projects", "projectJoins","projectStars", "todos","posts","comments" })
-@EqualsAndHashCode(exclude = { "projects", "projectJoins","projectStars", "todos","post","comments" })
+@EqualsAndHashCode(exclude = { "projects", "projectJoins","projectStars", "todos","posts","comments" })
 @Entity
 public class User {
    @Id
