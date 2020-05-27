@@ -10,19 +10,20 @@
                 <p style="color:silver; margin:300px auto;" v-if="data.length==0?true:false">해당 과목에 참가한 조가 없습니다.</p>
                 <b-row cols-md="2" cols="1">
                     <b-col class="mb-5" :key="index" v-for="(item, index) in data">
-                        <b-card align="left" bg-variant="dark" text-variant="white" style="height: 15rem;"> <!-- 30rem == 480px -->
+                        <b-card align="left" bg-variant="dark" text-variant="white" style="width: 70% ; height: 15rem;"> <!-- 30rem == 480px -->
                             <div>
                                 <b-card-header style="padding: 0 0 10px 0">
                                     <table>
                                         <tr>
-                                            <td style="width: 100%">{{item.name}} 조</td>
+                                            <td style="width: 100%">{{item.user.name}} 조</td>
                                         </tr>
                                     </table>
                                 </b-card-header>
                             </div>
-                            <b-card-text style="margin-top: 10px">
+                            <b-card-text style="margin-top: 10px ; font-size: 12px">
+                                프로젝트 이름: {{ item.project.projectName }} <br/>
                                 조원 목록: {{ MemberList.toString() }}
-                            </b-card-text>    
+                            </b-card-text>
                         </b-card>  
                     </b-col>
                 </b-row>    
@@ -42,12 +43,12 @@ export default {
         };
     },
     mounted() { 
-        axios.get('/api/url') // 프로젝트 팀(인원)
+        axios.get('/api/project/' + 5 + '/member') // 프로젝트 팀(인원)
         .then(response => {
             this.data = response.data
             
             for(var i = 0 ; i < response.data.length ; i++)
-                this.MemberList.push(" " + response.data[i].name) // 멤버 목록 저장할 배열
+                this.MemberList.push(" " + response.data[i].user.name) // 멤버 목록 저장할 배열
         });
     },
 
