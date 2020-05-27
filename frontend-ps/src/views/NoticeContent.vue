@@ -11,8 +11,12 @@
                         <td>{{list.title}}</td>
                     </tr>
                     <tr>
+                        <th class="th1" style="width: 20%">내용</th>
+                        <td>{{list.content}}</td>
+                    </tr>
+                    <tr>
                         <th class="th1">작성일</th>
-                        <td>{{ list.startDate }}</td>
+                        <td>{{ list.writeTime.substring(0,10)+" "+list.writeTime.substring(11,16) }}</td>
                     </tr>
                     <tr v-if="checkFile">
                         <th class="th1">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
@@ -52,6 +56,7 @@
                             <b-button v-if="userType" @click="viewFile()" variant="dark">제출물 보기</b-button>
                         </div>
                         <div style="display: inline-block ; margin-right: 5% ; float: right">
+                             <b-button class="mr-3" @click="deletePost()" variant="danger">삭제</b-button>
                             <b-button style="margin-right: 10px" v-if="userType" @click="edit()" variant="dark">수정</b-button>
                             <b-button @click="viewList()" variant="dark">목록으로</b-button>
                         </div>
@@ -63,14 +68,15 @@
                 <hr style="width: 90% ; border: 1px solid #ccc">
                 <table class="table table-bordered" style="width: 90%">
                     <tr v-for="(item, index) in comment" :key="index">
-                        <td> <div> <b> {{ item.name }} </b> <span style="color: #9A9A9A"> ({{ item.date }}) </span> </div>
+                        <td> <div> <b> {{ item.user.name }} </b> <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span> </div>
                              <div style="margin-top: 3px"> {{ item.content }} </div>
+                             <b-button variant="danger" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)">삭제</b-button>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <b-textarea trim v-model="content" rows="2" style="height: 80px ; min-height: 80px ; max-height: 150px"></b-textarea>
-                            <b-button :disabled="content==''" @click="addComment()" style="margin-top: 10px ; float: right ; background: #9A9A9A ; border-color: #9A9A9A">작성</b-button>
+                            <b-button :disabled="content.length==0" @click="addComment()" style="margin-top: 10px ; float: right ; background: #9A9A9A ; border-color: #9A9A9A">작성</b-button>
                         </td>
                     </tr>
                 </table>
@@ -103,13 +109,7 @@ export default {
     data() {
         return {
             list:{},
-            comment: [
-                { commentId: '1', name: '길보미', date: '2020-05-30 15:32', content: '알겠습니다.'},
-                { commentId: '2', name: '김소연', date: '2020-05-30 15:35', content: '교수님 과제는 어디에다 제출해야 하나요?'},
-                { commentId: '3', name: '이영선', date: '2020-05-31 05:21', content: '넵 알겠습니다.'},
-                { commentId: '4', name: '이윤영', date: '2020-05-31 12:32', content: '교수님 메일로 보내드리려했는데 메일 주소가 없다고 나옵니다. 확인 부탁드립니다.'},
-                { commentId: '5', name: '정은애', date: '2020-05-31 23:01', content: '교수님 강의 동영상은 언제 올려주시나요...?'},
-            ],
+            comment: {},
             checkComment: true,
             file1: '공지사항.docx',
             file2: [], // 내가 올린 파일
@@ -118,7 +118,8 @@ export default {
             userType: '',
             userName: '',
             nFile: '', // 새로 올릴 파일
-            nFileList: [] // 새로 올릴 파일 목록            
+            nFileList: [], // 새로 올릴 파일 목록          
+            userId:null,  
         }
     },
     mounted() { 
@@ -131,13 +132,18 @@ export default {
         .then(response => {
             this.userType = response.data.userType
             this.userName = response.data.name
+            this.userId=response.data.userId
+        })
+        axios.get('/api/noticeBoard/comment/'+this.$route.params.postId)
+        .then(response => {
+            this.comment=response.data
         })
         this.postId = this.$route.params.postId
     },
     methods: {
         edit() {
             this.$router.push({
-                path: '/noticeBoard/' + this.$route.params.subjectId + '/notice/' + this.postId + '/edit'
+                path: '/subject/'+ this.$route.params.subjectId+'/noticeBoard/'+ this.postId + '/edit'
             })
         },
         viewComment() {
@@ -151,10 +157,13 @@ export default {
                 alert("제출물이 없습니다.")
         },
         addComment() {
-                let nowDate = this.newNowDate()
-                let newComment = { commentId: this.comment.length + 1, name: this.userName, date: nowDate, content: this.content }
-                this.comment.push(newComment)
-                this.content = ''
+            axios.post('/api/noticeBoard/addComment/'+this.$route.params.postId, {
+                content:this.content
+            })
+            .then(response => {
+                console.log(response.data)
+                this.$router.go()
+            })
         },
         leadingZeros(n, digits) {
             var zero = '';
@@ -173,7 +182,8 @@ export default {
         },
         viewList() {
             this.$router.push({
-                path: '/noticeBoard/' + this.$route.params.subjectId
+                path: '/subject/' + this.$route.params.subjectId+'/noticeBoard',
+                quert:{page:1}
             })
         },
         resetFile() {
@@ -196,6 +206,31 @@ export default {
         removeFile(index) {
             alert(index)
             this.nFileList.splice(index, 1)
+        },
+        deleteComment(commentId) {
+            let result=confirm('삭제하시겠습니까?')
+            if(result) {
+                axios.post('/api/noticeBoard/deleteComment/'+commentId, {})
+                .then(response => {
+                    console.log(response.data)
+                    this.$router.go()
+                })
+            }
+        },
+        deletePost() {
+            let result=confirm('삭제하시겠습니까?')
+            if(result) {
+                axios.post('/api/noticeBoard/deletePost', {
+                    postId:this.$route.params.postId
+                })
+                .then(response => {
+                    console.log(response.data)
+                    this.$router.push({
+                        path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+                        query:{page:1}
+                    })
+                })
+            }
         }
     },
 }

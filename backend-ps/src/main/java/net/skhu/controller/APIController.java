@@ -1,5 +1,6 @@
 package net.skhu.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import net.skhu.domain.Comment;
 import net.skhu.domain.Detail;
 import net.skhu.domain.Post;
 import net.skhu.domain.Project;
@@ -26,6 +28,7 @@ import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
 import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
+import net.skhu.model.NoticeCommentModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.ProjectBoardModel;
 import net.skhu.model.SignUpModel;
@@ -33,11 +36,13 @@ import net.skhu.model.TodoModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.model.WeekGoalModel;
 import net.skhu.model.WriteNoticeModel;
+import net.skhu.repository.CommentRepository;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
+import net.skhu.service.CommentService;
 import net.skhu.service.DetailService;
 import net.skhu.service.PostService;
 import net.skhu.service.ProjectJoinService;
@@ -73,6 +78,10 @@ public class APIController {
 	PostService postService;
 	@Autowired
 	PostRepository postRepository;
+	@Autowired
+	CommentRepository commentRepository;
+	@Autowired
+	CommentService commentService;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -499,10 +508,32 @@ public class APIController {
 //		System.out.println(subject.length()==0);
 		return postRepository.findById(postId).get();
 	}
-	// 해당 게시글 내용
+	// 게시글 쓰기
 	@RequestMapping(value = "writeNotice", method = RequestMethod.POST)
 	public void writeNotice(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
 		postService.writeNotice(notice,getLoginUserId(request));
+	}
 
+	// 공지사항 해당 게시풀 댓글
+	@RequestMapping(value = "noticeBoard/comment/{postId}", method = RequestMethod.GET)
+	public List<Comment> noticeComment(@PathVariable("postId") int postId) {
+		List<Comment> lists=commentRepository.findByPost_PostId(postId);
+		Collections.reverse(lists);
+		return lists;
+	}
+	// 공지사항 해당 게시풀 댓글 작성
+	@RequestMapping(value = "noticeBoard/addComment/{postId}", method = RequestMethod.POST)
+	public void noticeAddComment(@PathVariable("postId") int postId, @RequestBody Comment comment,HttpServletRequest request) {
+		commentService.noticeAddComment(comment.getContent(),postId,getLoginUserId(request));
+	}
+	// 공지사항 해당 게시풀 댓글 삭제
+	@RequestMapping(value = "noticeBoard/deleteComment/{commentId}", method = RequestMethod.POST)
+	public void noticedeleteComment(@PathVariable("commentId") int commentId) {
+		commentService.noticedeleteComment(commentId);
+	}
+	// 공지사항 게시글 삭제
+	@RequestMapping(value = "noticeBoard/deletePost", method = RequestMethod.POST)
+	public void noticedeletePost(@RequestBody Post post) {
+		commentService.noticedeletePost(post.getPostId());
 	}
 }

@@ -53,7 +53,7 @@
 </template>
 
 <script>
-// import axios from 'axios'
+import axios from 'axios'
 export default {
     name: 'noticeEdit',
     data() {
@@ -62,10 +62,15 @@ export default {
             nowDate: '',
             list: { title: '안녕하세요 공지입니다.', content: '안녕하세요. xxx교수입니다.'
             + ' 코로나 사태로 인하여 대면 강의 수업이 전부 온라인 강의로 변경되었으므로 일정을 조금 변경하였습니다.'
-            + ' 다음주까지 현재 진행중인 프로젝트 작업물을 제출하고, 자세한 일정은 강의 동영상에서 설명할테니 참고 바랍니다.', deadline: '2020-05-31', extention: '2020-06-01' }
+            + ' 다음주까지 현재 진행중인 프로젝트 작업물을 제출하고, 자세한 일정은 강의 동영상에서 설명할테니 참고 바랍니다.', deadlineTime: '2020-05-31', extentionTime: '2020-06-01' }
         }
     },
     mounted() {
+         axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 모든 과목 정보
+        .then(response => {
+            this.list=response.data
+            
+        });
         this.postId = this.$route.params.postId
     },
     methods: {
