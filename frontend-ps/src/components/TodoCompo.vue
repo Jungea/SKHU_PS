@@ -45,7 +45,7 @@
                                     v-if="deleteSelect"
                                 ></b-form-checkbox>
                                 <span :style="`float:left; color:${member!=null?'black':member[getIndexById(member,'userId',todo.userId)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
-                                    {{todo.detail}}
+                                    <sup>{{todo.userName}}</sup><br> {{todo.detail}}
                                 </span>
                                 <!--수정#1-->
                                 <b-form @submit.prevent="editDetail(todo)" v-if="(todo.todoId==activingEditId)?true:false">
@@ -119,7 +119,7 @@
                                     v-if="deleteSelect2"
                                 ></b-form-checkbox>
                                 <span :style="`float:left; color:${member!=null?'black':member[getIndexById(member,'userId',todo.userId)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
-                                    {{todo.detail}}
+                                    <sup>{{todo.userName}}</sup><br> {{todo.detail}}
                                 </span>
                                 <!--수정#2-->
                                 <b-form @submit.prevent="editDetail(todo)" v-if="(todo.todoId==activingEditId)?true:false">
@@ -197,7 +197,7 @@
                                     v-if="deleteSelect3"
                                 ></b-form-checkbox>
                                 <span :style="`float:left; color:${member!=null?'black':member[getIndexById(member,'userId',todo.userId)]['color']}`" v-if="(todo.todoId!=activingEditId)?true:false">
-                                    {{todo.detail}}
+                                    <sup>{{todo.userName}}</sup><br> {{todo.detail}}
                                 </span>
                                 <!--수정#3-->
                                 <b-form @submit.prevent="editDetail(todo)" v-if="(todo.todoId==activingEditId)?true:false">
@@ -474,6 +474,7 @@ export default {
                             let data={
                                 'todoId':response.data[i].todoId,
                                 'userId':response.data[i].user.userId,
+                                'userName':response.data[i].user.name,
                                 'detail':response.data[i].detail,
                                 'created':response.data[i].createTime,
                                 'prog':response.data[i].progState,
