@@ -24,6 +24,7 @@ import net.skhu.domain.Weekly;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.ManagerSettingModel;
 import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProfileModel;
@@ -505,4 +506,12 @@ public class APIController {
 		postService.writeNotice(notice,getLoginUserId(request));
 
 	}
+	
+	//프로젝트 관리-설정 수정
+	@RequestMapping(value = "project/{projectId}/projectManager/setting", method = RequestMethod.PUT)
+	public void editProjectManagerSetting(@PathVariable("projectId") int projectId, @RequestBody ManagerSettingModel settingModel) {
+		projectService.editProjectManagerSetting(projectId, settingModel);
+
+	}
+	
 }
