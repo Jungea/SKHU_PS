@@ -52,4 +52,8 @@ public class Post {
 	@JsonIgnore
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	List<Comment> comments;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	List<File> files;
 }
