@@ -173,12 +173,12 @@ Vue.use(VueRouter)
     component: ProjectSearch
   },
   {
-    path: '/noticeBoard/:subjectId',
+    path: '/subject/:subjectId/noticeBoard',
     name: 'noticeBoard',
     component: NoticeBoard
   },
   {
-    path: '/noticeBoard/:subjectId/notice/:postId/content',
+    path: '/subject/:subjectId/noticeBoard/:postId',
     name: 'noticeContent',
     component: NoticeContent
   },

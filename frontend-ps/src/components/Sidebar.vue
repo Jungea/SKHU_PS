@@ -269,7 +269,8 @@ export default {
       },
       viewNotice() {
         this.$router.push({
-          path: '/noticeBoard/' + this.pinSubjectId + '/'
+          path: '/subject/' + this.pinSubjectId+'/noticeBoard',
+          query:{page:1} 
         })
       }
     }

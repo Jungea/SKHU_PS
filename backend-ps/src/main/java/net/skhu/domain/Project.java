@@ -59,6 +59,10 @@ public class Project {
 	@JsonIgnore
 	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
 	List<ProjectStar> projectStars;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+	List<Post> posts;
 
 	public Project() {
 	}

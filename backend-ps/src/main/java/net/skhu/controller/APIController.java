@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.skhu.domain.Detail;
+import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Subject;
@@ -31,11 +32,14 @@ import net.skhu.model.SignUpModel;
 import net.skhu.model.TodoModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.model.WeekGoalModel;
+import net.skhu.model.WriteNoticeModel;
+import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.service.DetailService;
+import net.skhu.service.PostService;
 import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.ProjectStarService;
@@ -65,7 +69,11 @@ public class APIController {
 	ProjectRepository projectRepository;
 	@Autowired
 	ProjectStarService projectStarService;
-
+	@Autowired
+	PostService postService;
+	@Autowired
+	PostRepository postRepository;
+	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		int userId = (int) session.getAttribute("userId");
@@ -442,7 +450,7 @@ public class APIController {
 		System.out.println(subject.length()==0);
 		return projectService.filter(getLoginUserId(request),grade,year,subject,tag);
 	}
-	
+
 	// todo 위치 변경
 	@RequestMapping(value = "moveTodo/{todoId}/{progState}/{order}", method = RequestMethod.GET)
 	public void moveTodo(@PathVariable("todoId") int todoId, @PathVariable("progState") int progState, @PathVariable("order") int order) {
@@ -472,5 +480,29 @@ public class APIController {
 	@RequestMapping(value = "deleteWeekly/{weeklyId}", method = RequestMethod.GET)
 	public void deleteWeekly(@PathVariable("weeklyId") int weeklyId) {
 		projectService.deleteWeekly(weeklyId);
+	}
+	// 공지사항 게시판에서 페이징  
+	@RequestMapping(value = "noticeBoard", method = RequestMethod.GET)
+	public List<Post> noticeBoard(@RequestParam("page") int page,@RequestParam("subjectId") int subjectId) {
+//		System.out.println(subject.length()==0);
+		return postService.noticeBoard(page,subjectId);
+	}
+	// 공지사항 게시판에서 전체 개수
+	@RequestMapping(value = "noticeListNum", method = RequestMethod.GET)
+	public int noticeListNum(@RequestParam("subjectId") int subjectId) {
+//		System.out.println(subject.length()==0);
+		return postRepository.findBySubject_subjectId(subjectId).size();
+	}
+	// 해당 게시글 내용
+	@RequestMapping(value = "noticeBoard/post/{postId}", method = RequestMethod.GET)
+	public Post post(@PathVariable("postId") int postId) {
+//		System.out.println(subject.length()==0);
+		return postRepository.findById(postId).get();
+	}
+	// 해당 게시글 내용
+	@RequestMapping(value = "writeNotice", method = RequestMethod.POST)
+	public void writeNotice(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
+		postService.writeNotice(notice,getLoginUserId(request));
+
 	}
 }
