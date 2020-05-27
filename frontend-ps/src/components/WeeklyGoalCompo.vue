@@ -79,7 +79,7 @@
                 </b-form-group>
             </form>
             <template v-slot:modal-footer>
-                <b-button type="ok" :disabled="!weeklyValidation">{{modalState}}</b-button>
+                <b-button @click="handleOk" :disabled="!weeklyValidation">{{modalState}}</b-button>
             </template>
         </b-modal>
 
@@ -368,8 +368,7 @@ export default {
                 projectId:this.project.projectId,
                 startTime:this.context.selectedYMD,  //시작 연월일
                 detail:this.detail,
-            }).then(response => { 
-                this.goals = response.data;
+            }).then(() => { 
                 this.goalsReload();
             });
         },
@@ -377,13 +376,20 @@ export default {
         //삭제
         deleteWeekly(weekly) {
             if(confirm('삭제합니까?')){
-                alert(weekly.id+'삭제합니다')
+                axios.get('/api/deleteWeekly/'+weekly.weeklyId)
+                .then(() => this.goalsReload())
             }
         },
 
         //수정
         editWeekly(weekly,date,detail){
-            alert('주차 아이디'+weekly.weeklyId+'수정\n날짜'+date+'\n상세'+detail)
+            axios.post('/api/editWeekly',{
+                weeklyId: weekly.weeklyId,
+                startTime: date,  //시작 연월일
+                detail: detail,
+            }).then(() => { 
+                this.goalsReload();
+            });
         }
     }
 }
