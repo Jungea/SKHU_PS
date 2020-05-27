@@ -26,9 +26,9 @@ import net.skhu.domain.Weekly;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
+import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
-import net.skhu.model.NoticeCommentModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.ProjectBoardModel;
 import net.skhu.model.SignUpModel;
@@ -535,5 +535,10 @@ public class APIController {
 	@RequestMapping(value = "noticeBoard/deletePost", method = RequestMethod.POST)
 	public void noticedeletePost(@RequestBody Post post) {
 		commentService.noticedeletePost(post.getPostId());
+	}
+	// 공지사항 게시글 수정
+	@RequestMapping(value = "noticeBoard/modifyPost", method = RequestMethod.POST)
+	public void noticeModifyPost(@RequestBody ModifyNoticePostModel post) {
+		postService.noticeModifyPost(post);
 	}
 }

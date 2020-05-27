@@ -23,7 +23,7 @@
                     <tr>
                         <th class="th1" style="vertical-align: middle">제출 기한</th>
                         <td>
-                            <b-input v-model="list.deadline" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
+                            <b-input v-model="deadlineTime" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
                             <b-button variant="dark" v-b-modal.calendar1 @click="newNowDate()" style="margin-right: 15px">제출 기한 선택</b-button>
                             <b-button variant="dark" @click="reset1()">삭제</b-button>
                         </td>
@@ -31,7 +31,7 @@
                     <tr>
                         <th class="th1" style="vertical-align: middle">연장 기한</th>
                         <td>
-                            <b-input v-model="list.extention" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
+                            <b-input v-model="extentionTime" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
                             <b-button variant="dark" v-b-modal.calendar2 @click="newNowDate()" style="margin-right: 15px">연장 기한 선택</b-button>
                             <b-button variant="dark" @click="reset2()">삭제</b-button>
                         </td>
@@ -60,17 +60,23 @@ export default {
         return {
             postId: '',
             nowDate: '',
-            list: { title: '안녕하세요 공지입니다.', content: '안녕하세요. xxx교수입니다.'
-            + ' 코로나 사태로 인하여 대면 강의 수업이 전부 온라인 강의로 변경되었으므로 일정을 조금 변경하였습니다.'
-            + ' 다음주까지 현재 진행중인 프로젝트 작업물을 제출하고, 자세한 일정은 강의 동영상에서 설명할테니 참고 바랍니다.', deadlineTime: '2020-05-31', extentionTime: '2020-06-01' }
+            list: {  },
+            deadlineTime:'',
+            extentionTime:'',
         }
     },
     mounted() {
          axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 모든 과목 정보
         .then(response => {
             this.list=response.data
-            
+            if(this.list.deadlineTime!='1000-01-01T00:00:00' && this.list.extentionTime=='1000-01-01T00:00:00') {
+                this.deadlineTime=this.list.deadlineTime.substring(0,10)
+            } else if(this.list.deadlineTime!='1000-01-01T00:00:00' && this.list.extentionTime!='1000-01-01T00:00:00') {
+                this.deadlineTime=this.list.deadlineTime.substring(0,10)
+                this.extentionTime=this.list.extentionTime.substring(0,10)
+            } 
         });
+        
         this.postId = this.$route.params.postId
     },
     methods: {
@@ -101,29 +107,42 @@ export default {
                 this.list.deadline = this.nowDate
         },
         onContext1(ctx) {
-            this.list.deadline = ctx.activeYMD;
+            this.deadlineTime = ctx.activeYMD;
         },
         onContext2(ctx) {
-            this.list.extention = ctx.activeYMD;
+            this.extentionTime = ctx.activeYMD;
         },
         reset1() {
-            this.list.deadline = ''
+            this.deadlineTime = ''
         },
         reset2() {
-            this.list.extention = ''
+            this.extentionTime = ''
         },
         save() {
-            if(((this.list.deadline >= this.list.extention) && (this.list.deadline != '' && this.list.extention != ''))
-                || (this.list.deadline == '' && this.list.extention != '')) {
+            if(((this.deadlineTime >= this.extentionTime) && (this.deadlineTime != '' && this.extentionTime != ''))
+                || (this.deadlineTime == '' && this.extentionTime != '')) {
                 alert("기한 설정이 잘못되었습니다.")
             }
             else {
-                alert("저장되었습니다.")
-                this.$router.push({
-                    path: '/noticeBoard/' + this.$route.params.subjectId + '/notice/' + this.postId + '/content'
+                if(this.deadlineTime=='' && this.extentionTime=='') {
+                    this.deadlineTime='1000-01-01'
+                    this.extentionTime='1000-01-01'
+                } else if(this.deadlineTime!='' && this.extentionTime=='') {
+                    this.extentionTime='1000-01-01'
+                }
+                axios.post('/api/noticeBoard/modifyPost', {
+                    postId:this.$route.params.postId,
+                    title:this.list.title,
+                    content:this.list.content,
+                    deadlineTime:this.deadlineTime,
+                    extentionTime:this.extentionTime,
                 })
-                // axios.post('/api/url')
-                // .then()
+                .then(response => {
+                    this.data = response.data
+                    this.$router.push({
+                        path: '/subject/'+this.$route.params.subjectId+'/noticeBoard/' + this.$route.params.postId
+                    })
+                })
             }
         },
         addFile() {
