@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.Post;
+import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.DetailRepository;
 import net.skhu.repository.PostRepository;
@@ -59,5 +60,14 @@ public class PostService {
 		post.setUser(userRepository.findById(userId).get());
 		post.setDetail(detailRepository.findById(13).get());
 		postRepository.save(post);
+	}
+	@Transactional
+	public void noticeModifyPost(ModifyNoticePostModel post) {
+		Post p=postRepository.findById(post.getPostId()).get();
+		p.setTitle(post.getTitle());
+		p.setContent(post.getContent());
+		p.setDeadlineTime(post.getDeadlineTime().atTime(0,0,0));
+		p.setExtentionTime(post.getExtentionTime().atTime(0,0,0));
+		postRepository.save(p);
 	}
 }

@@ -183,7 +183,7 @@ Vue.use(VueRouter)
     component: NoticeContent
   },
   {
-    path: '/noticeBoard/:subjectId/notice/:postId/edit',
+    path: '/subject/:subjectId/noticeBoard/:postId/edit',
     name: 'noticeEdit',
     component: NoticeEdit
   }
