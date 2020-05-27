@@ -32,6 +32,7 @@ import net.skhu.model.SignUpModel;
 import net.skhu.model.TodoModel;
 import net.skhu.model.UserLoginModel;
 import net.skhu.model.WeekGoalModel;
+import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
@@ -465,5 +466,10 @@ public class APIController {
 	public Post post(@PathVariable("postId") int postId) {
 //		System.out.println(subject.length()==0);
 		return postRepository.findById(postId).get();
+	}
+	// 해당 게시글 내용
+	@RequestMapping(value = "writeNotice", method = RequestMethod.POST)
+	public void writeNotice(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
+		postService.writeNotice(notice,getLoginUserId(request));
 	}
 }

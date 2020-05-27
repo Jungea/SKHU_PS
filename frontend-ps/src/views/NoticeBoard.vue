@@ -18,7 +18,7 @@
                         <td> <b> {{ item.title }} </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
-                        <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
+                        <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
                         <td class="td1"> {{item.deadlineTime=='1000-01-01T00:00:00'?'-':'X'}}  </td>
                     </tr>
                 </table>
@@ -64,7 +64,7 @@
                         <th>연장 기한</th>
                         <td>
                             <b-input v-model="extention" disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button variant="dark" v-b-modal.calendar2 @click="newNowDate()">연장 기한 선택</b-button>
+                            <b-button v-if="deadline.length!=0" variant="dark" v-b-modal.calendar2 @click="newNowDate()">연장 기한 선택</b-button>
                         </td>
                     </tr>
                 </table>
@@ -142,13 +142,21 @@ export default {
                 return
             }
             axios.post('/api/writeNotice', {
-                subjectId:this.$route.params.subjectId
+                subjectId:this.$route.params.subjectId,
+                title:this.title,
+                content:this.content,
+                deadlineTime:this.deadline,
+                extensionTime:this.extention,
                 }).then(response => {
                 console.log(response.data)
-                this.$router.push({
-                    path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
-                    query:{page:1}
-                })
+                if(this.$route.query.page!=1) {
+                    this.$router.push({
+                        path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+                        query:{page:1}
+                    })
+                } else {
+                    this.$router.go()
+                }
             })
         },
         dateDisabled1(ymd, date) {
@@ -197,7 +205,7 @@ export default {
         },
         onPageChanged(page){
             this.currentPage=this.$route.query.page
-        this.paginate(this.perPage, page - 1)
+            this.paginate(this.perPage, page - 1)
         },
     }
 }

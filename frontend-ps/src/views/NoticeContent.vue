@@ -18,7 +18,7 @@
                     </tr>
                     <tr>
                         <th class="th1">연장 기한</th>
-                        <td>{{ list.deadlineTime=='1000-01-01T00:00:00'?'-':list.extentionTime.substring(0,10)+" "+list.extentionTime.substring(11,16) }}</td>
+                        <td>{{ list.extentionTime=='1000-01-01T00:00:00'?'-':list.extentionTime.substring(0,10)+" "+list.extentionTime.substring(11,16) }}</td>
                     </tr>
                     <tr>
                         <th class="th1">제출 여부</th>
