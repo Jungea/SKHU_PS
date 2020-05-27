@@ -40,5 +40,7 @@ public class Subject {
 	   @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
 	   List<Project> projects;
 
-	   
+	   @JsonIgnore
+		@OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
+		List<Post> posts;
 }

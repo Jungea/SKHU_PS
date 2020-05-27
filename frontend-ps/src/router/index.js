@@ -22,6 +22,7 @@ import Team from '../views/Team.vue'
 import ProfessorSummary from '../views/ProfessorSummary.vue'
 import Score from '../views/Score.vue'
 import ProjectSearch from '../views/ProjectSearch.vue'
+import NoticeEdit from '../views/NoticeEdit.vue'
 
 import NoticeBoard from '../views/NoticeBoard.vue'
 import NoticeContent from '../views/NoticeContent.vue'
@@ -162,7 +163,7 @@ Vue.use(VueRouter)
     component: ProfessorSummary
   },
   {
-    path: '/Score/:subjectId',
+    path: '/score/:subjectId',
     name: 'score',
     component: Score
   },
@@ -172,14 +173,19 @@ Vue.use(VueRouter)
     component: ProjectSearch
   },
   {
-    path: '/noticeBoard/:subjectId',
+    path: '/subject/:subjectId/noticeBoard',
     name: 'noticeBoard',
     component: NoticeBoard
   },
   {
-    path: '/noticeContent/:postId',
+    path: '/subject/:subjectId/noticeBoard/:postId',
     name: 'noticeContent',
     component: NoticeContent
+  },
+  {
+    path: '/noticeBoard/:subjectId/notice/:postId/edit',
+    name: 'noticeEdit',
+    component: NoticeEdit
   }
 ]
 

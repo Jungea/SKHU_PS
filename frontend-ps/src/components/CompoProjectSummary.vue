@@ -13,7 +13,7 @@
                             </td>
                         </tr>
                          <tr>
-                            <th scope="row" style="width:28%">멤버 수</th>
+                            <th scope="row">멤버 수</th>
                             <td>
                                 {{ this.data.memNum }}
                             </td>
@@ -91,7 +91,7 @@ export default {
                     this.subject = '과목없음'
                 else
                     this.subject = this.data.subject.title
-            })    
+            })
         }
     },
     mounted() {
@@ -106,7 +106,17 @@ export default {
                 this.subject = this.data.subject.title
             this.rcrtStateCheck()
             this.progStateCheck()
-        })        
+            
+            axios.get('/api/project/' + this.$route.params.projectId + '/member')
+            .then(response => {
+                this.memList.push(this.data.user.name)
+                if(response.data.length != 0) {
+                    for(var i = 0 ; i < response.data.length ; i++) {
+                        this.memList.push(' ' + response.data[i].user.name);
+                    }
+                }
+            })
+        })
     },
     methods: {
         rcrtStateCheck() {
@@ -123,7 +133,7 @@ export default {
         },
         edit(projectId) {
             this.$router.push({
-                path: '/project/'+projectId+'/edit'
+                path: '/project/'+ projectId +'/edit'
             })
         }
     },
@@ -134,7 +144,7 @@ export default {
             state: '',
             progState: '',
             tagArray:[],
-            memList: ['홍길동(4)', ' 임꺽정(4)', ' 정길이(4)']
+            memList: []
         }
     }
 }

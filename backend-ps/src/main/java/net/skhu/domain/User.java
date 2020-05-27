@@ -60,6 +60,9 @@ public class User {
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	List<Todo> todos;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+	List<Post> posts;
    public User() {
    }
 
