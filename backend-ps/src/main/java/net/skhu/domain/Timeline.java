@@ -25,6 +25,7 @@ public class Timeline {
 	
 	String content;
 	LocalDateTime time;
+	String url;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userId")

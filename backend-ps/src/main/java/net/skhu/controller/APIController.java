@@ -616,4 +616,10 @@ public class APIController {
  	public List<Timeline> userTimeline(@PathVariable("userId") int userId) {
  		return userService.timeline(userId);
  	}
+ 	
+ 	//프로젝트 참여자 전부
+ 	@RequestMapping(value = "project/{projectId}/allMember", method = RequestMethod.GET)
+	public List<ProjectJoin> projectAllMember(@PathVariable("projectId") String projectId) {
+		return projectService.allMember(Integer.parseInt(projectId));
+	}
 }
