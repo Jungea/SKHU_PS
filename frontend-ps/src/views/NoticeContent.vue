@@ -128,7 +128,7 @@ export default {
         }
     },
     mounted() { 
-         axios.get('/api/file1/list/'+this.$route.params.postId) // 모든 과목 정보
+         axios.get('/api/file1/list/'+this.$route.params.postId) 
         .then(response => {
             this.files=response.data
         });
@@ -151,8 +151,21 @@ export default {
     },
     methods: {
         download(file) {
-            axios.get('/api/file1/download/'+file.fileId).then(response => {
-                console.log(response.data)
+            // axios.get('/api/file1/download/'+file.fileId).then(response => {
+            //     var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+            //     var fileLink = document.createElement('a');
+
+            //     fileLink.href = fileURL;
+            //     fileLink.setAttribute('download', file.name);
+            //     document.body.appendChild(fileLink);
+
+            //     fileLink.click();
+            // })
+            axios({
+                method: 'GET',
+                url: '/api/file1/download/'+file.fileId,                 
+                responseType: 'blob' // 가장 중요함
+            }).then(response => {
                 var fileURL = window.URL.createObjectURL(new Blob([response.data]));
                 var fileLink = document.createElement('a');
 
@@ -161,8 +174,8 @@ export default {
                 document.body.appendChild(fileLink);
 
                 fileLink.click();
-            })
-            
+            })    
+
         },
         edit() {
             this.$router.push({

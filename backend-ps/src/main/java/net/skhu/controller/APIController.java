@@ -584,11 +584,11 @@ public class APIController {
         }
     }
 
-//    @RequestMapping("file1/delete")
-//    public String delete(@RequestParam("id") int id) throws Exception {
-//        uploadedFile1Service.delete(id);
-//        return "redirect:list";
-//    }
+    @RequestMapping("file1/delete/{fileIds}")
+    public void delete(@PathVariable String fileIds) throws Exception {
+//        System.out.println(fileIds);
+    	fileService.delete(fileIds);
+    }
 
     @RequestMapping(value="/file1/download/{fileId}", method=RequestMethod.GET)
     public void download(@PathVariable("fileId") int id, HttpServletResponse response) throws Exception {

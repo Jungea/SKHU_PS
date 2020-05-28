@@ -61,8 +61,12 @@ public class FileService {
     }
 
     // 파일 삭제
-    public void delete(int id) throws IOException {
-    	fileRepository.deleteById(id); // uploadedFile 테이블에서 레코드 삭제
+    @Transactional
+    public void delete(String fileIds) throws IOException {
+    	String[] fileId=fileIds.split(",");
+    	for(String f:fileId) {
+    		fileRepository.deleteById(Integer.parseInt(f)); // uploadedFile 테이블에서 레코드 삭제
+    	}
     }
 
     // 다운로드하기 위해 파일을 조회하여 리턴
