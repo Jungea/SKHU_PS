@@ -19,7 +19,7 @@
                         <td>{{ list.writeTime.substring(0,10)+" "+list.writeTime.substring(11,16) }}</td>
                     </tr>
                     <tr v-if="checkFile">
-                        <th class="th1">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
+                        <th class="th1" style="vertical-align: middle">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
                         <td>
                             <div v-for="(item, index) in files" :key="index" style="cursor:pointer;color:blue" @click="download(item)">
                                 {{ item.name }}
@@ -41,7 +41,7 @@
                 </table>
                  <table class="table table-bordered" style="width: 90%" v-if="!userType">
                     <tr>
-                        <th class="th1" style="width: 15% ; vertical-align: middle">제출 파일</th>
+                        <th class="th1" style="width: 20% ; vertical-align: middle">제출 파일</th>
                         <td>
                             <div style="float: right">
                                 <b-icon-plus style="cursor:pointer" v-b-modal.modal-file font-scale="1.5"></b-icon-plus>
@@ -154,11 +154,9 @@ export default {
             // axios.get('/api/file1/download/'+file.fileId).then(response => {
             //     var fileURL = window.URL.createObjectURL(new Blob([response.data]));
             //     var fileLink = document.createElement('a');
-
             //     fileLink.href = fileURL;
             //     fileLink.setAttribute('download', file.name);
             //     document.body.appendChild(fileLink);
-
             //     fileLink.click();
             // })
             axios({
@@ -168,14 +166,11 @@ export default {
             }).then(response => {
                 var fileURL = window.URL.createObjectURL(new Blob([response.data]));
                 var fileLink = document.createElement('a');
-
                 fileLink.href = fileURL;
                 fileLink.setAttribute('download', file.name);
                 document.body.appendChild(fileLink);
-
                 fileLink.click();
             })    
-
         },
         edit() {
             this.$router.push({

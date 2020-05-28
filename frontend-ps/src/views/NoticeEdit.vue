@@ -21,13 +21,14 @@
                                 <div v-for="(item, index) in files2" :key="index" > <!--추가하는 파일 이름-->
                                     {{ item.name }}
                                 </div>
-                                <div v-for="(item, index) in files" :key="index" style="cursor:pointer;color:blue"> <!--기존 파일-->
+                                <div v-for="(item, index) in files" :key="index"> <!--기존 파일-->
                                     <div v-if="!removeFileId.includes(item.fileId)">
-                                    <span @click="download(item)">{{ item.name }}</span>
-                                    <b-button pill variant="outline-dark" size="sm" @click="removeFile(item.fileId,index)">x</b-button>
+                                        <div style="cursor:pointer;color:blue ; display: inline-block" class="mb-2"  @click="download(item)">{{ item.name }} </div>
+                                            <div class="ml-2" style="display: inline-block">
+                                                <b-button pill size="sm" variant="outline-dark" @click="removeFile(item.fileId,index)">X</b-button>
+                                            </div>                               
                                     </div>
                                 </div>
-
                             </div>
                         </td>
                     </tr>
@@ -98,6 +99,14 @@ export default {
         this.postId = this.$route.params.postId
     },
     methods: {
+        checkTime() {
+            let date1 = new Date(this.deadlineTime)
+            let date2 = new Date(this.extentionTime)
+            if(date1 >= date2)
+                return true
+            else
+                return false
+        },
         removeFile(fileId) {
             this.removeFileId.push(fileId)
         },

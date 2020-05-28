@@ -54,7 +54,7 @@
                         <b-button v-if="editVisible" variant="dark" @click="editScore()">저장</b-button>
                     </div>
                 </b-row>
-            </b-container> 
+            </b-container>
         </center>
       </b-modal>
     </div>
@@ -80,8 +80,7 @@ export default {
       .then(response => {
           this.data = response.data
           for(var i = 0 ; i < response.data.length ; i++) {
-            this.a.push(response.data[i].user)
-            axios.get('/api/project/' + response.data[i].projectId + '/member')
+            axios.get('/api/project/' + response.data[i].projectId + '/allMember')
             .then(res => {
                 if(res.data.length != 0) {
                     for(let j = 0 ; j < res.data.length ; j++)

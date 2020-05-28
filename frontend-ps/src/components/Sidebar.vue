@@ -4,7 +4,7 @@
       <p class="mt-4 ml-1">
         <b-icon-house-fill  style="cursor:pointer" class="mr-1" font-scale="1.4" @click="home"></b-icon-house-fill>
         {{name}} 님
-        <b-icon-bell style="cursor:pointer" class="ml-2" font-scale="1.3" v-b-modal.modal-timeLine></b-icon-bell>
+        <b-icon-bell @click="viewTimeline()" style="cursor:pointer" class="ml-2" font-scale="1.3" v-b-modal.modal-timeLine></b-icon-bell>
         <b-icon-person-fill style="cursor:pointer" class="ml-2" font-scale="1.3" @click="profile"></b-icon-person-fill>
       </p>
       <b-nav-item disabled><hr></b-nav-item>
@@ -74,10 +74,10 @@
           <hr style="border: 1px solid black ; width: 60% ; margin-bottom: 30px">
           <b-container>
               <p style="color:silver; margin: 300px auto;" v-if="data.length == 0 ? true : false">현재 알림이 없습니다.</p>
-              <b-row :key="index" v-for="(item, index) in data" style="width: 60% ; min-height: 70px ; margin: 10px">
+              <b-row @click="move(item.url)" :key="index" v-for="(item, index) in data" style="width: 60% ; min-height: 70px ; margin: 10px">
                   <b-col style=" text-align: left ; padding: 0">
                     <div>{{item.content}}</div>
-                    <div style="text-align: right ; font-size: 12px ; margin-top: 10px ; margin-bottom: -13px">{{item.timelineTime}}</div>
+                    <div style="text-align: right ; font-size: 12px ; margin-top: 10px ; margin-bottom: -13px">{{item.time}}</div>
                   </b-col>
                   <hr style="width: 100% ; border-color: silver">
                   <b-button variant="dark" style="height: 25px ; width: 100% ; font-size: 8px" v-if="index==arrIndex-1">여기까지 읽으셨습니다.</b-button>
@@ -104,26 +104,13 @@ export default {
         mysubjects:[],
         pinSubjectId:null,
         subjectName:null,
-        data: [
-          {content: '이영선 님의 ToDoList가 삭제 되었습니다.', timelineTime: '2020-05-25 00:01'},
-          {content: '길보미 님의 ToDoList가 [진행완료] 로 변경 되었습니다.', timelineTime: '2020-05-24 20:37'},
-          {content: '이윤영 님의 ToDoList가 [진행완료] 로 변경 되었습니다.', timelineTime: '2020-05-24 20:36'},
-          {content: '정은애 님의 ToDoList가 [진행완료] 로 변경 되었습니다.', timelineTime: '2020-05-24 20:35'},
-          {content: '정은애 님의 ToDoList가 [진행중] 으로 변경 되었습니다.', timelineTime: '2020-05-23 20:35'},
-          {content: '정은애 님의 ToDoList가 [생성] 되었습니다.', timelineTime: '2020-05-22 18:03'},
-          {content: '이영선 님의 ToDoList가 [진행완료] 로 변경 되었습니다.', timelineTime: '2020-05-21 21:01'},
-          {content: '이영선 님의 ToDoList가 [진행중] 으로 변경 되었습니다.', timelineTime: '2020-05-21 17:21'},
-          {content: '이영선 님의 ToDoList가 [생성] 되었습니다.', timelineTime: '2020-05-20 17:00'},
-          {content: '길보미 님의 ToDoList가 [진행중] 으로 변경 되었습니다.', timelineTime: '2020-05-20 15:28'},
-          {content: '이윤영 님의 ToDoList가 [진행중] 으로 변경 되었습니다.', timelineTime: '2020-05-20 15:27'},
-          {content: '이윤영 님의 ToDoList가 [생성] 되었습니다.', timelineTime: '2020-05-20 15:24'},
-          {content: '길보미 님의 ToDoList가 [생성] 되었습니다.', timelineTime: '2020-05-19 13:30'}
-        ],
-        checkTime1: '2020-05-21 21:01',
+        data: [],
+        checkTime1: '',
         beforeList: [],
         arrIndex: '',
         pinProjectSubjectId: '',
-        capName: ''
+        capName: '',
+        userId: ''
       }
     },
    
@@ -132,7 +119,8 @@ export default {
         .then(response => {
           this.type=response.data.userType
           this.name = response.data.name
-          
+          this.userId = response.data.userId
+
           if(this.type==false)  { // 학생이라면
               axios.get('/api/pinList').then(response => {
                 this.myProjects = response.data
@@ -153,13 +141,11 @@ export default {
         }).catch((erro)=> {
           console.error(erro);
         });
-        
         // axios.get('/api/allProjects').then(response => {
         //     this.allProjects = response.data
         //   }).catch((erro)=> {
         //   console.error(erro);
         // });
-        this.record()
     },
     watch: {
       '$route' () {
@@ -197,7 +183,9 @@ export default {
     methods: {
       record() {
         let checkTime = this.checkTime1
-        this.beforeList = this.data.filter(function(item) { return item.timelineTime < checkTime })
+        this.beforeList = this.data.filter(function(item) {
+          return item.time < checkTime
+        })
         this.arrIndex = this.data.length - this.beforeList.length
       },
       projectBoard(evt) {
@@ -297,6 +285,36 @@ export default {
          this.$router.push({
             path: '/professor/' + this.pinSubjectId + '/summary'
         })
+      },
+      viewTimeline() {
+        axios.get('/api/user/' + this.userId + '/timeline')
+        .then(res => {
+          this.data = res.data
+          let a = new Date();
+          this.checkTime1 = this.leadingZeros(a.getFullYear(), 4) + '-' + this.leadingZeros(a.getMonth() + 1, 2) + '-' + this.leadingZeros(a.getDate(), 2)
+                + ' ' + this.leadingZeros(a.getHours(), 2) + ':' + this.leadingZeros(a.getMinutes(), 2);
+
+          for(let i = 0 ; i < res.data.length ; i++) {
+            let d = new Date(res.data[i].time);
+            this.data[i].time = this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2)
+                + ' ' + this.leadingZeros(d.getHours(), 2) + ':' + this.leadingZeros(d.getMinutes(), 2);
+          }
+
+          this.record()
+        })
+      },
+      leadingZeros(n, digits) {
+            var zero = '';
+            n = n.toString();
+            if (n.length < digits) {
+                for (var i = 0; i < digits - n.length; i++)
+                    zero += '0';
+            }
+                return zero + n;
+      },
+      move(url) {
+        alert(url)
+        location.href = url
       }
     }
 }
