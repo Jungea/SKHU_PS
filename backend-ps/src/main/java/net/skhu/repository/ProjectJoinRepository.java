@@ -33,5 +33,8 @@ public interface ProjectJoinRepository extends JpaRepository<ProjectJoin, Intege
 
 	//프로젝트관리에 유저한테 신청받은 목록
 	List<ProjectJoin> findByProject_ProjectIdAndTypeAndState(int projectId, int type, int state);
+	
+	//프로젝트 참여자 전원(팀장포함)
+	List<ProjectJoin> findByProject_ProjectIdAndState(int projectId, int state);
 
 }

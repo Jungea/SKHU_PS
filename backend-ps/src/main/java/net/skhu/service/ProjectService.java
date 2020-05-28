@@ -549,6 +549,10 @@ public class ProjectService {
 	public List<Project> subjectProjects(int subjectId) {
 		return projectRepository.findBySubject_SubjectId(subjectId);
 	}
+
+	public List<ProjectJoin> allMember(int projectId) {
+		return projectJoinRepository.findByProject_ProjectIdAndState(projectId, 1);
+	}
 	
 	
 }
