@@ -599,4 +599,10 @@ public class APIController {
 //        }
 //    }
     
+    //과목의 프로젝트들
+ 	@RequestMapping(value = "subject/{subjectId}/projects", method = RequestMethod.GET)
+ 	public List<Project> subjectProjects(@PathVariable("subjectId") int subjectId) {
+ 		return projectService.subjectProjects(subjectId);
+ 	}
+    
 }

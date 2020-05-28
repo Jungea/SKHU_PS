@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.ProjectStar;
@@ -543,6 +544,10 @@ public class ProjectService {
 		project.setSubject(subjectRepository.findByAuthKey(settingModel.getSubjectAuthKey()));
 		
 		projectRepository.save(project);
+	}
+
+	public List<Project> subjectProjects(int subjectId) {
+		return projectRepository.findBySubject_SubjectId(subjectId);
 	}
 	
 	
