@@ -168,18 +168,20 @@ export default {
                 //     let f = this.files[i];
                 //     formData.append('file[' + i + ']', f);
                 // }
-            formData.append("file", this.files[0]);
-
+            
             axios.post('/api/writeNotice', {
-                subjectId:this.$route.params.subjectId,
-                title:this.title,
-                content:this.content,
-                deadlineTime:this.deadline,
-                extensionTime:this.extention,
+                    subjectId:this.$route.params.subjectId,
+                    title:this.title,
+                    content:this.content,
+                    deadlineTime:this.deadline,
+                    extensionTime:this.extention,
                 }).then(response => {
-                console.log(response.data)
-
-                axios.post('/api/file1/upload/'+18, 
+                alert('id:'+response.data)
+                let newPostId=response.data
+                for(let i=0;i<this.files.length;i++) {
+                    formData.append("file", this.files[i]);
+                }
+                axios.post('/api/file1/upload/'+newPostId, 
                     formData,
                     {
                         headers: {
@@ -189,17 +191,15 @@ export default {
                 )
                 .then(response => {
                     console.log(response.data)
-                })
-
-                location.reload()
-                // if(this.$route.query.page!=1) {
-                //     this.$router.push({
-                //         path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
-                //         query:{page:1}
-                //     })
-                // } else {
-                //     this.$router.go()
-                // }
+                })            
+                if(this.$route.query.page!=1) {
+                    this.$router.push({
+                        path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+                        query:{page:1}
+                    })
+                } else {
+                    this.$router.go()
+                }
             })
         },
         handleFilesUpload(){

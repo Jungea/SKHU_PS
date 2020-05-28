@@ -15,9 +15,20 @@
                     <tr>
                         <th class="th1" style="vertical-align: middle">첨부 파일</th>
                         <td>
-                            <b-input v-model="file" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button variant="dark" @click="addFile()" style="margin-right: 15px">첨부 파일 선택</b-button>
-                            <b-button variant="danger" @click="resetFile()">삭제</b-button>
+                            <b-form-file  multiple v-model="files2" class="mt-3" plain ></b-form-file>          
+                            <div v-if="this.files.length!=0">
+                                <hr>
+                                <div v-for="(item, index) in files2" :key="index" > <!--추가하는 파일 이름-->
+                                    {{ item.name }}
+                                </div>
+                                <div v-for="(item, index) in files" :key="index" style="cursor:pointer;color:blue"> <!--기존 파일-->
+                                    <div v-if="!removeFileId.includes(item.fileId)">
+                                    <span @click="download(item)">{{ item.name }}</span>
+                                    <b-button pill variant="outline-dark" size="sm" @click="removeFile(item.fileId,index)">x</b-button>
+                                    </div>
+                                </div>
+
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -63,10 +74,16 @@ export default {
             list: {  },
             deadlineTime:'',
             extentionTime:'',
-            file: ''
+            files:null, // 기존에 저장된 파일
+            files2:null, // 새로 업로드 한 파일
+            removeFileId:[],
         }
     },
     mounted() {
+        axios.get('/api/file1/list/'+this.$route.params.postId) 
+        .then(response => {
+            this.files=response.data
+        });
          axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 모든 과목 정보
         .then(response => {
             this.list=response.data
@@ -81,13 +98,24 @@ export default {
         this.postId = this.$route.params.postId
     },
     methods: {
-        checkTime() {
-            let date1 = new Date(this.deadlineTime)
-            let date2 = new Date(this.extentionTime)
-            if(date1 >= date2)
-                return true
-            else
-                return false
+        removeFile(fileId) {
+            this.removeFileId.push(fileId)
+        },
+        download(file) {
+            axios({
+                method: 'GET',
+                url: '/api/file1/download/'+file.fileId,                 
+                responseType: 'blob' // 가장 중요함
+            }).then(response => {
+                var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+                var fileLink = document.createElement('a');
+
+                fileLink.href = fileURL;
+                fileLink.setAttribute('download', file.name);
+                document.body.appendChild(fileLink);
+
+                fileLink.click();
+            })
         },
         dateDisabled1(ymd, date) {
             let d = date;
@@ -141,6 +169,7 @@ export default {
                 } else if(this.deadlineTime!='' && this.extentionTime=='') {
                     this.extentionTime='1000-01-01'
                 }
+                
                 axios.post('/api/noticeBoard/modifyPost', {
                     postId:this.$route.params.postId,
                     title:this.list.title,
@@ -149,19 +178,37 @@ export default {
                     extentionTime:this.extentionTime,
                 })
                 .then(response => {
-                    this.data = response.data
+                    console.log(this.data = response.data)
+                    // 파일 삭제
+                    axios.post('/api/file1/delete/'+this.removeFileId.toString(), {
+                        // fileIds: this.removeFileId.toString()
+                    }).then(response => {
+                        response.data
+                    })
+
+                    // 파일 추가
+                    let formData = new FormData();
+                    for(let i=0;i<this.files2.length;i++) {
+                        formData.append("file", this.files2[i]);
+                    }
+                    axios.post('/api/file1/upload/'+this.$route.params.postId, 
+                        formData,
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        }
+                    )
+                    .then(response => {
+                        console.log(response.data)
+                    })
                     this.$router.push({
                         path: '/subject/'+this.$route.params.subjectId+'/noticeBoard/' + this.$route.params.postId
                     })
                 })
             }
         },
-        addFile() {
-            alert("파일 추가")
-        },
-        resetFile() {
-            alert("파일 전부 지우기")
-        }
+
     }
 }
 </script>
