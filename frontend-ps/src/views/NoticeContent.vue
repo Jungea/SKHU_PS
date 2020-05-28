@@ -60,7 +60,7 @@
                             <b-button v-if="userType" @click="viewFile()" variant="dark">제출물 보기</b-button>
                         </div>
                         <div style="display: inline-block ; margin-right: 5% ; float: right">
-                             <b-button class="mr-3" @click="deletePost()" variant="danger">삭제</b-button>
+                             <b-button class="mr-3" v-if="userType" @click="deletePost()" variant="danger">삭제</b-button>
                             <b-button style="margin-right: 10px" v-if="userType" @click="edit()" variant="dark">수정</b-button>
                             <b-button @click="viewList()" variant="dark">목록으로</b-button>
                         </div>

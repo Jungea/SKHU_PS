@@ -13,7 +13,7 @@
                                 <th class="th1">이름</th>
                                 <th class="th1">학과</th>
                             </tr>
-                            <tr @click="studentScore(item)" :key="index" v-for="(item, index) in data">
+                            <tr @click="studentScore(item)" :key="index" v-for="(item, index) in a">
                                 <td class="td1"> {{ item.userNum }} </td>
                                 <td class="td1"> {{ item.grade }} </td>
                                 <td class="td1"> {{ item.name }} </td>
@@ -71,18 +71,23 @@ export default {
             s: [ { name: '1주차', max: 20, score: 20 }, { name: '2주차', max: 10, score: 9 }, { name: '3주차', max: 10, score: 9 }, { name: '4주차', max: 10, score: 8 },
             { name: '5주차', max: 10, score: 10 }, { name: '6주차', max: 10, score: 9 }, { name: '7주차', max: 10, score: 8 }, { name: '8주차', max: 10, score: 9 },
             { name: '9주차', max: 10, score: 10 }, { name: '10주차', max: 15, score: 14 }],
-            editVisible: false
+            editVisible: false,
+            a: []
         }
     },
-
     mounted() {
-      axios.get('/api/alluser')
+      axios.get('/api/subject/' + this.$route.params.subjectId + '/projects')
       .then(response => {
           this.data = response.data
-          
           for(var i = 0 ; i < response.data.length ; i++) {
-              if(response.data[i].detDepartment == null)
-                this.data[i].detDepartment = "null값"
+            this.a.push(response.data[i].user)
+            axios.get('/api/project/' + response.data[i].projectId + '/member')
+            .then(res => {
+                if(res.data.length != 0) {
+                    for(let j = 0 ; j < res.data.length ; j++)
+                        this.a.push(res.data[j].user)
+                }
+            })
           }
       })  
     },
@@ -102,6 +107,9 @@ export default {
         },
         resetModal() {
             this.editVisible = false;
+        },
+        sort(a, b) {
+            return a.userNum - b.userNum;
         }
     }
 }

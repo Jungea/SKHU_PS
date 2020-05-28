@@ -1,6 +1,6 @@
 <template>
     <div class="containerStyle">
-        <h3 style="margin-left: 5%">공지 게시판</h3>
+        <h3 style="margin-left: 5%">{{ this.$route.params.subjectId }} 공지 게시판</h3>
         <hr style="width: 90%">
         <center>
             <b-form-group label-for="SubjectNotice">
@@ -128,12 +128,12 @@ export default {
         .then(response => {
             this.userType = response.data.userType
         });
-        axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+        axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.$route.params.subjectId).then(response => {
                 this.paginatedItems=response.data
               }).catch((erro) => {
               console.error(erro);
         });
-        axios.get('/api/noticeListNum?subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+        axios.get('/api/noticeListNum?subjectId='+this.$route.params.subjectId).then(response => {
                 this.totalRows=response.data
               }).catch((erro) => {
               console.error(erro);
@@ -195,7 +195,7 @@ export default {
                 if(this.$route.query.page!=1) {
                     this.$router.push({
                         path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
-                        query:{page:1}
+                        query:{ page:1 }
                     })
                 } else {
                     this.$router.go()

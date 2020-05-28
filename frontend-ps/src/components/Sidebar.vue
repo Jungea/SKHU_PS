@@ -28,10 +28,10 @@
               <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
               <li><b-nav-item>캘린더</b-nav-item></li>
               <li><b-nav-item @click="projectInfoChange('weekly')">주차별 목표(to-do-list)</b-nav-item></li>
-              <li v-if="checkSubject"><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
+              <li v-if="pinProjectSubjectId > 0"><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
               <li><b-nav-item>토론 게시판</b-nav-item></li>
               <li><b-nav-item>자유 게시판</b-nav-item></li>
-              <li><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
+              <li v-if="this.name == this.capName"><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
             </ul>
             <hr>
           </div>
@@ -122,8 +122,8 @@ export default {
         checkTime1: '2020-05-21 21:01',
         beforeList: [],
         arrIndex: '',
-        checkSubject: false,
-        studentSubjectId: ''
+        pinProjectSubjectId: '',
+        capName: ''
       }
     },
    
@@ -169,7 +169,11 @@ export default {
             axios.get('/api/project/projectName/'+this.pinProjectId).then(response => { // 프로젝트 이름 가져오기
                 let project = response.data
                 this.projectName=project.projectName
-                this.studentSubjectId = project.subject.subjectId
+                this.capName = project.user.name
+                if(project.subject == null)
+                  this.pinProjectSubjectId = 0
+                else
+                  this.pinProjectSubjectId = project.subject.subjectId
                 if(project.subject != null)
                   this.checkSubject = true;
                 else
@@ -272,14 +276,12 @@ export default {
       },
       viewNotice() {
         if(!this.type) {
-          alert("학생" + this.type)
           this.$router.push({
-            path: '/subject/' + this.studentSubjectId +'/noticeBoard',
+            path: '/subject/' + this.pinProjectSubjectId +'/noticeBoard',
             query: {page:1} 
           })
         }
         else {
-          alert("교수" + this.type)
           this.$router.push({
             path: '/subject/' + this.pinSubjectId +'/noticeBoard',
             query: {page:1} 

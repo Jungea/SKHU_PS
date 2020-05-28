@@ -10,38 +10,38 @@
                                 <tr>
                                     <th scope="row" style="width:28%">과목명</th>
                                     <td>
-                                        {{ this.data.title }}
+                                        {{ data.title }}
                                         
                                     </td>
                                 </tr>
                                 <tr>
                                     <th scope="row" style="width:28%">연도</th>
                                     <td>
-                                        {{ this.data.year }}
+                                        {{ data.year }}
                                     </td>
                                 </tr>
                                 <tr>
                                     <th scope="row" style="width:28%">학기</th>
                                     <td>
-                                        {{ this.data.semester }}
+                                        {{ data.semester }}
                                     </td>
                                 </tr>
                                 <tr>
                                     <th scope="row" style="width:28%">총 인원</th>
                                     <td>
-                                        nn명
+                                        {{ memberCount }}명
                                     </td>
                                 </tr>
                                 <tr>
                                     <th scope="row" style="width:28%">프로젝트 수</th>
                                     <td>
-                                        8개
+                                        {{ teamLength }}개
                                     </td>
                                 </tr>
                                 <tr>
                                     <th scope="row" style="width:28%">인증번호</th>
                                     <td>
-                                        {{ this.data.authKey }}
+                                        {{ data.authKey }}
                                     </td>
                                 </tr>
 
@@ -57,26 +57,35 @@
 import axios from 'axios';
 export default {
     name: 'professorSummary',
+    data() {
+        return {
+            data: [],
+            teamLength: '',
+            memberCount: 0
+        }
+    },
     watch: {
         '$route' () {
             axios.get('/api/subject/subjectName/'+this.$route.params.subjectId)
             .then(response => {
                 this.data = response.data
-            })    
+            })
         }
     },
     mounted() {
         axios.get('/api/subject/subjectName/'+this.$route.params.subjectId)
         .then(response => {
             this.data = response.data
-        })        
+        })
+        axios.get('/api/subject/' + this.$route.params.subjectId + '/projects')
+        .then(response => {
+            this.teamLength = response.data.length
+            for(let i = 0 ; i < response.data.length ; i++) {
+                this.memberCount += response.data[i].memNum
+            }
+        })
     },
     methods: {
-    },
-    data() {
-        return { 
-            data: {}
-        }
     }
 }
 </script>

@@ -9,37 +9,37 @@
                         <tr>
                             <th scope="row" style="width:28%">프로젝트명</th>
                             <td>
-                                {{ this.data.projectName }}
+                                {{ data.projectName }}
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">멤버 수</th>
                             <td>
-                                {{ this.data.memNum }}
+                                {{ data.memNum }}
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">팀장</th>
                             <td>
-                                {{ this.data.user.name }}({{this.data.user.grade}})
+                                {{ capName }}({{ grade }})
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">팀원</th>
                             <td>
-                                {{ this.memList.join(", ") }}
+                                {{ memList.join(", ") }}
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">주제</th>
                             <td>
-                                {{ this.data.theme }}
+                                {{ data.theme }}
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">내용</th>
                             <td>
-                                {{ this.data.content }}
+                                {{ data.content }}
                             </td>
                         </tr>
                         <tr>
@@ -51,25 +51,25 @@
                         <tr>
                             <th scope="row">깃허브 리포지토리 주소</th>
                             <td>
-                              {{ this.data.github }}
+                              {{ data.github }}
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">인원 모집 상태</th>
                             <td>
-                               {{ this.state }}
+                               {{ state }}
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">프로젝트 진행 상태</th>
                             <td>
-                               {{ this.progState }}
+                               {{ progState }}
                             </td>
                         </tr>
                         <tr v-if="data.subject">
                             <th scope="row">과목</th>
                             <td>
-                                 {{ this.subject }}
+                                 {{ subject }}
                             </td>
                         </tr>
 
@@ -93,7 +93,9 @@ export default {
             state: '',
             progState: '',
             tagArray:[],
-            memList: []
+            memList: [],
+            capName: '',
+            grade: ''
         }
     },
 
@@ -114,6 +116,8 @@ export default {
             axios.get('/api/project/'+this.$route.params.projectId)
                 .then(response => {
                     this.data = response.data;
+                    this.capName = this.data.user.name
+                    this.grade = this.data.user.grade
                     if(this.data.tag)
                         this.tagArray = this.data.tag.split(',');
                     if(this.data.subject == null)
@@ -130,7 +134,7 @@ export default {
                     this.memList = [];
                     if(response.data.length != 0) {
                         for(var i = 0 ; i < response.data.length ; i++) {
-                            this.memList.push(response.data[i].user.name+'('+response.data[i].user.grade+')');
+                            this.memList.push(response.data[i].user.name + '(' + response.data[i].user.grade + ')');
                         }
                     }
                 })
