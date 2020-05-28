@@ -1,10 +1,13 @@
 package net.skhu.controller;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -519,8 +522,8 @@ public class APIController {
 	}
 	// 게시글 쓰기
 	@RequestMapping(value = "writeNotice", method = RequestMethod.POST)
-	public void writeNotice(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
-		postService.writeNotice(notice,getLoginUserId(request));
+	public int  writeNotice(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
+		return postService.writeNotice(notice,getLoginUserId(request));
 	}
 
 	// 공지사항 해당 게시풀 댓글
@@ -559,17 +562,18 @@ public class APIController {
 	}
 	
 	/*밑에부터 파일 업로드*/
-	@RequestMapping(value="file1/list",method= RequestMethod.GET)
-    public List<File> list() {
-        return fileService.findAll();
+	// 공지사항 게시글의 교수가 올린 파일 리스트
+	@RequestMapping(value="file1/list/{postId}",method= RequestMethod.GET)
+    public List<File> list(@PathVariable("postId") int postId) {
+        return fileService.findAll(postId);
     }
 	// 공지 생성시 파일 업로드
     @RequestMapping(value="/file1/upload/{postId}", method=RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
     public void upload(@PathVariable("postId") int postId,@RequestParam("file")  MultipartFile[] multipartFiles) throws IOException {
         System.out.println("fileupload");
         System.out.println("크기:"+multipartFiles[0].getOriginalFilename());
+//        System.out.println("model:"+model.getTitle());
     	for(MultipartFile multipartFile : multipartFiles) {
-    		System.out.println("for문");
             if (multipartFile.getSize() <= 0) continue;
 //            if(fileModel.getProjectId()==null) { // 교수가 올릴때
 //            	fileService.save(multipartFile,fileModel.getPostId(),null);
@@ -581,23 +585,25 @@ public class APIController {
         }
     }
 
-//    @RequestMapping("file1/delete")
-//    public String delete(@RequestParam("id") int id) throws Exception {
-//        uploadedFile1Service.delete(id);
-//        return "redirect:list";
-//    }
-//
-//    @RequestMapping("file1/download")
-//    public void download(@RequestParam("id") int id, HttpServletResponse response) throws Exception {
-//        UploadedFile uploadedfile = uploadedFile1Service.getUploadedFile(id);
-//       if (uploadedfile == null) return;
-//        String fileName = URLEncoder.encode(uploadedfile.getFileName(),"UTF-8");
-//        response.setContentType("application/octet-stream");
-//        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ";");
-//        try (BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream())) {
-//            output.write(uploadedfile.getData());
-//        }
-//    }
+    @RequestMapping("file1/delete/{fileIds}")
+    public void delete(@PathVariable String fileIds) throws Exception {
+//        System.out.println(fileIds);
+    	fileService.delete(fileIds);
+    }
+
+    @RequestMapping(value="/file1/download/{fileId}", method=RequestMethod.GET)
+    public void download(@PathVariable("fileId") int id, HttpServletResponse response) throws Exception {
+//        int fileId=Integer.parseInt(id);
+        System.out.println("download:"+id);
+        File uploadedfile = fileService.getUploadedFile(id);
+        if (uploadedfile == null) return;
+         String fileName = URLEncoder.encode(uploadedfile.getName(),"UTF-8");
+         response.setContentType("application/octet-stream");
+         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ";");
+         try (BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream())) {
+             output.write(uploadedfile.getData());
+         }
+    }
     
     //과목의 프로젝트들
  	@RequestMapping(value = "subject/{subjectId}/projects", method = RequestMethod.GET)
