@@ -15,9 +15,9 @@
                     <tr>
                         <th class="th1" style="vertical-align: middle">첨부 파일</th>
                         <td>
-                            <b-input v-model="deadline" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
+                            <b-input v-model="file" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
                             <b-button variant="dark" @click="addFile()" style="margin-right: 15px">첨부 파일 선택</b-button>
-                            <b-button variant="dark" @click="resetFile()">삭제</b-button>
+                            <b-button variant="danger" @click="resetFile()">삭제</b-button>
                         </td>
                     </tr>
                     <tr>
@@ -25,20 +25,20 @@
                         <td>
                             <b-input v-model="deadlineTime" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
                             <b-button variant="dark" v-b-modal.calendar1 @click="newNowDate()" style="margin-right: 15px">제출 기한 선택</b-button>
-                            <b-button variant="dark" @click="reset1()">삭제</b-button>
+                            <b-button variant="danger" @click="reset(1)">삭제</b-button>
                         </td>
                     </tr>
                     <tr>
                         <th class="th1" style="vertical-align: middle">연장 기한</th>
                         <td>
                             <b-input v-model="extentionTime" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button variant="dark" v-b-modal.calendar2 @click="newNowDate()" style="margin-right: 15px">연장 기한 선택</b-button>
-                            <b-button variant="dark" @click="reset2()">삭제</b-button>
+                            <b-button variant="dark" :disabled="(deadlineTime.length==0)" v-b-modal.calendar2 @click="newNowDate()" style="margin-right: 15px">연장 기한 선택</b-button>
+                            <b-button variant="danger" :disabled="(deadlineTime.length==0)" @click="reset(2)">삭제</b-button>
                         </td>
                     </tr>
                 </table>
                 <div style="text-align: right ; margin-right: 5%">
-                    <b-button @click="save()" variant="dark">저장</b-button>
+                    <b-button :disabled="checkTime()" @click="save()" variant="dark">저장</b-button>
                 </div>
             </b-form-group>
         </center>
@@ -63,6 +63,7 @@ export default {
             list: {  },
             deadlineTime:'',
             extentionTime:'',
+            file: ''
         }
     },
     mounted() {
@@ -80,6 +81,14 @@ export default {
         this.postId = this.$route.params.postId
     },
     methods: {
+        checkTime() {
+            let date1 = new Date(this.deadlineTime)
+            let date2 = new Date(this.extentionTime)
+            if(date1 >= date2)
+                return true
+            else
+                return false
+        },
         dateDisabled1(ymd, date) {
             let d = date;
             let date2 = this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2);
@@ -88,7 +97,7 @@ export default {
         dateDisabled2(ymd, date) {
             let d = date;
             let date2 = this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2);
-            return date2 <= this.list.deadline
+            return date2 <= this.deadlineTime
         },
         leadingZeros(n, digits) {
             var zero = '';
@@ -103,8 +112,8 @@ export default {
         newNowDate() {
             let d = new Date();
             this.nowDate = this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2);
-            if(this.list.deadline == '')
-                this.list.deadline = this.nowDate
+            if(this.list.deadlineTime == '')
+                this.list.deadlineTime = this.nowDate
         },
         onContext1(ctx) {
             this.deadlineTime = ctx.activeYMD;
@@ -112,11 +121,13 @@ export default {
         onContext2(ctx) {
             this.extentionTime = ctx.activeYMD;
         },
-        reset1() {
-            this.deadlineTime = ''
-        },
-        reset2() {
-            this.extentionTime = ''
+        reset(id) {
+            if(id == 1) {
+                this.deadlineTime = ''
+                this.extentionTime = ''
+            }
+            else
+                this.extentionTime = ''
         },
         save() {
             if(((this.deadlineTime >= this.extentionTime) && (this.deadlineTime != '' && this.extentionTime != ''))

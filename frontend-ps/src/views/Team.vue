@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
 export default {
     name: 'subjectTeam',
     data() {
@@ -43,13 +43,13 @@ export default {
         };
     },
     mounted() { 
-        axios.get('/api/project/' + 5 + '/member') // 프로젝트 팀(인원)
-        .then(response => {
-            this.data = response.data
+        // axios.get('/api/url') // 프로젝트 팀(인원)
+        // .then(response => {
+        //     this.data = response.data
             
-            for(var i = 0 ; i < response.data.length ; i++)
-                this.MemberList.push(" " + response.data[i].user.name) // 멤버 목록 저장할 배열
-        });
+        //     for(var i = 0 ; i < response.data.length ; i++)
+        //         this.MemberList.push(" " + response.data[i].name) // 멤버 목록 저장할 배열
+        // });
     },
 
      methods: {

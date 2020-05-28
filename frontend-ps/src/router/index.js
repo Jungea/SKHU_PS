@@ -153,7 +153,7 @@ Vue.use(VueRouter)
     component: EditProfessorProfile
   },
   {
-    path: '/Team',
+    path: '/subject/:subjectId/Team',
     name: 'team',
     component: Team
   },

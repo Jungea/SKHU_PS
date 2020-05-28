@@ -11,27 +11,30 @@
                         <th class="th1">작성일</th>
                         <th class="th1">제출 마감일</th>
                         <th class="th1">제출 연장일</th>
-                        <th class="th1">제출 여부</th>
+                        <th class="th1">제출</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td class="td1" style="width: 8%"> {{index}} </td>
-                        <td> <b> {{ item.title }} </b> </td>
-                        <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
+                        <td class="td1"> {{ index }} </td>
+                        <td style="width: 30%"> <b> {{ item.title }} </b> </td>
+                        <td class="td1"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
                         <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
-                        <td class="td1"> {{item.deadlineTime=='1000-01-01T00:00:00'?'-':'X'}}  </td>
+                        <td class="td1">
+                            <b-icon-check v-if="!(item.deadlineTime=='1000-01-01T00:00:00')" style="color: green" scale="1.3"></b-icon-check>
+                            <b-icon-x v-if="!(item.deadlineTime=='1000-01-01T00:00:00') && (files == null)" style="color: red" scale="1.3"></b-icon-x>
+                            <span v-if="item.deadlineTime=='1000-01-01T00:00:00'"> - </span>
+                        </td>
                     </tr>
                 </table>
                 <div style="text-align: right ; margin-right: 5%">
-                    <b-button variant="dark" v-b-modal.modal-newBoard>게시글 작성</b-button>
+                    <b-button v-if="userType" variant="dark" v-b-modal.modal-newBoard>게시글 작성</b-button>
                 </div>
             </b-form-group>
-             <b-pagination  @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
-
+             <b-pagination @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
         </center>
 
 
-     <b-modal id="modal-newBoard" size="lg"  @show="resetModal" @hidden="resetModal" title="게시글 작성" @ok="newBoard">
+     <b-modal id="modal-newBoard" size="lg"  @show="resetModal" @hidden="resetModal" title="게시글 작성" :ok-disabled="!checkForm() || checkTime()" @ok="newBoard">
         <center>
             <b-form-group label-for="newNotice" enctype="multipart/form-data">
                 <table class="table table-bordered" id="newNotice" >
@@ -50,23 +53,24 @@
                      <tr>
                        <th>파일 제출</th>
                             <td>
-                                <b-form-file  multiple v-model="files" class="mt-3" plain ></b-form-file>          
+                                <b-form-file multiple v-model="files" class="mt-3" plain ></b-form-file>          
                                 <!-- <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/> -->
-
                             </td>
                     </tr>
                     <tr>
                         <th>과제 제출 기한</th>
                         <td>
-                            <b-input v-model="deadline" disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button variant="dark" v-b-modal.calendar1 @click="newNowDate()">제출 기한 선택</b-button>
+                            <b-input v-model="deadline" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
+                            <b-button variant="dark" style="margin-right: 15px" v-b-modal.calendar1 @click="newNowDate()">제출 기한 선택</b-button>
+                            <b-button v-if="deadline.length!=0" variant="danger" @click="deleteTime(1)">삭제</b-button>
                         </td>
                     </tr>
                     <tr>
                         <th>연장 기한</th>
                         <td>
-                            <b-input v-model="extention" disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button v-if="deadline.length!=0" variant="dark" v-b-modal.calendar2 @click="newNowDate()">연장 기한 선택</b-button>
+                            <b-input v-model="extention" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
+                            <b-button v-if="deadline.length!=0" style="margin-right: 15px" variant="dark" v-b-modal.calendar2 @click="newNowDate()">연장 기한 선택</b-button>
+                            <b-button v-if="deadline.length!=0" variant="danger" @click="deleteTime(2)">삭제</b-button>
                         </td>
                     </tr>
                 </table>
@@ -92,13 +96,14 @@ export default {
             perPage: 6, // 각 페이지마다 보이는 리스트
             currentPage: 1,
             totalRows: null,
-           paginatedItems: {},
-           title: '',
-           content: '',
-           nowDate: '',
-           deadline: '',
-           extention: '',
-           files: '',
+            paginatedItems: {},
+            title: '',
+            content: '',
+            nowDate: '',
+            deadline: '',
+            extention: '',
+            userType: '',
+            files: ''
         } 
     },
     watch: {
@@ -119,6 +124,10 @@ export default {
             query:{page:1}
           })
         }
+        axios.get('/api/user')
+        .then(response => {
+            this.userType = response.data.userType
+        });
         axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
                 this.paginatedItems=response.data
               }).catch((erro) => {
@@ -138,11 +147,21 @@ export default {
             this.extention = '',
             this.nowDate = ''
         },
+        checkForm() {
+            if(this.title && this.content)
+                return true
+            else
+                return false
+        },
+        checkTime() {
+            let date1 = new Date(this.deadline)
+            let date2 = new Date(this.extention)
+            if(date1 >= date2)
+                return true
+            else
+                return false
+        },
         newBoard() {
-            if(this.title.length==0 || this.content.length==0) { 
-                alert('제목과 내용은 필수 입력입니다.')
-                return
-            }
             let formData = new FormData();
                 // for( var i = 0; i < this.files.length; i++ ){
                 //     alert('i:'+i)
@@ -171,10 +190,8 @@ export default {
                 .then(response => {
                     console.log(response.data)
                 })
-            
 
-
-
+                location.reload()
                 // if(this.$route.query.page!=1) {
                 //     this.$router.push({
                 //         path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
@@ -236,6 +253,14 @@ export default {
             this.currentPage=this.$route.query.page
             this.paginate(this.perPage, page - 1)
         },
+        deleteTime(id) {
+            if(id == 1) {
+                this.deadline = ''
+                this.extention = ''
+            }
+            else
+                this.extention = ''
+        }
     }
 }
 </script> 

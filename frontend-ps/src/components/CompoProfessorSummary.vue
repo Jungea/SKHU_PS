@@ -47,9 +47,6 @@
 
                             </tbody>
                         </table>
-                        <div class="mb-4" style="text-align: right">
-                            <b-button variant="dark" @click="viewTeam()">팀별 확인</b-button>
-                        </div>
                     </b-form-group>
                 </center>
             </form>
@@ -75,11 +72,6 @@ export default {
         })        
     },
     methods: {
-        viewTeam() {
-            this.$router.push({
-                path: '/Team'
-            })
-        }
     },
     data() {
         return { 

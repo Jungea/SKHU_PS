@@ -51,7 +51,8 @@
 
           <div disabled v-show="this.pinSubjectId">
             <ul style="list-style-type: none ; padding: 0px">
-              <b-nav-item><strong>{{ this.subjectName }}</strong></b-nav-item>
+              <b-nav-item @click="subjectInfo()"><strong>{{ this.subjectName }}</strong></b-nav-item>
+              <li><b-nav-item @click="viewTeam()">팀별 확인</b-nav-item></li>
               <li><b-nav-item @click="viewScore()">점수 모아보기</b-nav-item></li>
               <li><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
             </ul>
@@ -121,7 +122,8 @@ export default {
         checkTime1: '2020-05-21 21:01',
         beforeList: [],
         arrIndex: '',
-        checkSubject: false
+        checkSubject: false,
+        studentSubjectId: ''
       }
     },
    
@@ -167,6 +169,7 @@ export default {
             axios.get('/api/project/projectName/'+this.pinProjectId).then(response => { // 프로젝트 이름 가져오기
                 let project = response.data
                 this.projectName=project.projectName
+                this.studentSubjectId = project.subject.subjectId
                 if(project.subject != null)
                   this.checkSubject = true;
                 else
@@ -237,7 +240,7 @@ export default {
       },
       projectInfoChange(infoName) {
         this.$router.push({
-          path: '/project/'+this.$route.params.projectId+'/'+infoName
+          path: '/project/'+ this.pinProjectId +'/'+infoName
         })
       },
       management(){
@@ -268,9 +271,29 @@ export default {
         }
       },
       viewNotice() {
+        if(!this.type) {
+          alert("학생" + this.type)
+          this.$router.push({
+            path: '/subject/' + this.studentSubjectId +'/noticeBoard',
+            query: {page:1} 
+          })
+        }
+        else {
+          alert("교수" + this.type)
+          this.$router.push({
+            path: '/subject/' + this.pinSubjectId +'/noticeBoard',
+            query: {page:1} 
+          })
+        }
+      },
+      viewTeam() {
         this.$router.push({
-          path: '/subject/' + this.pinSubjectId+'/noticeBoard',
-          query:{page:1} 
+            path: '/subject/' + this.pinSubjectId + '/Team'
+        })
+      },
+      subjectInfo() {
+         this.$router.push({
+            path: '/professor/' + this.pinSubjectId + '/summary'
         })
       }
     }
