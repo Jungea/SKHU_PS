@@ -3,6 +3,8 @@
         <b-row>
             <b-col cols="8">
                 <h4>{{project.projectName}}: 주간 목표</h4>
+                <hr>
+                {{days}}
             </b-col>
             <b-col cols="4">
                 <b-button @click="openModal(0)" variant="outline-secondary" style="height: 70px; float:right;">목표 생성</b-button>
@@ -207,6 +209,7 @@ export default {
             axios.get('/api/project/'+this.$route.params.projectId+'/weeklyGoal')
                     .then(response => {
                         this.goals = response.data;
+                        this.days=[]
                         this.days=this.getRange()
 
                         this.goals.sort(function(a,b){
