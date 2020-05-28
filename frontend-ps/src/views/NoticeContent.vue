@@ -20,7 +20,11 @@
                     </tr>
                     <tr v-if="checkFile">
                         <th class="th1">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
-                        <td><a href="#" style="color: black">{{ file1 }}</a></td>
+                        <td>
+                            <div v-for="(item, index) in files" :key="index" style="cursor:pointer;color:blue" @click="download(item)">
+                                {{ item.name }}
+                            </div>
+                        </td>
                     </tr>
                      <tr>
                         <th class="th1">제출 기한</th>
@@ -120,9 +124,14 @@ export default {
             nFile: '', // 새로 올릴 파일
             nFileList: [], // 새로 올릴 파일 목록          
             userId:null,  
+            files:null,
         }
     },
     mounted() { 
+         axios.get('/api/file1/list/'+this.$route.params.postId) // 모든 과목 정보
+        .then(response => {
+            this.files=response.data
+        });
         axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 모든 과목 정보
         .then(response => {
             this.list=response.data
@@ -141,6 +150,20 @@ export default {
         this.postId = this.$route.params.postId
     },
     methods: {
+        download(file) {
+            axios.get('/api/file1/download/'+file.fileId).then(response => {
+                console.log(response.data)
+                var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+                var fileLink = document.createElement('a');
+
+                fileLink.href = fileURL;
+                fileLink.setAttribute('download', file.name);
+                document.body.appendChild(fileLink);
+
+                fileLink.click();
+            })
+            
+        },
         edit() {
             this.$router.push({
                 path: '/subject/'+ this.$route.params.subjectId+'/noticeBoard/'+ this.postId + '/edit'

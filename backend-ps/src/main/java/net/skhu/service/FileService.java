@@ -3,6 +3,7 @@ package net.skhu.service;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -26,8 +27,15 @@ public class FileService {
 	ProjectRepository projectRepository;
 
     // 파일 목록 조회
-    public List<File> findAll() {
-        return fileRepository.findAll(); // uploadedFile 테이블의 모든 레코드를 조회
+    public List<File> findAll(int postId) {
+        List<File> file=fileRepository.findByPost_PostId(postId); // uploadedFile 테이블의 모든 레코드를 조회
+        List<File> result=new ArrayList<>();
+        for(File f:file) {
+        	if(f.getProject()==null) {
+        		result.add(f);
+        	}
+        }
+        return result;
     }
 
     // 파일 저장
@@ -43,12 +51,12 @@ public class FileService {
         uploadedFile.setSubmitTime(LocalDateTime.now()); // 현재 시각 설정
         uploadedFile.setData(multipartFile.getBytes()); // 파일의 내용을 data 속성에 저장
         uploadedFile.setPost(postRepository.findById(postId).get());
-        //        uploadedFile.setPost(postRepository.findById(postId).get());
-//        if(projectId==null) {
-//        	 uploadedFile.setProject(null);
-//        } else {
-//        	 uploadedFile.setProject(projectRepository.findById(Integer.parseInt(projectId)).get());
-//        }
+        uploadedFile.setPost(postRepository.findById(postId).get());
+        if(projectId==null) {
+        	 uploadedFile.setProject(null);
+        } else {
+        	 uploadedFile.setProject(projectRepository.findById(Integer.parseInt(projectId)).get());
+        }
         fileRepository.save(uploadedFile); // uploadedFile 테이블에 저장
     }
 
@@ -58,8 +66,8 @@ public class FileService {
     }
 
     // 다운로드하기 위해 파일을 조회하여 리턴
-    public File getUploadedFile(int id) throws IOException {
-        return fileRepository.findById(id).get(); // uploadedFile 테이블에서 레코드 조회
+    public File getUploadedFile(int fileId) throws IOException {
+        return fileRepository.findById(fileId).get(); // uploadedFile 테이블에서 레코드 조회
     }
 
 }

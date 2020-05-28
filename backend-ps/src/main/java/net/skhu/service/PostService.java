@@ -40,7 +40,7 @@ public class PostService {
 		
 	}
 	@Transactional
-	public void writeNotice(WriteNoticeModel notice,int userId) {
+	public int writeNotice(WriteNoticeModel notice,int userId) {
 		Post post=new Post();
 		post.setSubject(subjectRepository.findBySubjectId(notice.getSubjectId()));
 		post.setTitle(notice.getTitle());
@@ -59,7 +59,8 @@ public class PostService {
 		}
 		post.setUser(userRepository.findById(userId).get());
 		post.setDetail(detailRepository.findById(13).get());
-		postRepository.save(post);
+		
+		return postRepository.save(post).getPostId();
 	}
 	@Transactional
 	public void noticeModifyPost(ModifyNoticePostModel post) {
