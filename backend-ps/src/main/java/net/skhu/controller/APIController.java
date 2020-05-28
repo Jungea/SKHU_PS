@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import net.skhu.domain.Comment;
 import net.skhu.domain.Detail;
@@ -25,14 +24,15 @@ import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Subject;
+import net.skhu.domain.Timeline;
 import net.skhu.domain.Todo;
 import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.MakeProjectModel;
-import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.ManagerSettingModel;
+import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
 import net.skhu.model.ProfileModel;
@@ -605,4 +605,9 @@ public class APIController {
  		return projectService.subjectProjects(subjectId);
  	}
     
+ 	//타임라인 목록
+ 	@RequestMapping(value = "user/{userId}/timeline", method = RequestMethod.GET)
+ 	public List<Timeline> userTimeline(@PathVariable("userId") int userId) {
+ 		return userService.timeline(userId);
+ 	}
 }

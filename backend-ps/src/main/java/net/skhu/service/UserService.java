@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.Detail;
 import net.skhu.domain.ProjectJoin;
+import net.skhu.domain.Timeline;
 import net.skhu.domain.User;
 import net.skhu.etc.SendEmail;
 import net.skhu.etc.TempAuth_key;
@@ -17,6 +18,7 @@ import net.skhu.model.ProfileModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.repository.DetailRepository;
 import net.skhu.repository.ProjectJoinRepository;
+import net.skhu.repository.TimelineRepository;
 import net.skhu.repository.UserRepository;
 
 @Service
@@ -28,6 +30,8 @@ public class UserService {
 	DetailRepository detailRepository;
 	@Autowired
 	ProjectJoinRepository projectJoinRepository;
+	@Autowired
+	TimelineRepository timelineRepository;
 
 	public User login(int userNum, String password) {
 		return userRepository.findByUserNumAndPassword(userNum, password);
@@ -121,5 +125,9 @@ public class UserService {
 	
 	public List<ProjectJoin> applicationList(int userId) {
 		return projectJoinRepository.findByUser_UserIdAndTypeAndStateNot(userId, 2, 1);
+	}
+
+	public List<Timeline> timeline(int userId) {
+		return timelineRepository.findByUser_UserId(userId);
 	}
 }
