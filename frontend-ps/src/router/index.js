@@ -193,7 +193,6 @@ Vue.use(VueRouter)
     component: NoticeEdit
   },
   {
-
     path: '/subject/:subjectId/noticeBoard/:postId/fileList',
     name: 'submitFileList',
     component: SubmitFileList
