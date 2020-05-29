@@ -129,6 +129,6 @@ public class UserService {
 
 	public List<Timeline> timeline(int userId) {
 		userRepository.updateUserTimelineTime(userId, LocalDateTime.now());
-		return timelineRepository.findByUser_UserId(userId);
+		return timelineRepository.findByUser_UserIdOrderByTimeDesc(userId);
 	}
 }
