@@ -10,4 +10,6 @@ public interface FileRepository extends JpaRepository<File, Integer> {
 
 	List<File> findByPost_PostId(int postId);
 
+	List<File> findByPost_PostIdAndProject_ProjectId(int postId, int projectId);
+
 }

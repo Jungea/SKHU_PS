@@ -2,6 +2,7 @@ package net.skhu.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import net.skhu.domain.Post;
 import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.DetailRepository;
+import net.skhu.repository.FileRepository;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
@@ -27,6 +29,8 @@ public class PostService {
 	UserRepository userRepository;
 	@Autowired
 	DetailRepository detailRepository;
+	@Autowired
+	FileRepository fileRepository;
 	
 	public List<Post> noticeBoard(int page,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
@@ -37,7 +41,6 @@ public class PostService {
 			posts=posts.subList((page-1)*6,page*6);
 		}
 		return posts;
-		
 	}
 	@Transactional
 	public int writeNotice(WriteNoticeModel notice,int userId) {
@@ -70,5 +73,23 @@ public class PostService {
 		p.setDeadlineTime(post.getDeadlineTime().atTime(0,0,0));
 		p.setExtentionTime(post.getExtentionTime().atTime(0,0,0));
 		postRepository.save(p);
+	}
+	public List<String> fileSubmitList(int page,int projectId,int subjectId) {
+		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
+		Collections.reverse(posts);
+		List<String> lists=new ArrayList<>();
+		for(int i=0;i<posts.size();i++) {
+			if(fileRepository.findByPost_PostIdAndProject_ProjectId(posts.get(i).getPostId(),projectId).size()==0) {
+				lists.add("0");
+			} else {
+				lists.add("1");
+			}
+		}
+		if(posts.size()<page*6) {
+			lists=lists.subList((page-1)*6,lists.size());
+		} else {
+			lists=lists.subList((page-1)*6,page*6);
+		}
+		return lists;
 	}
 }
