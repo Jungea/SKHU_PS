@@ -25,6 +25,10 @@ import ProjectSearch from '../views/ProjectSearch.vue'
 import NoticeEdit from '../views/NoticeEdit.vue'
 import SubmitFileList from '../views/SubmitFileList.vue'
 
+import StudentNoticeBoard from '../views/StudentNoticeBoard.vue'
+import StudentNoticeContent from '../views/StudentNoticeContent.vue'
+
+
 import NoticeBoard from '../views/NoticeBoard.vue'
 import NoticeContent from '../views/NoticeContent.vue'
 
@@ -189,10 +193,21 @@ Vue.use(VueRouter)
     component: NoticeEdit
   },
   {
+
     path: '/subject/:subjectId/noticeBoard/:postId/fileList',
     name: 'submitFileList',
     component: SubmitFileList
-  }
+  },
+  {
+    path: '/project/:projectId/noticeBoard',
+    name: 'studentNoticeBoard',
+    component: StudentNoticeBoard
+  },
+  {
+    path: '/project/:projectId/noticeBoard/:postId',
+    name: 'studentNoticeContent',
+    component: StudentNoticeContent
+  },
 ]
 
 const router = new VueRouter({

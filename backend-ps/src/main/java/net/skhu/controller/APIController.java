@@ -46,6 +46,7 @@ import net.skhu.model.UserLoginModel;
 import net.skhu.model.WeekGoalModel;
 import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.CommentRepository;
+import net.skhu.repository.FileRepository;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
@@ -94,6 +95,8 @@ public class APIController {
 	CommentService commentService;
 	@Autowired
 	FileService fileService;
+	@Autowired
+	FileRepository fileRepository;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -617,6 +620,7 @@ public class APIController {
  		return userService.timeline(userId);
  	}
  	
+
  	//프로젝트 참여자 전부
  	@RequestMapping(value = "project/{projectId}/allMember", method = RequestMethod.GET)
 	public List<ProjectJoin> projectAllMember(@PathVariable("projectId") String projectId) {
@@ -629,5 +633,39 @@ public class APIController {
  	@RequestMapping(value = "subject/{subjectId}/member", method = RequestMethod.GET)
 	public List<ProjectJoin> subjectMember(@PathVariable("subjectId") int subjectId, @RequestParam("sort") String sort) {
 		return projectService.subjectMember(subjectId, sort);
+ 	}
+ 	// 프로젝트에 참가한 유저인지 확인
+ 	@RequestMapping(value = "user/checkJoinMember/{projectId}", method = RequestMethod.GET)
+ 	public boolean checkJoinMember(@PathVariable("projectId") int projectId,HttpServletRequest request) {
+ 		System.out.println(projectJoinRepository.findByUser_userIdAndProject_projectId(getLoginUserId(request), projectId).getState());
+ 		return projectJoinRepository.findByUser_userIdAndProject_projectId(getLoginUserId(request), projectId).getState()==1?true:false;
+ 		
+ 	}
+ 	// 프로젝트별 제출한 파일
+	@RequestMapping(value="file1/list/{postId}/{projectId}",method= RequestMethod.GET)
+    public List<File> list(@PathVariable("postId") int postId,@PathVariable("projectId") int projectId) {
+		return fileRepository.findByPost_PostIdAndProject_ProjectId(postId,projectId);
+    }
+	// 프로젝트가 파일 제출
+    @RequestMapping(value="/file1/upload/{postId}/{projectId}", method=RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
+    public void upload(@PathVariable("postId") int postId,@PathVariable("projectId") int projectId,@RequestParam("file")  MultipartFile[] multipartFiles) throws IOException {
+        System.out.println("fileupload");
+        System.out.println("크기:"+multipartFiles[0].getOriginalFilename());
+//        System.out.println("model:"+model.getTitle());
+    	for(MultipartFile multipartFile : multipartFiles) {
+            if (multipartFile.getSize() <= 0) continue;
+//            if(fileModel.getProjectId()==null) { // 교수가 올릴때
+//            	fileService.save(multipartFile,fileModel.getPostId(),null);
+//            } else { // 학생이 올릴때
+//            	fileService.save(multipartFile,fileModel.getPostId(),null);
+//            }
+            fileService.save(multipartFile,postId, Integer.toString(projectId));
+
+        }
+    }
+	// 공지사항 게시판에서 제출 여부 리턴 
+	@RequestMapping(value = "/noticeBoard/fileSubmitList", method = RequestMethod.GET)
+	public List<String> fileSubmitList(@RequestParam("page") int page,@RequestParam("projectId") int projectId,@RequestParam("subjectId") int subjectId) {
+		return postService.fileSubmitList(page,projectId,subjectId);
 	}
 }
