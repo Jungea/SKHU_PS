@@ -235,7 +235,7 @@ export default {
         },
         viewContent(postId) {
             this.$router.push({
-                path: '/propject/'+this.$route.params.projectId+'/noticeBoard/' + postId
+                path: '/subject/'+this.$route.params.subjectId+'/noticeBoard/' + postId
             })
         },
         paginate (page_size, page_number) {
