@@ -284,13 +284,13 @@ export default {
         }
       },
       viewNotice() {
-        if(!this.type) {
+        if(!this.type) { // 학생일때
           this.$router.push({
-            path: '/subject/' + this.pinProjectSubjectId +'/noticeBoard',
+            path: '/project/' + this.pinProjectId +'/noticeBoard',
             query: {page:1} 
           })
         }
-        else {
+        else { // 교수일때
           this.$router.push({
             path: '/subject/' + this.pinSubjectId +'/noticeBoard',
             query: {page:1} 
