@@ -10,13 +10,17 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
 @ToString(exclude = {})
 @EqualsAndHashCode(exclude = {})
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Timeline {
 	@Id

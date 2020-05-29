@@ -304,8 +304,8 @@ public class APIController {
 
 	// 0430 추가
 	@RequestMapping(value = "/turnjoinstate/{joinId}/{state}", method = RequestMethod.POST)
-	public void turnState(@PathVariable("joinId") int joinId, @PathVariable("state") int state) {
-		projectJoinService.turnState(joinId, state);
+	public void turnState(@PathVariable("joinId") int joinId, @PathVariable("state") int state, HttpServletRequest request) {
+		projectJoinService.turnState(joinId, state, getLoginUserId(request));
 	}
 
 //	// 0501 추가
