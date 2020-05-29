@@ -1,11 +1,11 @@
 <template>
   <div>
     <b-nav vertical>
-      <p class="mt-4 ml-1">
+      <p class="mt-4 ml-3">
         <b-icon-house-fill  style="cursor:pointer" class="mr-1" font-scale="1.4" @click="home"></b-icon-house-fill>
         {{name}} 님
         <b-icon-bell @click="viewTimeline()" style="cursor:pointer" class="ml-2" font-scale="1.3" v-b-modal.modal-timeLine></b-icon-bell>
-        <b-icon-person-fill style="cursor:pointer" class="ml-2" font-scale="1.3" @click="profile"></b-icon-person-fill>
+        <b-icon-person-fill style="cursor:pointer" class="ml-2" font-scale="1.4" @click="profile"></b-icon-person-fill>
       </p>
       <b-nav-item disabled><hr></b-nav-item>
 
@@ -24,7 +24,7 @@
 
           <div disabled v-show="this.pinProjectId">
             <ul style="list-style-type: none ; padding: 0px">
-              <b-nav-item><strong>{{ this.projectName }}</strong></b-nav-item>
+              <b-nav-item disabled><strong>{{ this.projectName }}</strong></b-nav-item>
               <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
               <li><b-nav-item>캘린더</b-nav-item></li>
               <li><b-nav-item @click="projectInfoChange('weekly')">주차별 목표(to-do-list)</b-nav-item></li>
@@ -190,6 +190,12 @@ export default {
       },
       projectBoard(evt) {
         evt.preventDefault()
+
+        if(this.type == false)
+          this.pinProjectId = null;
+        else
+          this.pinSubjectId = null;
+
         this.$router.push({
             path: '/projectBoard',
             query:{page:1}
