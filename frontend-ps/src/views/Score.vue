@@ -13,11 +13,11 @@
                                 <th class="th1">이름</th>
                                 <th class="th1">학과</th>
                             </tr>
-                            <tr @click="studentScore(item)" :key="index" v-for="(item, index) in a">
-                                <td class="td1"> {{ item.userNum }} </td>
-                                <td class="td1"> {{ item.grade }} </td>
-                                <td class="td1"> {{ item.name }} </td>
-                                <td class="td1"> {{ item.detDepartment.detName }} </td>
+                            <tr @click="studentScore(item.user)" :key="index" v-for="(item, index) in data">
+                                <td class="td1"> {{ item.user.userNum }} </td>
+                                <td class="td1"> {{ item.user.grade }} </td>
+                                <td class="td1"> {{ item.user.name }} </td>
+                                <td class="td1"> {{ item.user.detDepartment.detName }} </td>
                             </tr>
                         </tbody>
                     </table>
@@ -71,24 +71,27 @@ export default {
             s: [ { name: '1주차', max: 20, score: 20 }, { name: '2주차', max: 10, score: 9 }, { name: '3주차', max: 10, score: 9 }, { name: '4주차', max: 10, score: 8 },
             { name: '5주차', max: 10, score: 10 }, { name: '6주차', max: 10, score: 9 }, { name: '7주차', max: 10, score: 8 }, { name: '8주차', max: 10, score: 9 },
             { name: '9주차', max: 10, score: 10 }, { name: '10주차', max: 15, score: 14 }],
-            editVisible: false,
-            a: []
+            editVisible: false
         }
     },
     mounted() {
-      axios.get('/api/subject/' + this.$route.params.subjectId + '/projects')
-      .then(response => {
-          this.data = response.data
-          for(var i = 0 ; i < response.data.length ; i++) {
-            axios.get('/api/project/' + response.data[i].projectId + '/allMember')
-            .then(res => {
-                if(res.data.length != 0) {
-                    for(let j = 0 ; j < res.data.length ; j++)
-                        this.a.push(res.data[j].user)
-                }
-            })
-          }
-      })  
+        axios.get('/api/subject/' + this.$route.params.subjectId + '/member?sort=project')
+        .then(response => {
+            this.data = response.data
+        })
+    //   axios.get('/api/subject/' + this.$route.params.subjectId + '/projects')
+    //   .then(response => {
+    //       this.data = response.data
+    //       for(var i = 0 ; i < response.data.length ; i++) {
+    //         axios.get('/api/project/' + response.data[i].projectId + '/allMember')
+    //         .then(res => {
+    //             if(res.data.length != 0) {
+    //                 for(let j = 0 ; j < res.data.length ; j++)
+    //                     this.a.push(res.data[j].user)
+    //             }
+    //         })
+    //       }
+    //   })  
     },
     methods: {
         studentScore(item) {
