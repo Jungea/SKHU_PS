@@ -3,6 +3,7 @@ package net.skhu.controller;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import net.skhu.model.ManagerSettingModel;
 import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.MyPinProjectModel;
 import net.skhu.model.MyProjectListModel;
+import net.skhu.model.NoticeBoardSubmitModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.ProjectBoardModel;
 import net.skhu.model.SignUpModel;
@@ -667,5 +669,19 @@ public class APIController {
 	@RequestMapping(value = "/noticeBoard/fileSubmitList", method = RequestMethod.GET)
 	public List<String> fileSubmitList(@RequestParam("page") int page,@RequestParam("projectId") int projectId,@RequestParam("subjectId") int subjectId) {
 		return postService.fileSubmitList(page,projectId,subjectId);
+	}
+	// 공지사항 게시판에서 제출 여부 리턴 
+	@RequestMapping(value = "/noticeBoard/submitFiles/{subjectId}/{postId}", method = RequestMethod.GET)
+	public List<NoticeBoardSubmitModel> fileSubmitList(@PathVariable("subjectId") int subjectId,@PathVariable("postId") int postId) {
+		System.out.println("NoticeBoardSubmitModel");
+		List<NoticeBoardSubmitModel> models=new ArrayList<>();
+		for(Project p:projectRepository.findBySubject_SubjectId(subjectId)) {
+			NoticeBoardSubmitModel item=new NoticeBoardSubmitModel();
+			item.setProject(p);
+			List<File> files=fileRepository.findByPost_PostIdAndProject_ProjectId(postId, p.getProjectId());
+			item.setFiles(files);
+			models.add(item);
+		}
+		return models;
 	}
 }
