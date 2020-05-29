@@ -7,22 +7,22 @@
             <b-form-group label-for="SubjectNotice">
                 <table class="table table-bordered" id="SubjectNotice" style="width: 90%">
                     <tr>
-                        <th class="th1" style="width: 20%">제목</th>
+                        <th class="th1" style="width: 14%">제목</th>
                         <td>{{list.title}}</td>
-                    </tr>
-                    <tr>
-                        <th class="th1" style="width: 20%">내용</th>
-                        <td>{{list.content}}</td>
                     </tr>
                     <tr>
                         <th class="th1">작성일</th>
                         <td>{{ list.writeTime.substring(0,10)+" "+list.writeTime.substring(11,16) }}</td>
                     </tr>
+                    <tr>
+                        <td colspan="2" style="height: 300px">{{ list.content }}</td>
+                    </tr>
+                    
                     <tr v-if="checkFile">
                         <th class="th1" style="vertical-align: middle">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
                         <td>
                             <div v-for="(item, index) in files" :key="index" style="cursor:pointer;color:blue" @click="download(item)">
-                                {{ item.name }}
+                                <div class="file">{{ item.name }}</div>
                             </div>
                         </td>
                     </tr>
@@ -34,14 +34,14 @@
                         <th class="th1">연장 기한</th>
                         <td>{{ list.extentionTime=='1000-01-01T00:00:00'?'-':list.extentionTime.substring(0,10)+" "+list.extentionTime.substring(11,16) }}</td>
                     </tr>
-                    <tr>
+                    <tr v-if="!userType">
                         <th class="th1">제출 여부</th>
                         <td>{{list.deadlineTime=='1000-01-01T00:00:00'?'-':'X'}}</td>
                     </tr>
                 </table>
                  <table class="table table-bordered" style="width: 90%" v-if="!userType">
                     <tr>
-                        <th class="th1" style="width: 20% ; vertical-align: middle">제출 파일</th>
+                        <th class="th1" style="width: 14% ; vertical-align: middle">제출 파일</th>
                         <td>
                             <div style="float: right">
                                 <b-icon-plus style="cursor:pointer" v-b-modal.modal-file font-scale="1.5"></b-icon-plus>
@@ -57,7 +57,7 @@
                             <b-button @click="viewComment()" v-if="checkComment" variant="dark">댓글 접기</b-button>
                         </div>
                         <div style="display: inline-block ; margin-left: 10px">
-                            <b-button v-if="userType" @click="viewFile()" variant="dark">제출물 보기</b-button>
+                            <b-button v-if="userType" @click="viewFileList()" variant="dark">제출물 보기</b-button>
                         </div>
                         <div style="display: inline-block ; margin-right: 5% ; float: right">
                              <b-button class="mr-3" v-if="userType" @click="deletePost()" variant="danger">삭제</b-button>
@@ -72,9 +72,11 @@
                 <hr style="width: 90% ; border: 1px solid #ccc">
                 <table class="table table-bordered" style="width: 90%">
                     <tr v-for="(item, index) in comment" :key="index">
-                        <td> <div> <b> {{ item.user.name }} </b> <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span> </div>
+                        <td> <div> <b> {{ item.user.name }} </b> <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
+                        <b-icon-x scale="2" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)" style="float: right ; cursor:pointer"></b-icon-x>
+                         </div>
                              <div style="margin-top: 3px"> {{ item.content }} </div>
-                             <b-button variant="danger" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)">삭제</b-button>
+                             <!-- <b-button variant="danger" style="float: right" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)">삭제</b-button> -->
                         </td>
                     </tr>
                     <tr>
@@ -132,10 +134,9 @@ export default {
         .then(response => {
             this.files=response.data
         });
-        axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 모든 과목 정보
+        axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 게시글 정보
         .then(response => {
             this.list=response.data
-            
         });
         axios.get('/api/user')
         .then(response => {
@@ -182,10 +183,6 @@ export default {
                 this.checkComment = false;
             else
                 this.checkComment = true;
-        },
-        viewFile() {
-            if(this.file == '')
-                alert("제출물이 없습니다.")
         },
         addComment() {
             axios.post('/api/noticeBoard/addComment/'+this.$route.params.postId, {
@@ -262,7 +259,16 @@ export default {
                     })
                 })
             }
+        },
+        viewFileList() {
+            this.$router.push({
+                path: '/subject/' + this.$route.params.subjectId + '/noticeBoard/' + this.$route.params.postId + '/fileList'
+            })
         }
     },
 }
 </script>
+
+<style scoped>
+    .file:hover { text-decoration: underline }
+</style>

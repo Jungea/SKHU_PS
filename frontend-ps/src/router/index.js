@@ -23,6 +23,7 @@ import ProfessorSummary from '../views/ProfessorSummary.vue'
 import Score from '../views/Score.vue'
 import ProjectSearch from '../views/ProjectSearch.vue'
 import NoticeEdit from '../views/NoticeEdit.vue'
+import SubmitFileList from '../views/SubmitFileList.vue'
 
 import NoticeBoard from '../views/NoticeBoard.vue'
 import NoticeContent from '../views/NoticeContent.vue'
@@ -186,6 +187,11 @@ Vue.use(VueRouter)
     path: '/subject/:subjectId/noticeBoard/:postId/edit',
     name: 'noticeEdit',
     component: NoticeEdit
+  },
+  {
+    path: '/subject/:subjectId/noticeBoard/:postId/fileList',
+    name: 'submitFileList',
+    component: SubmitFileList
   }
 ]
 
