@@ -622,4 +622,12 @@ public class APIController {
 	public List<ProjectJoin> projectAllMember(@PathVariable("projectId") String projectId) {
 		return projectService.allMember(Integer.parseInt(projectId));
 	}
+ 	
+ 	//과목의 프로젝트 참가자들
+ 	// /api/subject/{subjectId}/member?sort=project  프로젝트 중심(팀장먼저) 후 팀원 학번
+ 	// /api/subject/{subjectId}/member?sort=userNum  학번 중심
+ 	@RequestMapping(value = "subject/{subjectId}/member", method = RequestMethod.GET)
+	public List<ProjectJoin> subjectMember(@PathVariable("subjectId") int subjectId, @RequestParam("sort") String sort) {
+		return projectService.subjectMember(subjectId, sort);
+	}
 }

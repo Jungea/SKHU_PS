@@ -550,8 +550,27 @@ public class ProjectService {
 		return projectRepository.findBySubject_SubjectId(subjectId);
 	}
 
+	// 프로젝트 참가자들(팀장포함)
+	// 정렬 팀장 우선, 팀원 학번 순
 	public List<ProjectJoin> allMember(int projectId) {
-		return projectJoinRepository.findByProject_ProjectIdAndState(projectId, 1);
+		return projectJoinRepository.findByProject_ProjectIdAndStateOrderByTypeAscUser_UserIdAsc(projectId, 1);
+	}
+
+	// 과목의 프로젝트 참가자들
+	public List<ProjectJoin> subjectMember(int subjectId, String sort) {
+		System.out.println(subjectId+" "+sort);
+		if(sort.equals("userNum"))
+			return projectJoinRepository.findByProject_Subject_SubjectIdOrderByUser_userNum(subjectId);
+		
+		else if(sort.equals("project")) {
+			List<Project> projects = subjectProjects(subjectId);
+			List<ProjectJoin> members = new ArrayList<>();
+			for(Project p : projects)
+				members.addAll(allMember(p.getProjectId()));
+			return members;
+					
+		} else
+			return null;
 	}
 	
 	
