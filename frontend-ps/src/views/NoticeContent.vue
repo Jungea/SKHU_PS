@@ -12,31 +12,31 @@
                     </tr>
                     <tr>
                         <th class="th1">작성일</th>
-                        <td>{{ list.writeTime.substring(0,10)+" "+list.writeTime.substring(11,16) }}</td>
+                        <td>{{ list.writeTime }}</td>
                     </tr>
                     <tr>
                         <td colspan="2" style="height: 300px">{{ list.content }}</td>
                     </tr>
                     
-                    <tr v-if="checkFile">
+                    <tr>
                         <th class="th1" style="vertical-align: middle">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
                         <td>
-                            <div v-for="(item, index) in files" :key="index" style="cursor:pointer;color:blue" @click="download(item)">
-                                <div class="file">{{ item.name }}</div>
+                            <div v-for="(item, index) in files" :key="index">
+                                <span class="file" style="cursor:pointer;color:blue" @click="download(item)">{{ item.name }}</span>
                             </div>
                         </td>
                     </tr>
                      <tr>
                         <th class="th1">제출 기한</th>
-                        <td>{{ list.deadlineTime=='1000-01-01T00:00:00'?'-':list.deadlineTime.substring(0,10)+" "+list.deadlineTime.substring(11,16)}}</td>
+                        <td>{{ list.deadlineTime=='1000-01-01T00:00:00' ? '-' : deadlineTime }}</td>
                     </tr>
                     <tr>
                         <th class="th1">연장 기한</th>
-                        <td>{{ list.extentionTime=='1000-01-01T00:00:00'?'-':list.extentionTime.substring(0,10)+" "+list.extentionTime.substring(11,16) }}</td>
+                        <td>{{ list.extentionTime=='1000-01-01T00:00:00' ? '-' : extentionTime }}</td>
                     </tr>
                     <tr v-if="!userType">
                         <th class="th1">제출 여부</th>
-                        <td>{{list.deadlineTime=='1000-01-01T00:00:00'?'-':'X'}}</td>
+                        <td>{{ list.deadlineTime=='1000-01-01T00:00:00' ? '-' : 'X' }}</td>
                     </tr>
                 </table>
                  <table class="table table-bordered" style="width: 90%" v-if="!userType">
@@ -117,16 +117,16 @@ export default {
             list:{},
             comment: {},
             checkComment: true,
-            file1: '공지사항.docx',
             file2: [], // 내가 올린 파일
             content: '',
-            checkFile: true,
             userType: '',
             userName: '',
             nFile: '', // 새로 올릴 파일
             nFileList: [], // 새로 올릴 파일 목록          
             userId:null,  
             files:null,
+            deadlineTime: '',
+            extentionTime: ''
         }
     },
     mounted() { 
@@ -137,6 +137,9 @@ export default {
         axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 게시글 정보
         .then(response => {
             this.list=response.data
+            this.list.writeTime = this.list.writeTime.substring(0,10)+" "+this.list.writeTime.substring(11,16)
+            this.deadlineTime = this.list.deadlineTime.substring(0,10)+" "+this.list.deadlineTime.substring(11,16)
+            this.extentionTime = this.list.extentionTime.substring(0,10)+" "+this.list.extentionTime.substring(11,16)
         });
         axios.get('/api/user')
         .then(response => {
@@ -192,21 +195,6 @@ export default {
                 console.log(response.data)
                 this.$router.go()
             })
-        },
-        leadingZeros(n, digits) {
-            var zero = '';
-            n = n.toString();
-
-            if (n.length < digits) {
-                for (var i = 0; i < digits - n.length; i++)
-                    zero += '0';
-            }
-                return zero + n;
-        },
-        newNowDate() {
-            let d = new Date();
-            return this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2) + ' ' + this.leadingZeros(d.getHours(), 2) + ':' +
-                    this.leadingZeros(d.getMinutes(), 2);
         },
         viewList() {
             this.$router.push({

@@ -124,13 +124,12 @@ export default {
           this.name = response.data.name
           this.userId = response.data.userId
 
-
           if(this.type==false)  { // 학생이라면
-            axios.get('/api/user/checkJoinMember/'+this.pinProjectId).then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인
-                this.isJoined = response.data
-              }).catch((erro)=> {
-              console.error(erro);
-            });
+            // axios.get('/api/user/checkJoinMember/'+this.pinProjectId).then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인
+            //     this.isJoined = response.data
+            //   }).catch((erro)=> {
+            //   console.error(erro);
+            // });
             axios.get('/api/pinList').then(response => {
                 this.myProjects = response.data
               }).catch((erro)=> {
@@ -159,16 +158,17 @@ export default {
     watch: {
       '$route' () {
         if(this.type==false) { // 학생일때
-        axios.get('/api/user/checkJoinMember/'+this.pinProjectId).then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인
-              this.isJoined = response.data
-            }).catch((erro)=> {
-              console.error(erro);
-          });
           if(this.$route.params.projectId != undefined) { // 프로젝트를 선택한 상태일때
             this.pinProjectId = this.$route.params.projectId
             axios.get('/api/project/projectName/'+this.pinProjectId).then(response => { // 프로젝트 이름 가져오기
                 let project = response.data
                 this.projectName=project.projectName
+
+                 axios.get('/api/user/checkJoinMember/'+this.pinProjectId).then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인
+                  this.isJoined = response.data
+                }).catch((erro)=> {
+                  console.error(erro);
+                });
 
                 this.capName = project.user.name
                 if(project.subject == null)

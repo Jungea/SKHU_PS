@@ -189,28 +189,32 @@ export default {
                 .then(response => {
                     console.log(this.data = response.data)
                     // 파일 삭제
-                    axios.post('/api/file1/delete/'+this.removeFileId.toString(), {
-                        // fileIds: this.removeFileId.toString()
-                    }).then(response => {
-                        response.data
-                    })
+                    if(this.removeFileId.toString() != '') {
+                        axios.post('/api/file1/delete/'+this.removeFileId.toString(), {
+                            // fileIds: this.removeFileId.toString()
+                        }).then(response => {
+                            response.data
+                        })
+                    }
 
                     // 파일 추가
-                    let formData = new FormData();
-                    for(let i=0;i<this.files2.length;i++) {
-                        formData.append("file", this.files2[i]);
-                    }
-                    axios.post('/api/file1/upload/'+this.$route.params.postId, 
-                        formData,
-                        {
-                            headers: {
-                                'Content-Type': 'multipart/form-data'
-                            }
+                    if(this.files2 != null) {
+                        let formData = new FormData();
+                        for(let i=0;i<this.files2.length;i++) {
+                            formData.append("file", this.files2[i]);
                         }
-                    )
-                    .then(response => {
-                        console.log(response.data)
-                    })
+                        axios.post('/api/file1/upload/'+this.$route.params.postId, 
+                            formData,
+                            {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            }
+                        )
+                        .then(response => {
+                            console.log(response.data)
+                        })
+                    }
                     alert("asadf")
                     this.$router.push({
                         path: '/subject/'+this.$route.params.subjectId+'/noticeBoard/' + this.$route.params.postId

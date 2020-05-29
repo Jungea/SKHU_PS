@@ -10,23 +10,25 @@
                         <th class="th1">제목</th>
                         <th class="th1">작성일</th>
                         <th class="th1">제출 마감일</th>
-                        <th class="th1">제출 연장일</th>
+                        <!-- <th class="th1">제출 연장일</th> -->
                         <th class="th1">제출 여부</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
                         <td class="td1" style="width: 8%"> {{index}} </td>
-                        <td> <b> {{ item.title }} </b> </td>
+                        <td style="width: 40%"> <b> {{ item.title }} </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
-                        <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
-                        <td class="td1" v-if="item.deadlineTime=='1000-01-01T00:00:00'">-</td>
-                        <td class="td1" v-else >{{isFile[index]=='0'?'X':'O'}}</td>
-
+                        <!-- <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td> -->
+                        <td class="td1">
+                            <div v-if="item.deadlineTime=='1000-01-01T00:00:00'"> - </div>
+                            <b-icon-check v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] != '0')" style="color: green" scale="1.5"></b-icon-check>
+                            <b-icon-x v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] == '0')" style="color: red" scale="1.5"></b-icon-x>
+                        </td>
                     </tr>
                 </table>
                 
             </b-form-group>
-             <b-pagination  @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
+             <b-pagination style="float: right ; margin-right: 5%" @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
 
         </center>
 
@@ -63,10 +65,11 @@ export default {
         '$route'(){
             axios.get('/api/project/projectName/'+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                 this.subjectId = response.data.subject.subjectId
-                 console.log('query111:'+this.$route.query.page)
-                axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.subjectId).then(response => { // 프로젝트 이름 가져오기
+                console.log('query111:'+this.$route.query.page)
+                
+                axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.subjectId).then(response => {
                     this.paginatedItems=response.data
-                    axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => { // 프로젝트 이름 가져오기
+                    axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => {
                             this.isFile=response3.data
                         }).catch((erro) => {
                             console.error(erro);
@@ -80,25 +83,25 @@ export default {
         }
     },
     mounted() {
-        axios.get('/api/project/projectName/'+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
-                this.subjectId = response.data.subject.subjectId
-                if(this.currentPage==1) {
-                    this.$router.push({
-                        path: '/project/'+this.$route.params.projectId+'/noticeBoard',
-                        query:{page:1}
-                    })
+                axios.get('/api/project/projectName/'+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                    this.subjectId = response.data.subject.subjectId
+                    if(this.currentPage==1) {
+                        this.$router.push({
+                            path: '/project/'+this.$route.params.projectId+'/noticeBoard',
+                            query:{page:1}
+                        })
                 }
-                axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.subjectId).then(response2 => { // 프로젝트 이름 가져오기
-                        this.paginatedItems=response2.data
-                        axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => { // 프로젝트 이름 가져오기
-                            this.isFile=response3.data
-                            }).catch((erro) => {
-                            console.error(erro);
-                        });
+                axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.subjectId).then(response2 => {
+                    this.paginatedItems=response2.data
+                    axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => { // 프로젝트 이름 가져오기
+                        this.isFile=response3.data
+                        }).catch((erro) => {
+                        console.error(erro);
+                    });
                     }).catch((erro) => {
                     console.error(erro);
                 });
-                axios.get('/api/noticeListNum?subjectId='+this.subjectId).then(response3 => { // 프로젝트 이름 가져오기
+                axios.get('/api/noticeListNum?subjectId='+this.subjectId).then(response3 => {
                         this.totalRows=response3.data
                     }).catch((erro) => {
                     console.error(erro);

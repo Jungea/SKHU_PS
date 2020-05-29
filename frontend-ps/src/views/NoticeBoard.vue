@@ -14,27 +14,10 @@
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
                         <td class="td1" style="width: 8%"> {{index}} </td>
-                        <td> <b> {{ item.title }} </b> </td>
+                        <td style="width: 40%"> <b> {{ item.title }} </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
                         <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
-
-
-                        <!-- <th class="th1">제출 연장일</th>
-                        <th v-if="!userType" class="th1">제출</th>
-                    </tr>
-                    <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td class="td1" style="width: 3%"> {{ index }} </td>
-                        <td style="width: 30%"> <b> {{ item.title }} </b> </td>
-                        <td class="td1" style="width: 10%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
-                        <td class="td1" style="width: 10%"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
-                        <td class="td1" style="width: 15%"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
-                        <td v-if="!userType" class="td1" style="width: 3%">
-                            <b-icon-check v-if="!(item.deadlineTime=='1000-01-01T00:00:00')" style="color: green" scale="1.3"></b-icon-check>
-                            <b-icon-x v-if="!(item.deadlineTime=='1000-01-01T00:00:00') && (files == null)" style="color: red" scale="1.3"></b-icon-x>
-                            <span v-if="item.deadlineTime=='1000-01-01T00:00:00'"> - </span>
-                        </td> -->
-
                     </tr>
                 </table>
                 <div style="text-align: right ; margin-right: 5%">

@@ -6,52 +6,52 @@
             <div>
             <b-form-group label-for="SubjectNotice">
                 <table class="table table-bordered" id="SubjectNotice" style="width: 90%">
-                    <tr>
-                        <th class="th1" style="width: 20%">제목</th>
+                  <tr>
+                        <th class="th1" style="width: 14%">제목</th>
                         <td>{{list.title}}</td>
                     </tr>
                     <tr>
-                        <th class="th1" style="width: 20%">내용</th>
-                        <td>{{list.content}}</td>
+                        <th class="th1">작성일</th>
+                        <td>{{ list.writeTime }}</td>
                     </tr>
                     <tr>
-                        <th class="th1">작성일</th>
-                        <td>{{ list.writeTime.substring(0,10)+" "+list.writeTime.substring(11,16) }}</td>
+                        <td colspan="2" style="height: 300px">{{ list.content }}</td>
                     </tr>
-                    <tr v-if="checkFile">
-                        <th class="th1">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
+                    
+                    <tr>
+                        <th class="th1" style="vertical-align: middle">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
                         <td>
-                            <div v-for="(item, index) in files" :key="index" style="cursor:pointer;color:blue" @click="download(item)">
-                                {{ item.name }}
+                            <div v-for="(item, index) in files" :key="index">
+                                <span class="file" style="cursor:pointer;color:blue" @click="download(item)">{{ item.name }}</span>
                             </div>
                         </td>
                     </tr>
                      <tr>
                         <th class="th1">제출 기한</th>
-                        <td>{{ list.deadlineTime=='1000-01-01T00:00:00'?'-':list.deadlineTime.substring(0,10)+" "+list.deadlineTime.substring(11,16)}}</td>
+                        <td>{{ list.deadlineTime=='1000-01-01T00:00:00' ? '-' : deadlineTime }}</td>
                     </tr>
                     <tr>
                         <th class="th1">연장 기한</th>
-                        <td>{{ list.extentionTime=='1000-01-01T00:00:00'?'-':list.extentionTime.substring(0,10)+" "+list.extentionTime.substring(11,16) }}</td>
+                        <td>{{ list.extentionTime=='1000-01-01T00:00:00' ? '-' : extentionTime }}</td>
                     </tr>
                     <tr>
                         <th class="th1">제출 여부</th>
-                        <td v-if="removeFileId.length!=myProjectFiles.length">{{list.deadlineTime=='1000-01-01T00:00:00'?'-':myProjectFiles.length!=0?'O':'X'}}</td>
-                        <td v-if="removeFileId.length==myProjectFiles.length">{{list.deadlineTime=='1000-01-01T00:00:00'?'-':'X'}}</td>
+                        <td v-if="checkFile()">{{list.deadlineTime=='1000-01-01T00:00:00'?'-':checkLength()?'O':'X'}}</td>
+                        <td v-if="!checkFile()">{{list.deadlineTime=='1000-01-01T00:00:00'?'-':'X'}}</td>
                     </tr>
                 </table>
                  <table class="table table-bordered" style="width: 90%" v-if="!userType">
                     <tr>
-                        <th class="th1" style="width: 15% ; vertical-align: middle">제출 파일</th>
+                        <th class="th1" style="width: 14% ; vertical-align: middle">제출 파일</th>
                         <td>
                             <div style="float: left">
                                 <div v-for="(item, index) in myProjectFiles" :key="index" style="cursor:pointer;color:blue"> <!--기존 파일-->
                                     <div v-if="!removeFileId.includes(item.fileId)">
                                         <span @click="download(item)">{{ item.name }}</span>
-                                        <b-icon-x v-show="submitFilePossible" style="cursor:pointer;color:red" @click="removeFile(item.fileId,index)" font-scale="1.5"></b-icon-x>
+                                        <b-icon-x v-show="submitFilePossible" style="cursor:pointer ; color:red" @click="removeFile(item.fileId,index)" font-scale="1.5"></b-icon-x>
                                     </div>
                                 </div>
-                                <b-form-file  v-show="submitFilePossible"  multiple v-model="myProjectNewFiles" class="mt-3" plain ></b-form-file>
+                                <b-form-file v-show="submitFilePossible"  multiple v-model="myProjectNewFiles" class="mt-3" plain ></b-form-file>
                             </div>
                            
                         </td>
@@ -103,10 +103,8 @@ export default {
             list:{},
             comment: {},
             checkComment: true,
-            file1: '공지사항.docx',
             file2: [], // 내가 올린 파일
             content: '',
-            checkFile: true,
             userType: '',
             userName: '',
             nFile: '', // 새로 올릴 파일
@@ -118,6 +116,8 @@ export default {
             removeFileId:[],
             removeItem:null,
             submitFilePossible:true, // 파일 제출 가능여부
+            deadlineTime: '',
+            extentionTime: ''
         }
     },
     watch: {
@@ -153,12 +153,17 @@ export default {
         axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 모든 과목 정보
         .then(response => {
             this.list=response.data
+            this.list.writeTime =  this.list.writeTime.substring(0,10)+" "+this.list.writeTime.substring(11,16)
+            this.deadlineTime = this.list.deadlineTime.substring(0,10)+" "+this.list.deadlineTime.substring(11,16)
+            this.extentionTime = this.list.extentionTime.substring(0,10)+" "+this.list.extentionTime.substring(11,16)
+
             if(this.list.deadlineTime=='1000-01-01T00:00:00') { // 제출 기한이 없다면
                 this.submitFilePossible=false
             } else if(this.list.deadlineTime!='1000-01-01T00:00:00' && this.list.extentionTime=='1000-01-01T00:00:00') { // 제출기한은 있는데 연장기한이 없다면
-                let today=new Date()
-                let deadline=new Date()
-                deadline.setFullYear(Number(this.list.extentionTime.substring(0,4)),Number(this.list.extentionTime.substring(5,7))-1,Number(this.list.extentionTime.substring(8,10)))
+                let today = new Date()
+                let deadline = new Date()
+                deadline.setFullYear(Number(this.list.deadlineTime.substring(0,4)),Number(this.list.deadlineTime.substring(5,7))-1,Number(this.list.deadlineTime.substring(8,10)))
+
                 if(today.getFullYear()>deadline.getFullYear()) {
                     this.submitFilePossible=false
                 } else if(today.getFullYear()==deadline.getFullYear()) {
@@ -173,10 +178,9 @@ export default {
                     }
                 }
                 
-                
             } else if(this.list.deadlineTime!='1000-01-01T00:00:00' && this.list.extentionTime!='1000-01-01T00:00:00') { // 제출기한과 연장기한이 모두 있다면
-                let today=new Date()
-                let extention=new Date()
+                let today = new Date()
+                let extention = new Date()
                 extention.setFullYear(Number(this.list.extentionTime.substring(0,4)),Number(this.list.extentionTime.substring(5,7))-1,Number(this.list.extentionTime.substring(8,10)))
                 if(today.getFullYear()>extention.getFullYear()) {
                     this.submitFilePossible=false
@@ -191,9 +195,6 @@ export default {
                         }
                     }
                 }
-                
-            
-                
             } 
         });
         axios.get('/api/user')
@@ -236,30 +237,6 @@ export default {
             if(this.file == '')
                 alert("제출물이 없습니다.")
         },
-        addComment() {
-            axios.post('/api/noticeBoard/addComment/'+this.$route.params.postId, {
-                content:this.content
-            })
-            .then(response => {
-                console.log(response.data)
-                this.$router.go()
-            })
-        },
-        leadingZeros(n, digits) {
-            var zero = '';
-            n = n.toString();
-
-            if (n.length < digits) {
-                for (var i = 0; i < digits - n.length; i++)
-                    zero += '0';
-            }
-                return zero + n;
-        },
-        newNowDate() {
-            let d = new Date();
-            return this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2) + ' ' + this.leadingZeros(d.getHours(), 2) + ':' +
-                    this.leadingZeros(d.getMinutes(), 2);
-        },
         viewList() {
             this.$router.push({
                 path: '/project/' + this.$route.params.projectId+'/noticeBoard',
@@ -287,6 +264,15 @@ export default {
                      response.data
             })
         },
+        addComment() {
+            axios.post('/api/noticeBoard/addComment/'+this.$route.params.postId, {
+                content:this.content
+            })
+            .then(response => {
+                console.log(response.data)
+                this.$router.go()
+            })
+        },
         deleteComment(commentId) {
             let result=confirm('삭제하시겠습니까?')
             if(result) {
@@ -297,6 +283,14 @@ export default {
                 })
             }
         },
+        checkFile() {
+            if(this.removeFileId != null && this.myProjectFiles != null)
+                return this.removeFileId.length != this.myProjectFiles.length
+        },
+        checkLength() {
+            if(this.myProjectFiles != null)
+                return this.myProjectFiles.length!=0
+        }
     },
 }
 </script>
