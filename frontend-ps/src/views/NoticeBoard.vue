@@ -1,6 +1,6 @@
 <template>
     <div class="containerStyle">
-        <h3 style="margin-left: 5%">{{ this.$route.params.subjectId }} 공지 게시판</h3>
+        <h3 style="margin-left: 5%">공지 게시판</h3>
         <hr style="width: 90%">
         <center>
             <b-form-group label-for="SubjectNotice">
