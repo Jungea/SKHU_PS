@@ -106,9 +106,6 @@ export default {
         },
         resetModal() {
             this.editVisible = false;
-        },
-        sort(a, b) {
-            return a.userNum - b.userNum;
         }
     }
 }

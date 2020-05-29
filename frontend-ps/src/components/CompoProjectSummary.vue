@@ -1,73 +1,74 @@
 <template>
-    <div class="containerStyle">
-        <h3>프로젝트 정보</h3>
+<center>
+    <div class="containerStyle" style="width: 60%">
+        <h3 style="text-align: left">프로젝트 정보</h3>
         <hr>        
         <form ref="form">
             <b-form-group label-for="ProjectSummary">
                 <table class="table table-bordered" id="ProjectSummary" v-bind="this.data">
                     <tbody>
                         <tr>
-                            <th scope="row" style="width:28%">프로젝트명</th>
+                            <th class="th2" scope="row" style="width:28%">프로젝트명</th>
                             <td>
                                 {{ data.projectName }}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">멤버 수</th>
+                            <th class="th2" scope="row">멤버 수</th>
                             <td>
                                 {{ data.memNum }}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">팀장</th>
+                            <th class="th2" scope="row">팀장</th>
                             <td>
                                 {{ capName }}({{ grade }})
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">팀원</th>
+                            <th class="th2" scope="row">팀원</th>
                             <td>
                                 {{ memList.join(", ") }}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">주제</th>
+                            <th class="th2" scope="row">주제</th>
                             <td>
                                 {{ data.theme }}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">내용</th>
+                            <th class="th2" scope="row">내용</th>
                             <td>
                                 {{ data.content }}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">사용기술과 언어</th>
+                            <th class="th2" scope="row">사용기술과 언어</th>
                             <td>
                                 <b-badge variant="secondary" v-for="(tag,index) in tagArray" :key="index" style="margin-right:5px">{{tag}}</b-badge>
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">깃허브 리포지토리 주소</th>
+                            <th class="th2" scope="row">깃허브 리포지토리 주소</th>
                             <td>
                               {{ data.github }}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">인원 모집 상태</th>
+                            <th class="th2" scope="row">인원 모집 상태</th>
                             <td>
                                {{ state }}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">프로젝트 진행 상태</th>
+                            <th class="th2" scope="row">프로젝트 진행 상태</th>
                             <td>
                                {{ progState }}
                             </td>
                         </tr>
                         <tr v-if="data.subject">
-                            <th scope="row">과목</th>
+                            <th class="th2" scope="row">과목</th>
                             <td>
                                  {{ subject }}
                             </td>
@@ -81,6 +82,7 @@
             </b-form-group>
             </form>
     </div>
+</center>
 </template>
 
 <script>
@@ -170,5 +172,10 @@ export default {
 .containerStyle {
     margin: 100px;
     min-width: 350px;
+}
+
+.th2 {
+    background-color: rgb(243,243,243);
+    vertical-align: middle;
 }
 </style>
