@@ -17,6 +17,7 @@ import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.ProjectStar;
 import net.skhu.domain.Subject;
+import net.skhu.domain.Timeline;
 import net.skhu.domain.Todo;
 import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
@@ -32,6 +33,7 @@ import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.ProjectStarRepository;
 import net.skhu.repository.SubjectRepository;
+import net.skhu.repository.TimelineRepository;
 import net.skhu.repository.TodoRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.repository.WeeklyRepository;
@@ -53,6 +55,8 @@ public class ProjectService {
 	ProjectStarRepository projectStarRepository;
 	@Autowired
 	TodoRepository todoRepository;
+	@Autowired
+	TimelineRepository timelineRepository;
 
 	// userId 유저의 프로젝트 목록
 	public List<Project> findProjectByUserId(int userId) {
@@ -142,6 +146,7 @@ public class ProjectService {
 	}
 
 	// 팀장이 유저를 초대함.
+	@Transactional
 	public boolean inviteMember(int projectId, int userNum) {
 		User user = userRepository.findByUserNum(userNum);
 		ProjectJoin join = projectJoinRepository.findByProject_ProjectIdAndUser_UserId(projectId, user.getUserId());
@@ -159,6 +164,13 @@ public class ProjectService {
 		join.setType(1); // 초대;
 
 		projectJoinRepository.save(join);
+		
+		//TIMELINE 유저가 프로젝트에 초대 신청을 받음.
+		Project project = projectRepository.findById(projectId).get();
+		String content = project.getProjectName()+"("+project.getUser().getName()+")에서 초대 신청을 받았습니다.";
+		String url = "/profile";
+		timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, user));
+		
 		return true;
 	}
 
