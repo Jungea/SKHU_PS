@@ -28,8 +28,7 @@
               <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
               <li><b-nav-item>캘린더</b-nav-item></li>
               <li><b-nav-item @click="projectInfoChange('weekly')">주차별 목표(to-do-list)</b-nav-item></li>
-              <li v-if="checkSubject"><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
-              <li><b-nav-item>토론 게시판</b-nav-item></li>
+              <li v-if="checkSubject && isJoined"><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
               <li><b-nav-item>자유 게시판</b-nav-item></li>
               <li><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
             </ul>
@@ -121,16 +120,22 @@ export default {
         checkTime1: '2020-05-21 21:01',
         beforeList: [],
         arrIndex: '',
-        checkSubject: false
+        checkSubject: false,
+        isJoined:false,
       }
     },
    
     mounted() {
+       axios.get('/api/user/checkJoinMember/'+this.pinProjectId).then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인
+              this.isJoined = response.data
+            }).catch((erro)=> {
+              console.error(erro);
+          });
       axios.get('/api/user')
         .then(response => {
           this.type=response.data.userType
           this.name = response.data.name
-          
+
           if(this.type==false)  { // 학생이라면
               axios.get('/api/pinList').then(response => {
                 this.myProjects = response.data
@@ -161,15 +166,20 @@ export default {
     },
     watch: {
       '$route' () {
+        axios.get('/api/user/checkJoinMember/'+this.pinProjectId).then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인
+              this.isJoined = response.data
+            }).catch((erro)=> {
+              console.error(erro);
+          });
         if(this.type==false) { // 학생일때
           if(this.$route.params.projectId != undefined) { // 프로젝트를 선택한 상태일때
             this.pinProjectId = this.$route.params.projectId
             axios.get('/api/project/projectName/'+this.pinProjectId).then(response => { // 프로젝트 이름 가져오기
                 let project = response.data
                 this.projectName=project.projectName
-                if(project.subject != null)
+                if(project.subject != null) {
                   this.checkSubject = true;
-                else
+                } else
                   this.checkSubject = false;
               }).catch((erro) => {
               console.error(erro);
@@ -269,7 +279,7 @@ export default {
       },
       viewNotice() {
         this.$router.push({
-          path: '/subject/' + this.pinSubjectId+'/noticeBoard',
+          path: '/project/' + this.pinProjectId+'/noticeBoard',
           query:{page:1} 
         })
       }

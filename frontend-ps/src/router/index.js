@@ -23,6 +23,8 @@ import ProfessorSummary from '../views/ProfessorSummary.vue'
 import Score from '../views/Score.vue'
 import ProjectSearch from '../views/ProjectSearch.vue'
 import NoticeEdit from '../views/NoticeEdit.vue'
+import StudentNoticeBoard from '../views/StudentNoticeBoard.vue'
+import StudentNoticeContent from '../views/StudentNoticeContent.vue'
 
 import NoticeBoard from '../views/NoticeBoard.vue'
 import NoticeContent from '../views/NoticeContent.vue'
@@ -186,7 +188,17 @@ Vue.use(VueRouter)
     path: '/subject/:subjectId/noticeBoard/:postId/edit',
     name: 'noticeEdit',
     component: NoticeEdit
-  }
+  },
+  {
+    path: '/project/:projectId/noticeBoard',
+    name: 'studentNoticeBoard',
+    component: StudentNoticeBoard
+  },
+  {
+    path: '/project/:projectId/noticeBoard/:postId',
+    name: 'studentNoticeContent',
+    component: StudentNoticeContent
+  },
 ]
 
 const router = new VueRouter({
