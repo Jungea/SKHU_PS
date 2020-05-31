@@ -487,13 +487,13 @@ public class APIController {
 	// todo 디테일 수정
 	@RequestMapping(value = "editTodo", method = RequestMethod.POST)
 	public void editTodo(@RequestBody Todo todo, HttpServletRequest request) {
-		projectService.editTodo(todo);
+		projectService.editTodo(todo, getLoginUserId(request));
 	}
 	
 	// todo 삭제
 	@RequestMapping(value = "deleteTodo/{todoId}", method = RequestMethod.GET)
-	public void deleteTodo(@PathVariable("todoId") int todoId) {
-		projectService.deleteTodo(todoId);
+	public void deleteTodo(@PathVariable("todoId") int todoId, HttpServletRequest request) {
+		projectService.deleteTodo(todoId, getLoginUserId(request));
 	}
 	
 	// 주간 목표 수정

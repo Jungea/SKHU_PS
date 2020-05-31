@@ -301,6 +301,7 @@ public class ProjectService {
 	}
 
 	// 새로운 todo 추가
+	@Transactional
 	public void createTodo(int userId, TodoModel todoModel) {
 		Todo todo = new Todo();
 
@@ -312,6 +313,18 @@ public class ProjectService {
 		todo.setOrder(todoModel.getOrder());
 
 		todoRepository.save(todo);
+		
+		//TIMELINE 새로운 todo 추가 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(userId).get();
+		Project p = todo.getWeekly().getProject();
+		for(ProjectJoin join : allMember(p.getProjectId())) {
+			if(join.getUser().getUserId() != userId) {
+				String content = loginUser.getName()+"님이 "+p.getProjectName()+"에 새로운 todo를 생성하였습니다.";
+				String url = "/project/"+p.getProjectId()+"/weekly/"+todo.getWeekly().getWeeklyId();
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
 	}
 	public ProjectBoardModel getModal(int projectId,int userId) {
 //		List<Project> project = projectRepository.findAll();
@@ -537,24 +550,64 @@ public class ProjectService {
 	}
 
 	// todo 순서 변경
-	public void moveTodo(int todoId, int progState, int order) {
+	@Transactional
+	public void moveTodo(int todoId, int progState, int order, int LoginUserId) {
 		Todo todo = todoRepository.findById(todoId).get();
 		todo.setProgState(progState);
 		todo.setOrder(order);
 		
 		todoRepository.save(todo);
+		
+		//TIMELINE 새로운 todo 추가 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(userId).get();
+		Project p = todo.getWeekly().getProject();
+		for(ProjectJoin join : allMember(p.getProjectId())) {
+			if(join.getUser().getUserId() != userId) {
+				String content = loginUser.getName()+"님이 "+p.getProjectName()+"에 새로운 todo를 생성하였습니다.";
+				String url = "/project/"+p.getProjectId()+"/weekly/"+todo.getWeekly().getWeeklyId();
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
 	}
 
 	// todo 디테일 수정
-	public void editTodo(Todo editTodo) {
+	@Transactional
+	public void editTodo(Todo editTodo, int loginUserId) {
 		Todo originTodo = todoRepository.findById(editTodo.getTodoId()).get();
 		originTodo.setDetail(editTodo.getDetail());
 
 		todoRepository.save(originTodo);
+		
+		//TIMELINE 새로운 todo 추가 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(loginUserId).get();
+		Project p = originTodo.getWeekly().getProject();
+		for(ProjectJoin join : allMember(p.getProjectId())) {
+			if(join.getUser().getUserId() != loginUserId) {
+				String content = loginUser.getName()+"님이 "+p.getProjectName()+"의 todo를 수정하였습니다.";
+				String url = "/project/"+p.getProjectId()+"/weekly/"+originTodo.getWeekly().getWeeklyId();
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
 	}
 
 	// todo 삭제
-	public void deleteTodo(int todoId) {
+	@Transactional
+	public void deleteTodo(int todoId, int loginUserId) {
+		//TIMELINE 새로운 todo 추가 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(loginUserId).get();
+		Todo todo = todoRepository.findById(todoId).get();
+		Project p = todo.getWeekly().getProject();
+		for(ProjectJoin join : allMember(p.getProjectId())) {
+			if(join.getUser().getUserId() != loginUserId) {
+				String content = loginUser.getName()+"님이 "+p.getProjectName()+"의 todo를 삭제하였습니다.";
+				String url = "/project/"+p.getProjectId()+"/weekly/"+todo.getWeekly().getWeeklyId();
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
+		
 		todoRepository.deleteById(todoId);
 	}
 
