@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class WriteNoticeModel {
 	int subjectId;
+	int projectId;
 	String title;
 	String content;
 	LocalDate deadlineTime;

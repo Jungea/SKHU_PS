@@ -17,24 +17,18 @@
                     <tr>
                         <td colspan="2" style="height: 300px">{{ list.content }}</td>
                     </tr>
+                    
                     <tr>
                         <th class="th1" style="vertical-align: middle">첨부 파일</th> <!-- 교수님이 올리신 파일 -->
                         <td>
                             <div v-for="(item, index) in files" :key="index">
-                                <span class="file" style="cursor: pointer ; color: blue" @click="download(item)">{{ item.name }}</span>
+                                <span class="file" style="cursor:pointer;color:blue" @click="download(item)">{{ item.name }}</span>
                             </div>
                         </td>
                     </tr>
-                     <tr>
-                        <th class="th1">제출 기한</th>
-                        <td>{{ list.deadlineTime=='1000-01-01T00:00:00' ? '-' : deadlineTime }}</td>
-                    </tr>
-                    <tr>
-                        <th class="th1">연장 기한</th>
-                        <td>{{ list.extentionTime=='1000-01-01T00:00:00' ? '-' : extentionTime }}</td>
-                    </tr>
+                    
                 </table>
-                <div style="text-align: left">
+               <div style="text-align: left">
                         <div style="display: inline-block ; margin-left: 5%">
                             <b-button @click="viewComment()" v-if="!checkComment" variant="dark">댓글 보기</b-button>
                             <b-button @click="viewComment()" v-if="checkComment" variant="dark">댓글 접기</b-button>
@@ -43,9 +37,10 @@
                             <b-button v-if="userType" @click="viewFileList()" variant="dark">제출물 보기</b-button>
                         </div>
                         <div style="display: inline-block ; margin-right: 5% ; float: right">
-                             <b-button class="mr-3" v-if="userType" @click="deletePost()" variant="danger">삭제</b-button>
-                            <b-button style="margin-right: 10px" v-if="userType" @click="edit()" variant="dark">수정</b-button>
+                             <b-button class="mr-3" v-if="userId==list.user.userId" @click="deletePost()" variant="danger">삭제</b-button>
+                            <b-button style="margin-right: 10px" v-if="userId==list.user.userId" @click="edit()" variant="dark">수정</b-button>
                             <b-button @click="viewList()" variant="dark">목록으로</b-button>
+                            <b-button @click="postLike()" variant="primary">좋아요</b-button>
                         </div>
                 </div>
             </b-form-group>
@@ -55,11 +50,15 @@
                 <hr style="width: 90% ; border: 1px solid #ccc">
                 <table class="table table-bordered" style="width: 90%">
                     <tr v-for="(item, index) in comment" :key="index">
-                        <td> <div> <b> {{ item.user.name }} </b> <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
-                        <b-icon-x scale="1.5" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)" style="color: red ; float: right ; cursor: pointer"></b-icon-x>
-                         </div>
-                             <div style="margin-top: 3px"> {{ item.content }} </div>
-                        </td>
+                        <td> 
+                            <div> 
+                                <b> {{ item.user.name }} </b> 
+                                <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
+                                <b-icon-x scale="2" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)" style="float: right ; cursor:pointer"></b-icon-x>
+                                 <b-icon-check-circle scale="2" v-if="item.choice==0" @click="commentSelect(item.commentId)" style="cursor:pointer"></b-icon-check-circle>
+                            </div>
+                            <div style="margin-top: 3px"> {{ item.content }} </div>
+                       </td>
                     </tr>
                     <tr>
                         <td>
@@ -70,13 +69,30 @@
                 </table>
             </b-form-group>
         </center>
+
+       <b-modal id="modal-file" ref="modal" size="lg"  @show="resetModal" no-close-on-backdrop no-close-on-esc title="파일 첨부" @ok="save()">
+                <form ref="form">
+                    <b-form-group>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="th1" style="width: 20% ; vertical-align: middle">파일 첨부</th>
+                                <td>
+                                    <b-input class="mt-2" :disabled="false" trim style="width: 60% ; display: inline" v-model="nFile"></b-input>
+                                    <div class="mt-2" style="float: right"><b-button @click="addFile()">추가</b-button></div>
+                                    <div v-for="(item, index) in nFileList" :key="index" style="margin-top: 15px">{{ item.toString() }} <b-icon-x @click="removeFile(index)"></b-icon-x></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </b-form-group>
+                </form>
+        </b-modal>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 export default {
-    name: 'noticeContent',
+    name: 'freeContent',
     data() {
         return {
             list:{},
@@ -103,9 +119,7 @@ export default {
         .then(response => {
             this.list=response.data
             this.list.writeTime = this.list.writeTime.substring(0,10)+" "+this.list.writeTime.substring(11,16)
-            this.deadlineTime = this.list.deadlineTime.substring(0,10)+" "+this.list.deadlineTime.substring(11,16)
-            this.extentionTime = this.list.extentionTime.substring(0,10)+" "+this.list.extentionTime.substring(11,16)
-        });
+       });
         axios.get('/api/user')
         .then(response => {
             this.userType = response.data.userType
@@ -120,14 +134,6 @@ export default {
     },
     methods: {
         download(file) {
-            // axios.get('/api/file1/download/'+file.fileId).then(response => {
-            //     var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-            //     var fileLink = document.createElement('a');
-            //     fileLink.href = fileURL;
-            //     fileLink.setAttribute('download', file.name);
-            //     document.body.appendChild(fileLink);
-            //     fileLink.click();
-            // })
             axios({
                 method: 'GET',
                 url: '/api/file1/download/'+file.fileId,                 
@@ -143,7 +149,7 @@ export default {
         },
         edit() {
             this.$router.push({
-                path: '/subject/'+ this.$route.params.subjectId+'/noticeBoard/'+ this.postId + '/edit'
+                path: '/project/'+ this.$route.params.projectId+'/freeBoard/'+ this.postId + '/edit'
             })
         },
         viewComment() {
@@ -163,9 +169,30 @@ export default {
         },
         viewList() {
             this.$router.push({
-                path: '/subject/' + this.$route.params.subjectId+'/noticeBoard',
+                path: '/project/' + this.$route.params.projectId+'/freeBoard',
                 quert:{page:1}
             })
+        },
+        resetFile() {
+            this.file2 = []
+        },
+        addFile() {
+            if(this.nFile == '')
+                alert("파일을 등록해주세요.")
+            else
+                this.nFileList.push(this.nFile);
+        },
+        resetModal() {
+            this.nFile = ''
+            this.nFileList = []
+        },
+        save() {
+            for(var i = 0 ; i < this.nFileList.length ; i++)
+                this.file2.push(this.nFileList[i])
+        },
+        removeFile(index) {
+            alert(index)
+            this.nFileList.splice(index, 1)
         },
         deleteComment(commentId) {
             let result=confirm('삭제하시겠습니까?')
@@ -186,7 +213,7 @@ export default {
                 .then(response => {
                     console.log(response.data)
                     this.$router.push({
-                        path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+                        path: '/project/'+this.$route.params.projectId+'/freeBoard',
                         query:{page:1}
                     })
                 })
@@ -196,7 +223,25 @@ export default {
             this.$router.push({
                 path: '/subject/' + this.$route.params.subjectId + '/noticeBoard/' + this.$route.params.postId + '/fileList'
             })
-        }
+        },
+        commentSelect(commentId) {
+            if(this.userId==this.list.user.userId) { // 현 게시글 작성한 사람만 check 할 권한 부여
+                 axios.post('/api/freeBoard/commentCheck/'+commentId)
+                .then(response => {
+                    console.log(response.data)
+                    
+                })
+            } else {
+                alert('글을 작성한 사람만 댓글을 채택할 수 있습니다.')
+            }
+        },
+        postLike() {
+            axios.post('/api/freeBoard/postLike/'+this.$route.params.postId)
+                .then(response => {
+                    console.log(response.data)
+            })
+        },
+        
     },
 }
 </script>

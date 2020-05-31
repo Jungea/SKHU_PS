@@ -30,7 +30,7 @@
               <li><b-nav-item @click="projectInfoChange('weekly')">주차별 목표(to-do-list)</b-nav-item></li>
               <li v-if="pinProjectSubjectId > 0 && isJoined"><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
               <li><b-nav-item>토론 게시판</b-nav-item></li>
-              <li><b-nav-item>자유 게시판</b-nav-item></li>
+              <li><b-nav-item @click="freeBoard()">자유 게시판</b-nav-item></li>
               <li v-if="this.name == this.capName"><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
             </ul>
             <hr>
@@ -68,19 +68,19 @@
       </b-nav-item>
       </b-nav>
 
-      <b-modal id="modal-timeLine" size="lg" ok-only>
+      <b-modal id="modal-timeLine" size="lg" ok-only @hide="closeTimelineModal">
         <center>
           <h3 class="mt-3">TimeLine</h3>
           <hr style="border: 1px solid black ; width: 60% ; margin-bottom: 30px">
           <b-container>
               <p style="color:silver; margin: 300px auto;" v-if="data.length == 0 ? true : false">현재 알림이 없습니다.</p>
-              <b-row @click="move(item.url)" :key="index" v-for="(item, index) in data" style="width: 60% ; min-height: 70px ; margin: 10px">
+              <b-row :key="index" v-for="(item, index) in data" style="width: 60% ; min-height: 70px ; margin: 10px ;">
                   <b-col style=" text-align: left ; padding: 0">
-                    <div>{{item.content}}</div>
-                    <div style="text-align: right ; font-size: 12px ; margin-top: 10px ; margin-bottom: -13px">{{item.time}}</div>
+                    <div v-bind:class="{fontColor: index > (arrIndex-1)}" @click="move(item.url)" class="timeline" style="cursor: pointer">{{item.content}}</div>
+                    <div v-bind:class="{fontColor: index > (arrIndex-1)}" style="text-align: right ; font-size: 12px ; margin-top: 10px ; margin-bottom: -13px">{{item.time}}</div>
                   </b-col>
                   <hr style="width: 100% ; border-color: silver">
-                  <b-button variant="dark" style="height: 25px ; width: 100% ; font-size: 8px" v-if="index==arrIndex-1">여기까지 읽으셨습니다.</b-button>
+                  <b-button variant="dark" style="height: 25px ; width: 100% ; font-size: 8px" v-if="index==arrIndex-1" disabled>여기까지 읽으셨습니다.</b-button>
                   <hr v-if="index==arrIndex-1" style="width: 100% ; border-color: silver">
               </b-row>
           </b-container> 
@@ -308,21 +308,31 @@ export default {
             })
       },
       viewTimeline() {
-        axios.get('/api/user/' + this.userId + '/timeline')
-        .then(res => {
-          this.data = res.data
-          let a = new Date();
-          this.checkTime1 = this.leadingZeros(a.getFullYear(), 4) + '-' + this.leadingZeros(a.getMonth() + 1, 2) + '-' + this.leadingZeros(a.getDate(), 2)
-                + ' ' + this.leadingZeros(a.getHours(), 2) + ':' + this.leadingZeros(a.getMinutes(), 2);
+        //유저의 마지막 타임라인 확인 시간 가져오기
+        axios.get('/api/user/timelineTime')
+        .then(response => {
+          let a = new Date(response.data);
 
-          for(let i = 0 ; i < res.data.length ; i++) {
-            let d = new Date(res.data[i].time);
-            this.data[i].time = this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2)
-                + ' ' + this.leadingZeros(d.getHours(), 2) + ':' + this.leadingZeros(d.getMinutes(), 2);
-          }
+          //유저의 타임라인 목록
+          axios.get('/api/user/' + this.userId + '/timeline')
+            .then(res => {
+              this.data = res.data
+              console.log(a)
 
-          this.record()
+              this.checkTime1 = this.leadingZeros(a.getFullYear(), 4) + '-' + this.leadingZeros(a.getMonth() + 1, 2) + '-' + this.leadingZeros(a.getDate(), 2)
+                    + ' ' + this.leadingZeros(a.getHours(), 2) + ':' + this.leadingZeros(a.getMinutes(), 2) + ':' + this.leadingZeros(a.getSeconds(), 2);
+
+              for(let i = 0 ; i < res.data.length ; i++) {
+                let d = new Date(res.data[i].time);
+                console.log(i + "시간: " + d)
+                this.data[i].time = this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2)
+                    + ' ' + this.leadingZeros(d.getHours(), 2) + ':' + this.leadingZeros(d.getMinutes(), 2) + ':' + this.leadingZeros(d.getSeconds(), 2);
+              }
+
+              this.record()
+            })
         })
+        
       },
       leadingZeros(n, digits) {
             var zero = '';
@@ -335,14 +345,25 @@ export default {
       },
       move(url) {
         alert(url)
+        axios.put('/api/user/timelineTime').then().catch(erro => console.error(erro))
         location.href = url
+      },
+      closeTimelineModal() {
+        axios.put('/api/user/timelineTime').then().catch(erro => console.error(erro))
+      },
+      freeBoard() {
+        this.$router.push({
+            path: '/project/' + this.pinProjectId + '/freeBoard',
+            query:{page:1}
+        })
       }
     }
 }
 </script>
 
-<style>
+<style scoped>
 
 li { color: black }
-
+.timeline:hover { text-decoration: underline !important}
+.fontColor { color: darkgray ;}
 </style>

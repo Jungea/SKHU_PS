@@ -77,9 +77,11 @@
                 <hr style="width: 90% ; border: 1px solid #ccc">
                 <table class="table table-bordered" style="width: 90%">
                     <tr v-for="(item, index) in comment" :key="index">
-                        <td> <div> <b> {{ item.user.name }} </b> <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span> </div>
+                        <td> 
+                            <div> <b> {{ item.user.name }} </b> <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
+                                <b-icon-x style="cursor: pointer ; color: red ; float: right" scale="1.5" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)"></b-icon-x>
+                            </div>
                              <div style="margin-top: 3px"> {{ item.content }} </div>
-                             <b-button variant="danger" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)">삭제</b-button>
                         </td>
                     </tr>
                     <tr>
@@ -142,6 +144,10 @@ export default {
         },
     },
     mounted() { 
+         axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
+        .then(response => {
+            this.submitFilePossible=response.data
+        });
          axios.get('/api/file1/list/'+this.$route.params.postId) 
         .then(response => {
             this.files=response.data

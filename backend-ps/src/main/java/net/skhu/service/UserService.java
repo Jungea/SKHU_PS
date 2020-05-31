@@ -127,8 +127,12 @@ public class UserService {
 		return projectJoinRepository.findByUser_UserIdAndTypeAndStateNot(userId, 2, 1);
 	}
 
+	//유저의 타임라인 목록
 	public List<Timeline> timeline(int userId) {
-		userRepository.updateUserTimelineTime(userId, LocalDateTime.now());
 		return timelineRepository.findByUser_UserIdOrderByTimeDescTimelineIdDesc(userId);
+	}
+	
+	public void updateTimelineTime(int userId) {
+		userRepository.updateUserTimelineTime(userId, LocalDateTime.now());
 	}
 }

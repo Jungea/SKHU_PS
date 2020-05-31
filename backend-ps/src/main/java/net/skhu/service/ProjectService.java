@@ -92,7 +92,8 @@ public class ProjectService {
 	}
 
 	// 프로젝트 수정후 저장
-	public void update(int projectId, EditProjectModel editProjectModel) {
+	@Transactional
+	public void update(int projectId, EditProjectModel editProjectModel, int loginUserId) {
 		Project project = findById(projectId);
 		project.setProjectName(editProjectModel.getProjectName());
 		project.setTheme(editProjectModel.getTheme());
@@ -103,6 +104,18 @@ public class ProjectService {
 		project.setRcrtState(editProjectModel.isRcrtState());
 
 		projectRepository.save(project);
+		
+		//TIMELINE 프로젝트 정보 수정 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(loginUserId).get();
+		for(ProjectJoin join : allMember(projectId)) {
+			if(join.getUser().getUserId() != loginUserId) {
+				String content = loginUser.getName()+"님이 "+project.getProjectName()+"의 정보를 수정하였습니다.";
+				String url = "/project/"+projectId+"/summary";
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
+		
 	}
 
 	// 멤버
@@ -221,13 +234,25 @@ public class ProjectService {
 	}
 
 	// 주간 목표 저장
-	public void createWeekGoal(WeekGoalModel weekGoalModel) {
+	@Transactional
+	public void createWeekGoal(WeekGoalModel weekGoalModel, int loginUserId) {
 		Weekly weekly = new Weekly();
 		weekly.setStartTime(weekGoalModel.getStartTime());
 		weekly.setDetail(weekGoalModel.getDetail());
 		weekly.setProject(projectRepository.findById(weekGoalModel.getProjectId()).get());
 
 		weeklyRepository.save(weekly);
+		
+		//TIMELINE 주간목표 생성 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(loginUserId).get();
+		for(ProjectJoin join : allMember(weekly.getProject().getProjectId())) {
+			if(join.getUser().getUserId() != loginUserId) {
+				String content = loginUser.getName()+"님이 "+weekly.getProject().getProjectName()+"에 새로운 주차별 목표를 생성하였습니다.";
+				String url = "/project/"+weekly.getProject().getProjectId()+"/weekly";
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
 	}
 
 	public List<ProjectBoardModel> projectBoard(int userId,int page) {
@@ -276,6 +301,7 @@ public class ProjectService {
 	}
 
 	// 새로운 todo 추가
+	@Transactional
 	public void createTodo(int userId, TodoModel todoModel) {
 		Todo todo = new Todo();
 
@@ -287,6 +313,18 @@ public class ProjectService {
 		todo.setOrder(todoModel.getOrder());
 
 		todoRepository.save(todo);
+		
+		//TIMELINE 새로운 todo 추가 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(userId).get();
+		Project p = todo.getWeekly().getProject();
+		for(ProjectJoin join : allMember(p.getProjectId())) {
+			if(join.getUser().getUserId() != userId) {
+				String content = loginUser.getName()+"님이 "+p.getProjectName()+"에 새로운 todo를 생성하였습니다.";
+				String url = "/project/"+p.getProjectId()+"/weekly/"+todo.getWeekly().getWeeklyId();
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
 	}
 	public ProjectBoardModel getModal(int projectId,int userId) {
 //		List<Project> project = projectRepository.findAll();
@@ -512,38 +550,107 @@ public class ProjectService {
 	}
 
 	// todo 순서 변경
-	public void moveTodo(int todoId, int progState, int order) {
+	@Transactional
+	public void moveTodo(int todoId, int progState, int order, int loginUserId) {
 		Todo todo = todoRepository.findById(todoId).get();
+		int oldState = todo.getProgState();
 		todo.setProgState(progState);
 		todo.setOrder(order);
 		
 		todoRepository.save(todo);
+		
+		//TIMELINE todo 상태 변경 [팀원 전체가 받음]
+		if(oldState != progState) {
+			String[] state = {"시작 안함", "진행 중", "완료"};
+			User loginUser = userRepository.findById(loginUserId).get();
+			Project p = todo.getWeekly().getProject();
+			for(ProjectJoin join : allMember(p.getProjectId())) {
+				if(join.getUser().getUserId() != loginUserId) {
+					String content = loginUser.getName()+"님이 "+p.getProjectName()+"의 todo 상태를 "+state[progState]+"으로 변경하였습니다.";
+					String url = "/project/"+p.getProjectId()+"/weekly/"+todo.getWeekly().getWeeklyId();
+					
+					timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+				}
+			}
+		}
 	}
 
 	// todo 디테일 수정
-	public void editTodo(Todo editTodo) {
+	@Transactional
+	public void editTodo(Todo editTodo, int loginUserId) {
 		Todo originTodo = todoRepository.findById(editTodo.getTodoId()).get();
 		originTodo.setDetail(editTodo.getDetail());
 
 		todoRepository.save(originTodo);
+		
+		//TIMELINE todo 수정 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(loginUserId).get();
+		Project p = originTodo.getWeekly().getProject();
+		for(ProjectJoin join : allMember(p.getProjectId())) {
+			if(join.getUser().getUserId() != loginUserId) {
+				String content = loginUser.getName()+"님이 "+p.getProjectName()+"의 todo를 수정하였습니다.";
+				String url = "/project/"+p.getProjectId()+"/weekly/"+originTodo.getWeekly().getWeeklyId();
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
 	}
 
 	// todo 삭제
-	public void deleteTodo(int todoId) {
+	@Transactional
+	public void deleteTodo(int todoId, int loginUserId) {
+		//TIMELINE todo 삭제 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(loginUserId).get();
+		Todo todo = todoRepository.findById(todoId).get();
+		Project p = todo.getWeekly().getProject();
+		for(ProjectJoin join : allMember(p.getProjectId())) {
+			if(join.getUser().getUserId() != loginUserId) {
+				String content = loginUser.getName()+"님이 "+p.getProjectName()+"의 todo를 삭제하였습니다.";
+				String url = "/project/"+p.getProjectId()+"/weekly/"+todo.getWeekly().getWeeklyId();
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
+		
 		todoRepository.deleteById(todoId);
 	}
 
 	// 주간 목표 수정
-	public void editWeekly(Weekly editWeekly) {
+	@Transactional
+	public void editWeekly(Weekly editWeekly, int loginUserId) {
 		Weekly originWeekly = weeklyRepository.findById(editWeekly.getWeeklyId()).get();
 		originWeekly.setDetail(editWeekly.getDetail());
 		originWeekly.setStartTime(editWeekly.getStartTime());
 		
 		weeklyRepository.save(originWeekly);
+		
+		//TIMELINE 주차별 목표 수정 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(loginUserId).get();
+		for(ProjectJoin join : allMember(originWeekly.getProject().getProjectId())) {
+			if(join.getUser().getUserId() != loginUserId) {
+				String content = loginUser.getName()+"님이 "+originWeekly.getProject().getProjectName()+"의 주차별 목표를 수정하였습니다.";
+				String url = "/project/"+originWeekly.getProject().getProjectId()+"/weekly";
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
 	}
 
 	// 주간 목표 삭제
-	public void deleteWeekly(int weeklyId) {
+	@Transactional
+	public void deleteWeekly(int weeklyId, int loginUserId) {
+		//TIMELINE 주차별 목표 삭제 [팀원 전체가 받음]
+		User loginUser = userRepository.findById(loginUserId).get();
+		Weekly weekly = weeklyRepository.findById(weeklyId).get();
+		for(ProjectJoin join : allMember(weekly.getProject().getProjectId())) {
+			if(join.getUser().getUserId() != loginUserId) {
+				String content = loginUser.getName()+"님이 "+weekly.getProject().getProjectName()+"의 주차별 목표를 삭제하였습니다.";
+				String url = "/project/"+weekly.getProject().getProjectId()+"/weekly";
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
+		
 		weeklyRepository.deleteById(weeklyId);
 	}
 

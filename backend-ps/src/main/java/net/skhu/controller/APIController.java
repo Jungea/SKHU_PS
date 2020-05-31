@@ -3,6 +3,7 @@ package net.skhu.controller;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +58,7 @@ import net.skhu.repository.UserRepository;
 import net.skhu.service.CommentService;
 import net.skhu.service.DetailService;
 import net.skhu.service.FileService;
+import net.skhu.service.PostLikeService;
 import net.skhu.service.PostService;
 import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
@@ -99,6 +101,8 @@ public class APIController {
 	FileService fileService;
 	@Autowired
 	FileRepository fileRepository;
+	@Autowired
+	PostLikeService postLikeService;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -225,8 +229,8 @@ public class APIController {
 	// 프로젝트 개요가 수정되고 저장되었을 때
 	@RequestMapping(value = "project/{projectId}/edit", method = RequestMethod.POST)
 	public void editProject(@RequestBody EditProjectModel editProjectModel,
-			@PathVariable("projectId") String projectId) {
-		projectService.update(Integer.parseInt(projectId), editProjectModel);
+			@PathVariable("projectId") String projectId, HttpServletRequest request) {
+		projectService.update(Integer.parseInt(projectId), editProjectModel, getLoginUserId(request));
 	}
 
 	// 핀 바꾸기
@@ -395,9 +399,9 @@ public class APIController {
 
 	// 주간 목표 생성
 	@RequestMapping(value = "createGoal", method = RequestMethod.POST)
-	public void createWeekGoal(@RequestBody WeekGoalModel weekGoalModel) {
+	public void createWeekGoal(@RequestBody WeekGoalModel weekGoalModel, HttpServletRequest request) {
 		System.out.println(weekGoalModel);
-		projectService.createWeekGoal(weekGoalModel);
+		projectService.createWeekGoal(weekGoalModel, getLoginUserId(request));
 
 	}
 
@@ -479,33 +483,33 @@ public class APIController {
 
 	// todo 위치 변경
 	@RequestMapping(value = "moveTodo/{todoId}/{progState}/{order}", method = RequestMethod.GET)
-	public void moveTodo(@PathVariable("todoId") int todoId, @PathVariable("progState") int progState, @PathVariable("order") int order) {
-		projectService.moveTodo(todoId, progState, order);
+	public void moveTodo(@PathVariable("todoId") int todoId, @PathVariable("progState") int progState, @PathVariable("order") int order, HttpServletRequest request) {
+		projectService.moveTodo(todoId, progState, order, getLoginUserId(request));
 	}
 	
 	// todo 디테일 수정
 	@RequestMapping(value = "editTodo", method = RequestMethod.POST)
 	public void editTodo(@RequestBody Todo todo, HttpServletRequest request) {
-		projectService.editTodo(todo);
+		projectService.editTodo(todo, getLoginUserId(request));
 	}
 	
 	// todo 삭제
 	@RequestMapping(value = "deleteTodo/{todoId}", method = RequestMethod.GET)
-	public void deleteTodo(@PathVariable("todoId") int todoId) {
-		projectService.deleteTodo(todoId);
+	public void deleteTodo(@PathVariable("todoId") int todoId, HttpServletRequest request) {
+		projectService.deleteTodo(todoId, getLoginUserId(request));
 	}
 	
 	// 주간 목표 수정
 	@RequestMapping(value = "editWeekly", method = RequestMethod.POST)
-	public void editWeekly(@RequestBody Weekly weekly) {
+	public void editWeekly(@RequestBody Weekly weekly, HttpServletRequest request) {
 		System.out.println(weekly);
-		projectService.editWeekly(weekly);
+		projectService.editWeekly(weekly, getLoginUserId(request));
 	}
 	
 	// 주간 목표 삭제
 	@RequestMapping(value = "deleteWeekly/{weeklyId}", method = RequestMethod.GET)
-	public void deleteWeekly(@PathVariable("weeklyId") int weeklyId) {
-		projectService.deleteWeekly(weeklyId);
+	public void deleteWeekly(@PathVariable("weeklyId") int weeklyId, HttpServletRequest request) {
+		projectService.deleteWeekly(weeklyId, getLoginUserId(request));
 	}
 	// 공지사항 게시판에서 페이징  
 	@RequestMapping(value = "noticeBoard", method = RequestMethod.GET)
@@ -576,7 +580,7 @@ public class APIController {
     @RequestMapping(value="/file1/upload/{postId}", method=RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
     public void upload(@PathVariable("postId") int postId,@RequestParam("file")  MultipartFile[] multipartFiles) throws IOException {
         System.out.println("fileupload");
-        System.out.println("크기:"+multipartFiles[0].getOriginalFilename());
+        System.out.println("크기:"+multipartFiles.length);
 //        System.out.println("model:"+model.getTitle());
     	for(MultipartFile multipartFile : multipartFiles) {
             if (multipartFile.getSize() <= 0) continue;
@@ -683,5 +687,44 @@ public class APIController {
 			models.add(item);
 		}
 		return models;
+	}
+
+	//유저의 timelineTime
+	@RequestMapping(value = "user/timelineTime", method = RequestMethod.GET)
+	public LocalDateTime userTimelineTime(HttpServletRequest request) {
+		return user(request).getTimelineTime();
+	}
+	
+	//timeline 모달 닫을 때 유저의 timelineTime 변경
+	@RequestMapping(value = "user/timelineTime", method = RequestMethod.PUT)
+	public void updateTimelineTime(HttpServletRequest request) {
+		userService.updateTimelineTime(getLoginUserId(request));
+	}
+	
+	// 자유  게시판에서 페이징  
+	@RequestMapping(value = "freeBoard", method = RequestMethod.GET)
+	public List<Post> freeBoard(@RequestParam("page") int page,@RequestParam("projectId") int projectId) {
+		return postService.freeBoard(page,projectId);
+	}
+	// 공지사항 게시판에서 전체 개수
+	@RequestMapping(value = "freeListNum", method = RequestMethod.GET)
+	public int freeListNum(@RequestParam("projectId") int projectId) {
+		return postRepository.findByProject_projectId(projectId).size();
+	}
+	// 자유게시판 게시글 쓰기
+	@RequestMapping(value = "writeFree", method = RequestMethod.POST)
+	public int  writeFree(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
+		return postService.writeFree(notice,getLoginUserId(request));
+	}
+	// 댓글 채택
+	@RequestMapping(value = "freeBoard/commentCheck/{commentId}", method = RequestMethod.POST)
+	public void commentCheck(@PathVariable("commentId") int commentId) {
+		commentService.commentCheck(commentId);
+	}
+	// 게시글 좋아요
+	@RequestMapping(value = "freeBoard/postLike/{postId}", method = RequestMethod.POST)
+	public void postLike(@PathVariable("postId") int postId,HttpServletRequest request) {
+		System.out.println("postLike");
+		postLikeService.postLike(postId,getLoginUserId(request));
 	}
 }
