@@ -226,8 +226,8 @@ public class APIController {
 	// 프로젝트 개요가 수정되고 저장되었을 때
 	@RequestMapping(value = "project/{projectId}/edit", method = RequestMethod.POST)
 	public void editProject(@RequestBody EditProjectModel editProjectModel,
-			@PathVariable("projectId") String projectId) {
-		projectService.update(Integer.parseInt(projectId), editProjectModel);
+			@PathVariable("projectId") String projectId, HttpServletRequest request) {
+		projectService.update(Integer.parseInt(projectId), editProjectModel, getLoginUserId(request));
 	}
 
 	// 핀 바꾸기
@@ -396,9 +396,9 @@ public class APIController {
 
 	// 주간 목표 생성
 	@RequestMapping(value = "createGoal", method = RequestMethod.POST)
-	public void createWeekGoal(@RequestBody WeekGoalModel weekGoalModel) {
+	public void createWeekGoal(@RequestBody WeekGoalModel weekGoalModel, HttpServletRequest request) {
 		System.out.println(weekGoalModel);
-		projectService.createWeekGoal(weekGoalModel);
+		projectService.createWeekGoal(weekGoalModel, getLoginUserId(request));
 
 	}
 
@@ -498,15 +498,15 @@ public class APIController {
 	
 	// 주간 목표 수정
 	@RequestMapping(value = "editWeekly", method = RequestMethod.POST)
-	public void editWeekly(@RequestBody Weekly weekly) {
+	public void editWeekly(@RequestBody Weekly weekly, HttpServletRequest request) {
 		System.out.println(weekly);
-		projectService.editWeekly(weekly);
+		projectService.editWeekly(weekly, getLoginUserId(request));
 	}
 	
 	// 주간 목표 삭제
 	@RequestMapping(value = "deleteWeekly/{weeklyId}", method = RequestMethod.GET)
-	public void deleteWeekly(@PathVariable("weeklyId") int weeklyId) {
-		projectService.deleteWeekly(weeklyId);
+	public void deleteWeekly(@PathVariable("weeklyId") int weeklyId, HttpServletRequest request) {
+		projectService.deleteWeekly(weeklyId, getLoginUserId(request));
 	}
 	// 공지사항 게시판에서 페이징  
 	@RequestMapping(value = "noticeBoard", method = RequestMethod.GET)

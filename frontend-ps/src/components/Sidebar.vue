@@ -318,7 +318,7 @@ export default {
             .then(res => {
               this.data = res.data
               console.log(a)
-              
+
               this.checkTime1 = this.leadingZeros(a.getFullYear(), 4) + '-' + this.leadingZeros(a.getMonth() + 1, 2) + '-' + this.leadingZeros(a.getDate(), 2)
                     + ' ' + this.leadingZeros(a.getHours(), 2) + ':' + this.leadingZeros(a.getMinutes(), 2);
 
@@ -344,6 +344,7 @@ export default {
       },
       move(url) {
         alert(url)
+        axios.put('/api/user/timelineTime').then().catch(erro => console.error(erro))
         location.href = url
       },
       closeTimelineModal() {
