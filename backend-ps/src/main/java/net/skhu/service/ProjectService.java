@@ -551,12 +551,28 @@ public class ProjectService {
 
 	// todo 순서 변경
 	@Transactional
-	public void moveTodo(int todoId, int progState, int order) {
+	public void moveTodo(int todoId, int progState, int order, int loginUserId) {
 		Todo todo = todoRepository.findById(todoId).get();
+		int oldState = todo.getProgState();
 		todo.setProgState(progState);
 		todo.setOrder(order);
 		
 		todoRepository.save(todo);
+		
+		//TIMELINE todo 상태 변경 [팀원 전체가 받음]
+		if(oldState != progState) {
+			String[] state = {"시작 안함", "진행 중", "완료"};
+			User loginUser = userRepository.findById(loginUserId).get();
+			Project p = todo.getWeekly().getProject();
+			for(ProjectJoin join : allMember(p.getProjectId())) {
+				if(join.getUser().getUserId() != loginUserId) {
+					String content = loginUser.getName()+"님이 "+p.getProjectName()+"의 todo 상태를 "+state[progState]+"으로 변경하였습니다.";
+					String url = "/project/"+p.getProjectId()+"/weekly/"+todo.getWeekly().getWeeklyId();
+					
+					timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+				}
+			}
+		}
 	}
 
 	// todo 디테일 수정
@@ -567,7 +583,7 @@ public class ProjectService {
 
 		todoRepository.save(originTodo);
 		
-		//TIMELINE 새로운 todo 추가 [팀원 전체가 받음]
+		//TIMELINE todo 수정 [팀원 전체가 받음]
 		User loginUser = userRepository.findById(loginUserId).get();
 		Project p = originTodo.getWeekly().getProject();
 		for(ProjectJoin join : allMember(p.getProjectId())) {
@@ -583,7 +599,7 @@ public class ProjectService {
 	// todo 삭제
 	@Transactional
 	public void deleteTodo(int todoId, int loginUserId) {
-		//TIMELINE 새로운 todo 추가 [팀원 전체가 받음]
+		//TIMELINE todo 삭제 [팀원 전체가 받음]
 		User loginUser = userRepository.findById(loginUserId).get();
 		Todo todo = todoRepository.findById(todoId).get();
 		Project p = todo.getWeekly().getProject();

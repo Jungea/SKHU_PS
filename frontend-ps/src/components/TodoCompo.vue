@@ -499,17 +499,26 @@ export default {
     },
 
     mounted() {
-        // for(let i in this.todo){
-        //     if(this.todo[i].prog==0){
-        //         this.state1.push(this.todo[i])
-        //     }
-        //     else if(this.todo[i].prog==1){
-        //         this.state2.push(this.todo[i])
-        //     }
-        //     else{
-        //         this.state3.push(this.todo[i])
-        //     }
-        // }
+        if(this.$route.query.id == undefined) {
+            axios.get('/api/project/'+this.$route.params.projectId+'/weeklyGoal')
+                .then(response => {
+                    let goals = response.data;
+
+                    goals.sort(function(a,b){
+                        var date1 = new Date(a.startTime);
+                        var date2 = new Date(b.startTime);
+                        return date1-date2
+                    })
+                    
+                    console.log(this.$route.params.week)
+                    let week = goals.findIndex(p => p.weeklyId == this.$route.params.week) + 1;
+                    
+                    this.$router.push({
+                        path: '/project/'+this.$route.params.projectId+'/weekly/'+week,
+                        query: {id: this.$route.params.week}
+                    })
+                })
+        }
 
         axios.get('/api/project/'+this.$route.params.projectId)
         .then(response => {
@@ -517,11 +526,17 @@ export default {
         })
 
         //todo 가져와 배열에 채우기
-        this.todoReload();
-
+        if(this.$route.query.id != undefined) 
+            this.todoReload();
+        
         //이 프로젝트에 참여중인 멤버 정보 가져오기??
 
     },
+    watch: {
+      '$route' () {
+          this.todoReload();
+      }
+    }
 }
 </script>
 

@@ -480,8 +480,8 @@ public class APIController {
 
 	// todo 위치 변경
 	@RequestMapping(value = "moveTodo/{todoId}/{progState}/{order}", method = RequestMethod.GET)
-	public void moveTodo(@PathVariable("todoId") int todoId, @PathVariable("progState") int progState, @PathVariable("order") int order) {
-		projectService.moveTodo(todoId, progState, order);
+	public void moveTodo(@PathVariable("todoId") int todoId, @PathVariable("progState") int progState, @PathVariable("order") int order, HttpServletRequest request) {
+		projectService.moveTodo(todoId, progState, order, getLoginUserId(request));
 	}
 	
 	// todo 디테일 수정
