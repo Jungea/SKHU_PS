@@ -40,6 +40,7 @@
                              <b-button class="mr-3" v-if="userId==list.user.userId" @click="deletePost()" variant="danger">삭제</b-button>
                             <b-button style="margin-right: 10px" v-if="userId==list.user.userId" @click="edit()" variant="dark">수정</b-button>
                             <b-button @click="viewList()" variant="dark">목록으로</b-button>
+                            <b-button @click="postLike()" variant="primary">좋아요</b-button>
                         </div>
                 </div>
             </b-form-group>
@@ -49,12 +50,15 @@
                 <hr style="width: 90% ; border: 1px solid #ccc">
                 <table class="table table-bordered" style="width: 90%">
                     <tr v-for="(item, index) in comment" :key="index">
-                        <td> <div> <b> {{ item.user.name }} </b> <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
-                        <b-icon-x scale="2" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)" style="float: right ; cursor:pointer"></b-icon-x>
-                         </div>
-                             <div style="margin-top: 3px"> {{ item.content }} </div>
-                             <!-- <b-button variant="danger" style="float: right" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)">삭제</b-button> -->
-                        </td>
+                        <td> 
+                            <div> 
+                                <b> {{ item.user.name }} </b> 
+                                <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
+                                <b-icon-x scale="2" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)" style="float: right ; cursor:pointer"></b-icon-x>
+                                 <b-icon-check-circle scale="2" v-if="item.choice==0" @click="commentSelect(item.commentId)" style="cursor:pointer"></b-icon-check-circle>
+                            </div>
+                            <div style="margin-top: 3px"> {{ item.content }} </div>
+                       </td>
                     </tr>
                     <tr>
                         <td>
@@ -219,7 +223,25 @@ export default {
             this.$router.push({
                 path: '/subject/' + this.$route.params.subjectId + '/noticeBoard/' + this.$route.params.postId + '/fileList'
             })
-        }
+        },
+        commentSelect(commentId) {
+            if(this.userId==this.list.user.userId) { // 현 게시글 작성한 사람만 check 할 권한 부여
+                 axios.post('/api/freeBoard/commentCheck/'+commentId)
+                .then(response => {
+                    console.log(response.data)
+                    
+                })
+            } else {
+                alert('글을 작성한 사람만 댓글을 채택할 수 있습니다.')
+            }
+        },
+        postLike() {
+            axios.post('/api/freeBoard/postLike/'+this.$route.params.postId)
+                .then(response => {
+                    console.log(response.data)
+            })
+        },
+        
     },
 }
 </script>

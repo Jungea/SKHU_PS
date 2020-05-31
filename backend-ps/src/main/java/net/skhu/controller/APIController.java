@@ -57,6 +57,7 @@ import net.skhu.repository.UserRepository;
 import net.skhu.service.CommentService;
 import net.skhu.service.DetailService;
 import net.skhu.service.FileService;
+import net.skhu.service.PostLikeService;
 import net.skhu.service.PostService;
 import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
@@ -99,6 +100,8 @@ public class APIController {
 	FileService fileService;
 	@Autowired
 	FileRepository fileRepository;
+	@Autowired
+	PostLikeService postLikeService;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -576,7 +579,7 @@ public class APIController {
     @RequestMapping(value="/file1/upload/{postId}", method=RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
     public void upload(@PathVariable("postId") int postId,@RequestParam("file")  MultipartFile[] multipartFiles) throws IOException {
         System.out.println("fileupload");
-        System.out.println("크기:"+multipartFiles[0].getOriginalFilename());
+        System.out.println("크기:"+multipartFiles.length);
 //        System.out.println("model:"+model.getTitle());
     	for(MultipartFile multipartFile : multipartFiles) {
             if (multipartFile.getSize() <= 0) continue;
@@ -694,9 +697,20 @@ public class APIController {
 	public int freeListNum(@RequestParam("projectId") int projectId) {
 		return postRepository.findByProject_projectId(projectId).size();
 	}
-	// 게시글 쓰기
+	// 자유게시판 게시글 쓰기
 	@RequestMapping(value = "writeFree", method = RequestMethod.POST)
 	public int  writeFree(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
 		return postService.writeFree(notice,getLoginUserId(request));
+	}
+	// 댓글 채택
+	@RequestMapping(value = "freeBoard/commentCheck/{commentId}", method = RequestMethod.POST)
+	public void commentCheck(@PathVariable("commentId") int commentId) {
+		commentService.commentCheck(commentId);
+	}
+	// 게시글 좋아요
+	@RequestMapping(value = "freeBoard/postLike/{postId}", method = RequestMethod.POST)
+	public void postLike(@PathVariable("postId") int postId,HttpServletRequest request) {
+		System.out.println("postLike");
+		postLikeService.postLike(postId,getLoginUserId(request));
 	}
 }

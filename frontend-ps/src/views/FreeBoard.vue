@@ -6,18 +6,16 @@
             <b-form-group label-for="SubjectNotice">
                 <table class="table table-bordered" id="SubjectNotice" style="width: 90%">
                     <tr>
-                        <th class="th1">번호</th>
                         <th class="th1">제목</th>
                         <th class="th1">작성일</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td class="td1" style="width: 8%"> {{index}} </td>
                         <td style="width: 40%"> <b> {{ item.title }} </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                     </tr>
                 </table>
                 <div style="text-align: right ; margin-right: 5%">
-                    <b-button variant="dark" v-b-modal.modal-newBoard>게시글 작성</b-button>
+                    <b-button variant="dark" v-if="isjoinMember" v-b-modal.modal-newBoard>게시글 작성</b-button>
                 </div>
             </b-form-group>
             <b-pagination style="float: right ; margin-right: 5%" @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
@@ -48,22 +46,6 @@
                                 <!-- <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/> -->
                             </td>
                     </tr>
-                    <!-- <tr>
-                        <th>과제 제출 기한</th>
-                        <td>
-                            <b-input v-model="deadline" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button variant="dark" style="margin-right: 15px" v-b-modal.calendar1 @click="newNowDate()">제출 기한 선택</b-button>
-                            <b-button v-if="deadline.length!=0" variant="danger" @click="deleteTime(1)">삭제</b-button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>연장 기한</th>
-                        <td>
-                            <b-input v-model="extention" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button v-if="deadline.length!=0" style="margin-right: 15px" variant="dark" v-b-modal.calendar2 @click="newNowDate()">연장 기한 선택</b-button>
-                            <b-button v-if="deadline.length!=0" variant="danger" @click="deleteTime(2)">삭제</b-button>
-                        </td>
-                    </tr> -->
                 </table>
             </b-form-group>
         </center>
@@ -92,7 +74,8 @@ export default {
             content: '',
             nowDate: '',
             userType: '',
-            files: ''
+            files: '',
+            isjoinMember:true,
         } 
     },
     watch: {
@@ -107,6 +90,10 @@ export default {
         }
     },
     mounted() {
+         axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
+        .then(response => {
+            this.isjoinMember=response.data
+        });
         if(this.currentPage==1) {
             this.$router.push({
             path: '/project/'+this.$route.params.projectId+'/freeBoard',
@@ -134,8 +121,8 @@ export default {
             this.content = '',
             this.deadline = '',
             this.extention = '',
-            this.nowDate = '',
-            this.files=''
+            this.nowDate = ''
+    
         },
         checkForm() {
             if(this.title && this.content)

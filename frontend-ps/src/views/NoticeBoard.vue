@@ -6,14 +6,12 @@
             <b-form-group label-for="SubjectNotice">
                 <table class="table table-bordered" id="SubjectNotice" style="width: 90%">
                     <tr>
-                        <th class="th1">번호</th>
                         <th class="th1">제목</th>
                         <th class="th1">작성일</th>
                         <th class="th1">제출 마감일</th>
                         <th class="th1">제출 연장일</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td class="td1" style="width: 8%"> {{index}} </td>
                         <td style="width: 40%"> <b> {{ item.title }} </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
