@@ -3,6 +3,7 @@ package net.skhu.controller;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -684,4 +685,17 @@ public class APIController {
 		}
 		return models;
 	}
+	
+	//유저의 timelineTime
+	@RequestMapping(value = "user/timelineTime", method = RequestMethod.GET)
+	public LocalDateTime userTimelineTime(HttpServletRequest request) {
+		return user(request).getTimelineTime();
+	}
+	
+	//timeline 모달 닫을 때 유저의 timelineTime 변경
+	@RequestMapping(value = "user/timelineTime", method = RequestMethod.PUT)
+	public void updateTimelineTime(HttpServletRequest request) {
+		userService.updateTimelineTime(getLoginUserId(request));
+	}
+	
 }
