@@ -2,9 +2,7 @@
     <div class="containerStyle">
         <b-row>
             <b-col cols="8">
-                <h4>{{project.projectName}}: 주간 목표</h4>
-                <hr>
-                {{days}}
+                <h4>{{project.projectName}}: 주차별 목표</h4>
             </b-col>
             <b-col cols="4">
                 <b-button @click="openModal(0)" variant="outline-secondary" style="height: 70px; float:right;">목표 생성</b-button>
@@ -196,7 +194,7 @@ export default {
         openModal(temp, weekly){
             if(temp==0){
                 this.modalState='생성'
-                this.title=this.goals.length+1+"주차 목표 생성"
+                this.title="목표 생성"
             }
             else{
                 this.modalState='수정'
