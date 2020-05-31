@@ -57,41 +57,43 @@
         </div>
         <hr style="margin:30px 0;">
         <div class="infoContainer">
-            <h5>초대받은 이력</h5>
-            <div style="margin-top:30px; padding: 30px;">
-                <b-row>
-                    <b-col style="min-width:350px;" class="mt-0">
-                        <b-card>
-                            <ul style="list-style:none; padding:0 20px">
-                                <b-media class="inviteList" tag="li" v-for="invit in inviteList" :key="invit.joinId">
-                                    <h5 style="display:inline;">{{invit.project.projectName}}</h5>
-                                    <span style="float:right">
-                                        <b-button size="sm" @click="turnState(invit, 1)" class="mr-2" variant="success">수락</b-button>
-                                        <b-button size="sm" @click="turnState(invit, 2)" variant="danger">거절</b-button>
-                                    </span>
-                                    <h6>From {{invit.project.user.name}}</h6>
-                                </b-media>
-                            </ul>
-                        </b-card>
-                    </b-col>
-                </b-row>
+            <h5>초대/신청 이력</h5>
+            <div style="padding:30px;">
+                <b-card no-body header="초대 받은 이력">
+                    <b-list-group flush>
+                        <b-list-group-item class="inviteList" v-for="invit in inviteList" :key="invit.joinId">
+                            <b-media>
+                                <h5 style="display:inline;">{{invit.project.projectName}}</h5>
+                                <span style="float:right">
+                                    <b-button size="sm" @click="turnState(invit, 1)" class="mr-2" variant="success">수락</b-button>
+                                    <b-button size="sm" @click="turnState(invit, 2)" variant="danger">거절</b-button>
+                                </span>
+                                <h6>From {{invit.project.user.name}}</h6>
+                            </b-media>
+                        </b-list-group-item>
+                    </b-list-group>
+                    <b-card-body v-if="inviteList.length==0">
+                        프로젝트에 초대받은 이력이 없습니다.
+                    </b-card-body>
+                </b-card>
+
+                <b-card no-body header="신청한 이력" class="mt-4">
+                    <b-list-group flush>
+                        <b-list-group-item class="inviteList" v-for="application in applicationList" :key="application.JoinId">
+                            <span style="float:left">
+                                <b>{{application.project.projectName}}</b><b-badge variant="warning" class="ml-2">{{state[application.state]}}</b-badge>
+                            </span>
+                            <span style="float:right">
+                                <b-button @click="deleteWaiting(application)" size="sm" style="clear:both; margin-left:20px">신청 취소</b-button>
+                            </span>
+                        </b-list-group-item>
+                    </b-list-group>
+                    <b-card-body v-if="applicationList.length==0">
+                        프로젝트에 신청한 이력이 없습니다.
+                    </b-card-body>
+                </b-card>
             </div>
         </div>
-
-        <hr style="margin:30px 0;">
-        <div style="padding:30px;">
-            <h5>신청한 이력</h5>
-            <ul style="list-style:none; padding:0;">
-                <li class="mt-3" v-for="application in applicationList" :key="application.JoinId">
-                    <span style="float:left">
-                        {{application.project.projectName}} ({{application.project.user.name}}) - {{state[application.state]}}
-                    </span>
-                    <b-button @click="deleteWaiting(application)" size="sm" style="clear:both; margin-left:20px">신청 취소</b-button>
-                </li>
-            </ul>
-        </div>
-
-        <hr style="margin:30px 0;">
     </div>
 </template>
 
@@ -204,7 +206,7 @@ export default {
     }
 
     .inviteList{
-        margin-top:10px; 
+        margin:10px; 
         padding:10px;
         border-bottom:1px solid #E6E6E6
     }
