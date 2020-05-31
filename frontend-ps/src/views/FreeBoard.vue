@@ -96,15 +96,15 @@ export default {
         } 
     },
     watch: {
-        // '$route'(){
-        //     //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
-        //     console.log('query111:'+this.$route.query.page)
-        //      axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
-        //         this.paginatedItems=response.data
-        //         }).catch((erro) => {
-        //         console.error(erro);
-        //      });
-        // }
+        '$route'(){
+            //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
+            console.log('query111:'+this.$route.query.page)
+             axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                this.paginatedItems=response.data
+                }).catch((erro) => {
+                console.error(erro);
+             });
+        }
     },
     mounted() {
         if(this.currentPage==1) {
@@ -227,12 +227,12 @@ export default {
         },
         viewContent(postId) {
             this.$router.push({
-                path: '/subject/'+this.$route.params.subjectId+'/noticeBoard/' + postId
+                path: '/project/'+this.$route.params.projectId+'/freeBoard/' + postId
             })
         },
         paginate (page_size, page_number) {
          this.$router.push({
-            path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+            path: '/project/'+this.$route.params.projectId+'/noticeBoard',
             query:{page:page_number+1}
           })
         },
