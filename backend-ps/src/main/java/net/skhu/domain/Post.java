@@ -19,8 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@ToString(exclude = { "comments" })
-@EqualsAndHashCode(exclude = { "comments" })
+@ToString(exclude = { "comments","files","postLikes" })
+@EqualsAndHashCode(exclude = { "comments","files","postLikes" })
 @Entity
 public class Post {
 	@Id
@@ -56,4 +56,8 @@ public class Post {
 	@JsonIgnore
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	List<File> files;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	List<PostLike> postLikes;
 }

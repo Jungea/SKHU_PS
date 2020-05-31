@@ -39,4 +39,13 @@ public class CommentService {
 	public void noticedeletePost(int postId) {
 		postRepository.delete(postRepository.findById(postId).get());
 	}
+	@Transactional
+	public void commentCheck(int commentId) {
+		Comment c=commentRepository.findById(commentId).get();
+		if(c.getChoice()==0) 
+			c.setChoice(1);
+		else
+			c.setChoice(0);
+		commentRepository.save(c);
+	}
 }

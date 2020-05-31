@@ -1,6 +1,6 @@
 <template>
     <div class="containerStyle">
-        <h3 style="margin-left: 5%">공지 게시판</h3>
+        <h3 style="margin-left: 5%">자유 게시판</h3>
         <hr style="width: 90%">
         <center>
             <b-form-group label-for="SubjectNotice">
@@ -8,18 +8,14 @@
                     <tr>
                         <th class="th1">제목</th>
                         <th class="th1">작성일</th>
-                        <th class="th1">제출 마감일</th>
-                        <th class="th1">제출 연장일</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
                         <td style="width: 40%"> <b> {{ item.title }} </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
-                        <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
-                        <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
                     </tr>
                 </table>
                 <div style="text-align: right ; margin-right: 5%">
-                    <b-button v-if="userType" variant="dark" v-b-modal.modal-newBoard>게시글 작성</b-button>
+                    <b-button variant="dark" v-if="isjoinMember" v-b-modal.modal-newBoard>게시글 작성</b-button>
                 </div>
             </b-form-group>
             <b-pagination style="float: right ; margin-right: 5%" @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
@@ -44,27 +40,11 @@
                             
                     </tr>
                      <tr>
-                       <th>파일 제출</th>
+                       <th>파일 업로드</th>
                             <td>
                                 <b-form-file multiple v-model="files" class="mt-3" plain ></b-form-file>          
                                 <!-- <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/> -->
                             </td>
-                    </tr>
-                    <tr>
-                        <th>과제 제출 기한</th>
-                        <td>
-                            <b-input v-model="deadline" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button variant="dark" style="margin-right: 15px" v-b-modal.calendar1 @click="newNowDate()">제출 기한 선택</b-button>
-                            <b-button v-if="deadline.length!=0" variant="danger" @click="deleteTime(1)">삭제</b-button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>연장 기한</th>
-                        <td>
-                            <b-input v-model="extention" :disabled="true" style="width: 60% ; float: left ; margin-right: 15px"></b-input>
-                            <b-button v-if="deadline.length!=0" style="margin-right: 15px" variant="dark" v-b-modal.calendar2 @click="newNowDate()">연장 기한 선택</b-button>
-                            <b-button v-if="deadline.length!=0" variant="danger" @click="deleteTime(2)">삭제</b-button>
-                        </td>
                     </tr>
                 </table>
             </b-form-group>
@@ -83,7 +63,7 @@
 <script>
 import axios from 'axios'
 export default {
-    name: 'noticeBoard',
+    name: 'freeBoard',
     data() {
         return {
             perPage: 6, // 각 페이지마다 보이는 리스트
@@ -93,17 +73,16 @@ export default {
             title: '',
             content: '',
             nowDate: '',
-            deadline: '',
-            extention: '',
             userType: '',
-            files: ''
+            files: '',
+            isjoinMember:true,
         } 
     },
     watch: {
         '$route'(){
             //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
             console.log('query111:'+this.$route.query.page)
-             axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+             axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                 this.paginatedItems=response.data
                 }).catch((erro) => {
                 console.error(erro);
@@ -111,22 +90,26 @@ export default {
         }
     },
     mounted() {
+         axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
+        .then(response => {
+            this.isjoinMember=response.data
+        });
         if(this.currentPage==1) {
             this.$router.push({
-            path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+            path: '/project/'+this.$route.params.projectId+'/freeBoard',
             query:{page:1}
             })
         }
-        axios.get('/api/user')
-        .then(response => {
-            this.userType = response.data.userType
-        });
-        axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+        // axios.get('/api/user')
+        // .then(response => {
+        //     this.userType = response.data.userType
+        // });
+        axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                 this.paginatedItems=response.data
                 }).catch((erro) => {
                 console.error(erro);
         });
-        axios.get('/api/noticeListNum?subjectId='+this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+        axios.get('/api/freeListNum?projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                 this.totalRows=response.data
                 }).catch((erro) => {
                 console.error(erro);
@@ -139,6 +122,7 @@ export default {
             this.deadline = '',
             this.extention = '',
             this.nowDate = ''
+    
         },
         checkForm() {
             if(this.title && this.content)
@@ -162,12 +146,10 @@ export default {
                 //     formData.append('file[' + i + ']', f);
                 // }
             
-            axios.post('/api/writeNotice', {
-                    subjectId:this.$route.params.subjectId,
+            axios.post('/api/writeFree', {
+                    projectId:this.$route.params.projectId,
                     title:this.title,
                     content:this.content,
-                    deadlineTime:this.deadline,
-                    extensionTime:this.extention,
                 }).then(response => {
                 alert('id:'+response.data)
                 let newPostId=response.data
@@ -188,7 +170,7 @@ export default {
             
                 if(this.$route.query.page!=1) {
                     this.$router.push({
-                        path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+                        path: '/project/'+this.$route.params.projectId+'/freeBoard',
                         query:{page:1}
                     })
                 } else {
@@ -232,12 +214,12 @@ export default {
         },
         viewContent(postId) {
             this.$router.push({
-                path: '/subject/'+this.$route.params.subjectId+'/noticeBoard/' + postId
+                path: '/project/'+this.$route.params.projectId+'/freeBoard/' + postId
             })
         },
         paginate (page_size, page_number) {
          this.$router.push({
-            path: '/subject/'+this.$route.params.subjectId+'/noticeBoard',
+            path: '/project/'+this.$route.params.projectId+'/noticeBoard',
             query:{page:page_number+1}
           })
         },

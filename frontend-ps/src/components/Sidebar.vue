@@ -30,7 +30,7 @@
               <li><b-nav-item @click="projectInfoChange('weekly')">주차별 목표(to-do-list)</b-nav-item></li>
               <li v-if="pinProjectSubjectId > 0 && isJoined"><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
               <li><b-nav-item>토론 게시판</b-nav-item></li>
-              <li><b-nav-item>자유 게시판</b-nav-item></li>
+              <li><b-nav-item @click="freeBoard()">자유 게시판</b-nav-item></li>
               <li v-if="this.name == this.capName"><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
             </ul>
             <hr>
@@ -349,6 +349,12 @@ export default {
       },
       closeTimelineModal() {
         axios.put('/api/user/timelineTime').then().catch(erro => console.error(erro))
+      },
+      freeBoard() {
+        this.$router.push({
+            path: '/project/' + this.pinProjectId + '/freeBoard',
+            query:{page:1}
+        })
       }
     }
 }

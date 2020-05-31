@@ -142,6 +142,10 @@ export default {
         },
     },
     mounted() { 
+         axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
+        .then(response => {
+            this.submitFilePossible=response.data
+        });
          axios.get('/api/file1/list/'+this.$route.params.postId) 
         .then(response => {
             this.files=response.data

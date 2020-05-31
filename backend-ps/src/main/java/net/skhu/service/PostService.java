@@ -16,6 +16,7 @@ import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.DetailRepository;
 import net.skhu.repository.FileRepository;
 import net.skhu.repository.PostRepository;
+import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
 
@@ -31,6 +32,8 @@ public class PostService {
 	DetailRepository detailRepository;
 	@Autowired
 	FileRepository fileRepository;
+	@Autowired
+	ProjectRepository projectRepository;
 	
 	public List<Post> noticeBoard(int page,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
@@ -91,5 +94,26 @@ public class PostService {
 			lists=lists.subList((page-1)*6,page*6);
 		}
 		return lists;
+	}
+	public List<Post> freeBoard(int page,int projectId) {
+		List<Post> posts=postRepository.findByProject_projectId(projectId);
+		Collections.reverse(posts);
+		if(posts.size()<page*6) {
+			posts=posts.subList((page-1)*6,posts.size());
+		} else {
+			posts=posts.subList((page-1)*6,page*6);
+		}
+		return posts;
+	}
+	@Transactional
+	public int writeFree(WriteNoticeModel notice,int userId) {
+		Post post=new Post();
+		post.setProject(projectRepository.findById(notice.getProjectId()).get());
+		post.setTitle(notice.getTitle());
+		post.setContent(notice.getContent());
+		post.setWriteTime(LocalDateTime.now());
+		post.setUser(userRepository.findById(userId).get());
+		post.setDetail(detailRepository.findById(14).get());
+		return postRepository.save(post).getPostId();
 	}
 }

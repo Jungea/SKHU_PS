@@ -11,4 +11,6 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
 
 	List<Post> findBySubject_subjectId(int subjectId);
 
+	List<Post> findByProject_projectId(int projectId);
+
 }
