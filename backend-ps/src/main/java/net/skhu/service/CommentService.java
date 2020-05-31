@@ -40,14 +40,21 @@ public class CommentService {
 		c.setUser(userRepository.findById(userId).get());
 		commentRepository.save(c);
 		
-		//TIMELINE 댓글 작성 [교수님에게]
-		//어떤 과목의 공지 게시글에 새로운 댓글이 작성되었습니다.
+		//TIMELINE 댓글 작성 [작성자에게]
 		Post p = c.getPost();
-		if(userId != p.getSubject().getUser().getUserId()) { //학생이 작성했을 때
-			String text = p.getSubject().getTitle()+"의 공지 게시글에 새로운 댓글이 추가되었습니다.";
-			String url = "/subject/"+p.getSubject().getSubjectId()+"/noticeBoard/"+postId;
-			
-			timelineRepository.save(new Timeline(0, text, LocalDateTime.now(), url, p.getSubject().getUser()));
+		if(userId != p.getUser().getUserId()) { //댓글 작성자가 게시글 작성자가 아닌 경우
+			if(p.getSubject() != null) {  //공지게시판
+				String text = p.getSubject().getTitle()+"의 공지 게시글에 새로운 댓글이 추가되었습니다.";
+				String url = "/subject/"+p.getSubject().getSubjectId()+"/noticeBoard/"+postId;
+				
+				timelineRepository.save(new Timeline(0, text, LocalDateTime.now(), url, p.getUser()));
+				
+			} else if(p.getProject() != null){  //자유게시판
+				String text = p.getProject().getProjectName()+"의 자유 게시글에 새로운 댓글이 추가되었습니다.";
+				String url = "/project/"+p.getProject().getProjectId()+"/freeBoard/"+postId;
+				
+				timelineRepository.save(new Timeline(0, text, LocalDateTime.now(), url, p.getUser()));
+			}
 		}
 	}
 	@Transactional
