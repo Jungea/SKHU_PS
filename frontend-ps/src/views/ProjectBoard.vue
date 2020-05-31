@@ -67,7 +67,7 @@
         </b-row>
 
         <!--프로젝트 정보 모달-->
-        <b-modal id="modal-xl" size="lg" title="프로젝트 개요" @ok="handleOk" ref="modal" data-backdrop="static">
+        <b-modal id="modal-xl" size="lg" title="프로젝트 개요" ref="modal" data-backdrop="static">
             <table class="table table-bordered" id="ProjectSummary" v-bind="this.summaryData">
                 <tbody>
                     <tr>
@@ -132,7 +132,7 @@
                     <tr>
                         <th scope="row">과목</th>
                         <td>
-                                {{this.summaryData.subjectName==null?"-":this.summaryData.subjectName }}
+                            {{this.summaryData.subjectName==null?"-":this.summaryData.subjectName }}
                         </td>
                     </tr>
                 </tbody>
@@ -140,6 +140,10 @@
                 <b-button variant="danger" v-if="this.summaryData.state==2&& this.summaryData.project.rcrtState==false" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
                 <b-button variant="warning" v-else-if="this.summaryData.state==0" >승인 대기</b-button>
                 <b-button variant="success" v-else-if="this.summaryData.state==1" >참가중</b-button>
+
+            <template v-slot:modal-footer="{cancel}">
+                <b-button size="sm" @click="cancel()">닫기</b-button>
+            </template>
         </b-modal>  
 
   </div>
