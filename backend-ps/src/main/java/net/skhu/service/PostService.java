@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.Post;
+import net.skhu.domain.Project;
+import net.skhu.domain.ProjectJoin;
+import net.skhu.domain.Timeline;
+import net.skhu.domain.User;
 import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.DetailRepository;
@@ -18,6 +22,7 @@ import net.skhu.repository.FileRepository;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
+import net.skhu.repository.TimelineRepository;
 import net.skhu.repository.UserRepository;
 
 @Service
@@ -34,6 +39,10 @@ public class PostService {
 	FileRepository fileRepository;
 	@Autowired
 	ProjectRepository projectRepository;
+	@Autowired
+	ProjectService projectService;
+	@Autowired
+	TimelineRepository timelineRepository;
 	
 	public List<Post> noticeBoard(int page,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
@@ -66,7 +75,20 @@ public class PostService {
 		post.setUser(userRepository.findById(userId).get());
 		post.setDetail(detailRepository.findById(13).get());
 		
-		return postRepository.save(post).getPostId();
+		int postId = postRepository.save(post).getPostId();
+		
+		//TIMELINE 새로운 공지게시글 작성 [과목 선택 프로젝트 모든 참가자가 받음]
+		//어떤 과목에 새로운 공지 게시글이 생성되었습니다.
+		for(Project project : projectService.subjectProjects(notice.getSubjectId())) {
+			for(ProjectJoin join : projectService.allMember(project.getProjectId())) {
+				String content = post.getSubject().getTitle()+"에 새로운 공지 게시글이 생성되었습니다. ("+post.getTitle()+")";
+				String url = "/project/"+project.getProjectId()+"/noticeBoard/"+postId;
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
+		
+		return postId;
 	}
 	@Transactional
 	public void noticeModifyPost(ModifyNoticePostModel post) {
@@ -76,6 +98,16 @@ public class PostService {
 		p.setDeadlineTime(post.getDeadlineTime().atTime(0,0,0));
 		p.setExtentionTime(post.getExtentionTime().atTime(0,0,0));
 		postRepository.save(p);
+		
+		//TIMELINE 새로운 공지게시글 수정 [과목 선택 프로젝트 모든 참가자가 받음]
+		for(Project project : projectService.subjectProjects(p.getSubject().getSubjectId())) {
+			for(ProjectJoin join : projectService.allMember(project.getProjectId())) {
+				String content = p.getSubject().getTitle()+"의 공지 게시글이 수정되었습니다. ("+p.getTitle()+")";
+				String url = "/project/"+project.getProjectId()+"/noticeBoard/"+p.getPostId();
+				
+				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+			}
+		}
 	}
 	public List<String> fileSubmitList(int page,int projectId,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
