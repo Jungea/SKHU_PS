@@ -74,10 +74,10 @@
           <hr style="border: 1px solid black ; width: 60% ; margin-bottom: 30px">
           <b-container>
               <p style="color:silver; margin: 300px auto;" v-if="data.length == 0 ? true : false">현재 알림이 없습니다.</p>
-              <b-row @click="move(item.url)" :key="index" v-for="(item, index) in data" style="width: 60% ; min-height: 70px ; margin: 10px; cursor:pointer;">
+              <b-row :key="index" v-for="(item, index) in data" style="width: 60% ; min-height: 70px ; margin: 10px ;">
                   <b-col style=" text-align: left ; padding: 0">
-                    <div class="timeline">{{item.content}}</div>
-                    <div style="text-align: right ; font-size: 12px ; margin-top: 10px ; margin-bottom: -13px">{{item.time}}</div>
+                    <div v-bind:class="{fontColor: index > (arrIndex-1)}" @click="move(item.url)" class="timeline" style="cursor: pointer">{{item.content}}</div>
+                    <div v-bind:class="{fontColor: index > (arrIndex-1)}" style="text-align: right ; font-size: 12px ; margin-top: 10px ; margin-bottom: -13px">{{item.time}}</div>
                   </b-col>
                   <hr style="width: 100% ; border-color: silver">
                   <b-button variant="dark" style="height: 25px ; width: 100% ; font-size: 8px" v-if="index==arrIndex-1" disabled>여기까지 읽으셨습니다.</b-button>
@@ -320,12 +320,13 @@ export default {
               console.log(a)
 
               this.checkTime1 = this.leadingZeros(a.getFullYear(), 4) + '-' + this.leadingZeros(a.getMonth() + 1, 2) + '-' + this.leadingZeros(a.getDate(), 2)
-                    + ' ' + this.leadingZeros(a.getHours(), 2) + ':' + this.leadingZeros(a.getMinutes(), 2);
+                    + ' ' + this.leadingZeros(a.getHours(), 2) + ':' + this.leadingZeros(a.getMinutes(), 2) + ':' + this.leadingZeros(a.getSeconds(), 2);
 
               for(let i = 0 ; i < res.data.length ; i++) {
                 let d = new Date(res.data[i].time);
+                console.log(i + "시간: " + d)
                 this.data[i].time = this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2)
-                    + ' ' + this.leadingZeros(d.getHours(), 2) + ':' + this.leadingZeros(d.getMinutes(), 2);
+                    + ' ' + this.leadingZeros(d.getHours(), 2) + ':' + this.leadingZeros(d.getMinutes(), 2) + ':' + this.leadingZeros(d.getSeconds(), 2);
               }
 
               this.record()
@@ -358,5 +359,5 @@ export default {
 
 li { color: black }
 .timeline:hover { text-decoration: underline !important}
-
+.fontColor { color: darkgray ;}
 </style>
