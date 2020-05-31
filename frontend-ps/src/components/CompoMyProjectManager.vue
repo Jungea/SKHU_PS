@@ -31,76 +31,84 @@
             <hr>
 
             <div style="padding:30px;">
-                <h5>현재 팀 구성원</h5>
-                <ul style="list-style:none; padding:0; margin-top:30px">
-                    <li class="mt-3" v-for="member in memberList" :key="member.JoinId">
-                        <span style="float:left">
-                            {{member.user.userNum}} {{member.user.name}}
-                        </span>
-                        <b-button @click="exile(member)" size="sm" style="clear:both; margin-left:20px">내보내기</b-button>
-                    </li>
-                </ul>
+                <b-card no-body header="현재 팀 구성원">
+                    <b-list-group flush>
+                        <b-list-group-item class="inviteList" v-for="member in memberList" :key="member.JoinId">
+                            <p style="display:inline; font-size: 12pt">
+                                {{member.user.name}}({{member.user.userNum}})
+                            </p>
+                            <b-button @click="exile(member)" size="sm" variant="danger" style="float:right">내보내기</b-button>
+                        </b-list-group-item>
+                    </b-list-group>
+                    <b-card-body v-if="memberList.length==0">
+                        나 이외에 다른 구성원이 없습니다.
+                    </b-card-body>
+                </b-card>
             </div>
             <hr>
 
             <div style="padding:30px;">
-                <h5>초대한 이력</h5>
-                <ul style="list-style:none; padding:0;">
-                    <li class="mt-3" v-for="invit in inviteList" :key="invit.JoinId">
-                        <span style="float:left">
-                            {{invit.user.userNum}} {{invit.user.name}} - {{state[invit.state]}}
-                        </span>
-                        <b-button @click="deleteWaiting(invit)" size="sm" style="clear:both; margin-left:20px">초대 취소</b-button>
-                    </li>
-                </ul>
+                <b-card no-body header="초대 이력">
+                    <b-list-group flush>
+                        <b-list-group-item class="inviteList" v-for="invit in inviteList" :key="invit.JoinId">
+                            <p style="display:inline; font-size: 12pt">
+                                {{invit.user.name}}({{invit.user.userNum}})<b-badge variant="warning" class="ml-2">{{state[invit.state]}}</b-badge>
+                            </p>
+                            <b-button @click="deleteWaiting(invit)" size="sm" variant="danger" style="float:right">초대 취소</b-button>
+                        </b-list-group-item>
+                    </b-list-group>
+                    <b-card-body v-if="inviteList.length==0">
+                        프로젝트에 초대한 인원이 없습니다.
+                    </b-card-body>
+                </b-card>
             </div>
             <hr style="margin:30px 0;">
 
-            <div class="infoContainer">
-                <h5>신청받은 이력</h5>
-                <div style="margin-top:30px; padding: 30px;">
-                    <b-row>
-                        <b-col style="min-width:350px;" class="mt-0">
-                            <b-card>
-                                <ul style="list-style:none; padding:0 20px">
-                                    <b-media class="inviteList" tag="li" v-for="application in applicationList" :key="application.joinId">
-                                        <h5 style="display:inline;">{{application.user.name}}({{application.user.userNum}})</h5>
-                                        <span style="float:right">
-                                            <b-button size="sm" @click="turnState(application, 1)" class="mr-2" variant="success">수락</b-button>
-                                            <b-button size="sm" @click="turnState(application, 2)" variant="danger">거절</b-button>
-                                        </span>
-                                    </b-media>
-                                </ul>
-                            </b-card>
-                        </b-col>
-                    </b-row>
-                </div>
+            <div style="padding:30px;">
+                <b-card no-body header="신청자 목록">
+                    <b-list-group flush>
+                        <b-list-group-item class="inviteList" tag="li" v-for="application in applicationList" :key="application.joinId">
+                            <p style="display:inline; font-size: 12pt">{{application.user.name}}({{application.user.userNum}})</p>
+                            <span style="float:right">
+                                <b-button size="sm" @click="turnState(application, 1)" class="mr-2" variant="success">수락</b-button>
+                                <b-button size="sm" @click="turnState(application, 2)" variant="danger">거절</b-button>
+                            </span>
+                        </b-list-group-item>
+                    </b-list-group>
+                    <b-card-body v-if="applicationList.length==0">
+                        현재 프로젝트에 대한 신청자가 없습니다.
+                    </b-card-body>
+                </b-card>
             </div>
             <br/>
         </div>
 
         <!-- 설정 -->
-        <div style="padding: 30px ; padding-bottom: 0">
+        <div style="padding: 30px;">
             <h4>설정</h4>
             <hr>
+            <div style="padding:30px;">
             <table class="table table-bordered" v-if="!edit">
                 <tbody>
                     <tr>
                         <th style="width:28%">인원 모집 상태</th>
                         <td>
-                            {{ rcrtStateName }}
+                            <span v-if="projectInfo.rcrtState==false">모집중</span>
+                            <span v-if="projectInfo.rcrtState==true">모집 안함</span>
                         </td>
                     </tr>
                     <tr>
                         <th style="width:28%">프로젝트 진행 상태</th>
                         <td>
-                            {{ progStateName }}
+                            <span v-if="projectInfo.progState==false">진행중</span>
+                            <span v-if="projectInfo.progState==true">진행 완료</span>
                         </td>
                     </tr>
                     <tr>
                         <th style="width:28%">과목</th>
                         <td>
-                            {{ subjectName }}
+                            <span v-if="subjectName.length!=0">{{ subjectName }}</span>
+                            <span v-if="subjectName.length==0">과목 없음</span>
                         </td>
                     </tr>
                 </tbody>
@@ -138,7 +146,7 @@
                 <b-button class="mr-3" variant="dark" @click="edit = false">취소</b-button>
                 <b-button variant="dark" @click="stateEdit()">저장</b-button>
             </div>
-
+            </div>
         </div>
 
 
@@ -162,8 +170,8 @@ export default {
             subjectPass: '',
             subjectName: '',
 
-            progStateArray: [ {item: false, text:'진행중'}, {item: true, text: '진행완료'}],
-            rcrtStateArray: [ {item: false, text:'모집중'}, {item: true, text: '모집완료'}],
+            progStateArray: [ {item: false, text:'진행중'}, {item: true, text: '진행 완료'}],
+            rcrtStateArray: [ {item: false, text:'모집중'}, {item: true, text: '모집 안함'}],
             progStateName: '',
             rcrtStateName: '',
             edit: false,
@@ -199,8 +207,8 @@ export default {
                     this.projectInfo = response.data;
                     this.subjectName = this.projectInfo.subject != null? this.projectInfo.subject.title : '';
                     console.log(this.projectInfo)
-                    this.progStateCheck()
-                    this.rcrtStateCheck()
+                    // this.progStateCheck()
+                    // this.rcrtStateCheck()
                 }).catch((erro) => {
                     console.error(erro);
                 }) 
@@ -228,23 +236,6 @@ export default {
                 .catch((erro)=> {
                     console.error(erro);
                 });
-        },
-
-        progStateCheck() {
-           if(this.projectInfo.progState == false) {
-                this.progStateName = '진행중'
-           }
-            else {
-                this.progStateName = '진행완료'
-            }
-        },
-        rcrtStateCheck() {
-           if(this.projectInfo.rcrtState == false) {
-                this.rcrtStateName = '모집중'
-           }
-            else {
-                this.rcrtStateName = '모집완료'
-            }
         },
         stateEdit() {
             if(this.edit) { // 저장버튼을 누름
