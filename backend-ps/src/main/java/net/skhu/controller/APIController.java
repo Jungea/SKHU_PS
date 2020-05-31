@@ -684,4 +684,19 @@ public class APIController {
 		}
 		return models;
 	}
+	// 자유  게시판에서 페이징  
+	@RequestMapping(value = "freeBoard", method = RequestMethod.GET)
+	public List<Post> freeBoard(@RequestParam("page") int page,@RequestParam("projectId") int projectId) {
+		return postService.freeBoard(page,projectId);
+	}
+	// 공지사항 게시판에서 전체 개수
+	@RequestMapping(value = "freeListNum", method = RequestMethod.GET)
+	public int freeListNum(@RequestParam("projectId") int projectId) {
+		return postRepository.findByProject_projectId(projectId).size();
+	}
+	// 게시글 쓰기
+	@RequestMapping(value = "writeFree", method = RequestMethod.POST)
+	public int  writeFree(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
+		return postService.writeFree(notice,getLoginUserId(request));
+	}
 }

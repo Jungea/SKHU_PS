@@ -24,6 +24,8 @@ import Score from '../views/Score.vue'
 import ProjectSearch from '../views/ProjectSearch.vue'
 import NoticeEdit from '../views/NoticeEdit.vue'
 import SubmitFileList from '../views/SubmitFileList.vue'
+import FreeBoard from '../views/FreeBoard.vue'
+
 
 import StudentNoticeBoard from '../views/StudentNoticeBoard.vue'
 import StudentNoticeContent from '../views/StudentNoticeContent.vue'
@@ -206,6 +208,11 @@ Vue.use(VueRouter)
     path: '/project/:projectId/noticeBoard/:postId',
     name: 'studentNoticeContent',
     component: StudentNoticeContent
+  },
+  {
+    path: '/project/:projectId/freeBoard',
+    name: 'freeBoard',
+    component: FreeBoard
   },
 ]
 
