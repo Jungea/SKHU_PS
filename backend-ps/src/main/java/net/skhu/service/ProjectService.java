@@ -551,24 +551,12 @@ public class ProjectService {
 
 	// todo 순서 변경
 	@Transactional
-	public void moveTodo(int todoId, int progState, int order, int LoginUserId) {
+	public void moveTodo(int todoId, int progState, int order) {
 		Todo todo = todoRepository.findById(todoId).get();
 		todo.setProgState(progState);
 		todo.setOrder(order);
 		
 		todoRepository.save(todo);
-		
-		//TIMELINE 새로운 todo 추가 [팀원 전체가 받음]
-		User loginUser = userRepository.findById(userId).get();
-		Project p = todo.getWeekly().getProject();
-		for(ProjectJoin join : allMember(p.getProjectId())) {
-			if(join.getUser().getUserId() != userId) {
-				String content = loginUser.getName()+"님이 "+p.getProjectName()+"에 새로운 todo를 생성하였습니다.";
-				String url = "/project/"+p.getProjectId()+"/weekly/"+todo.getWeekly().getWeeklyId();
-				
-				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
-			}
-		}
 	}
 
 	// todo 디테일 수정
