@@ -10,7 +10,7 @@
                         <th class="th1">작성일</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td style="width: 40%"> <b> {{ item.title }} </b> </td>
+                        <td style="width: 40%"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                     </tr>
                 </table>
@@ -76,6 +76,7 @@ export default {
             userType: '',
             files: '',
             isjoinMember:true,
+            commentNum:[],
         } 
     },
     watch: {
@@ -87,6 +88,11 @@ export default {
                 }).catch((erro) => {
                 console.error(erro);
              });
+            axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                this.commentNum=response.data
+                }).catch((erro) => {
+                console.error(erro);
+            });
         }
     },
     mounted() {
@@ -111,6 +117,11 @@ export default {
         });
         axios.get('/api/freeListNum?projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                 this.totalRows=response.data
+                }).catch((erro) => {
+                console.error(erro);
+        });
+         axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                this.commentNum=response.data
                 }).catch((erro) => {
                 console.error(erro);
         });
@@ -219,7 +230,7 @@ export default {
         },
         paginate (page_size, page_number) {
          this.$router.push({
-            path: '/project/'+this.$route.params.projectId+'/noticeBoard',
+            path: '/project/'+this.$route.params.projectId+'/freeBoard',
             query:{page:page_number+1}
           })
         },

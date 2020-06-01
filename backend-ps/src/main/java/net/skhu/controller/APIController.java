@@ -718,13 +718,29 @@ public class APIController {
 	}
 	// 댓글 채택
 	@RequestMapping(value = "freeBoard/commentCheck/{commentId}", method = RequestMethod.POST)
-	public void commentCheck(@PathVariable("commentId") int commentId) {
-		commentService.commentCheck(commentId);
+	public int commentCheck(@PathVariable("commentId") int commentId,@RequestBody Post post) {
+		return commentService.commentCheck(commentId,post.getPostId());
 	}
 	// 게시글 좋아요
 	@RequestMapping(value = "freeBoard/postLike/{postId}", method = RequestMethod.POST)
 	public void postLike(@PathVariable("postId") int postId,HttpServletRequest request) {
 		System.out.println("postLike");
 		postLikeService.postLike(postId,getLoginUserId(request));
+	}
+	// 게시글 좋아요한 상태 리턴
+	@RequestMapping(value = "freeBoard/postLike/{postId}", method = RequestMethod.GET)
+	public boolean isPostLiked(@PathVariable("postId") int postId,HttpServletRequest request) {
+		System.out.println("postLike");
+		return postLikeService.isPostLiked(postId,getLoginUserId(request));
+	}
+	// 게시판에서 댓글 수 리턴
+	@RequestMapping(value = "freeBoard/commentNum", method = RequestMethod.GET)
+	public List<Integer> commentNum(@RequestParam("page") int page,@RequestParam("projectId") int projectId) {
+		return postService.commentNum(page,projectId);
+	}
+	// 게시판에서 댓글 수 리턴
+	@RequestMapping(value = "noticeBoard/commentNum", method = RequestMethod.GET)
+	public List<Integer> commentNum2(@RequestParam("page") int page,@RequestParam("subjectId") int subjectId) {
+		return postService.commentNum2(page,subjectId);
 	}
 }

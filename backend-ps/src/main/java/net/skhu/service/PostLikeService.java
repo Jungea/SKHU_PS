@@ -32,4 +32,13 @@ public class PostLikeService {
 			postLikeRepository.delete(p);
 		}
 	}
+	
+	public boolean isPostLiked(int postId,int userId) {
+		PostLike p=postLikeRepository.findByPost_PostIdAndUser_UserId(postId,userId);
+		if(p==null) { // like가 존재하지않는다면
+			return false;
+		} else { // like가 존재한다면
+			return true;
+		}
+	}
 }

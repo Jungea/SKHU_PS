@@ -13,7 +13,7 @@
                         <th class="th1">제출 여부</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td style="width: 40%"> <b> {{ item.title }} </b> </td>
+                        <td style="width: 40%"> <b> {{ item.title }} [{{commentNum[index]}}]</b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
                         <!-- <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td> -->
@@ -57,6 +57,7 @@ export default {
            files: '',
            subjectId:null,
            isFile:[],
+           commentNum:[],
         } 
     },
     watch: {
@@ -64,7 +65,13 @@ export default {
             axios.get('/api/project/projectName/'+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                 this.subjectId = response.data.subject.subjectId
                 console.log('query111:'+this.$route.query.page)
-                
+
+                axios.get('/api/noticeBoard/commentNum?page='+this.$route.query.page+'&subjectId='+ this.subjectId).then(response => { // 프로젝트 이름 가져오기
+                    this.commentNum=response.data
+                }).catch((erro) => {
+                    console.error(erro);
+                 });
+                 
                 axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.subjectId).then(response => {
                     this.paginatedItems=response.data
                     axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => {
@@ -81,14 +88,19 @@ export default {
         }
     },
     mounted() {
-                axios.get('/api/project/projectName/'+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
-                    this.subjectId = response.data.subject.subjectId
-                    if(this.currentPage==1) {
+        axios.get('/api/project/projectName/'+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                this.subjectId = response.data.subject.subjectId
+                if(this.currentPage==1) {
                         this.$router.push({
                             path: '/project/'+this.$route.params.projectId+'/noticeBoard',
                             query:{page:1}
                         })
                 }
+                axios.get('/api/noticeBoard/commentNum?page='+this.$route.query.page+'&subjectId='+ this.subjectId).then(response => { // 프로젝트 이름 가져오기
+                    this.commentNum=response.data
+                }).catch((erro) => {
+                    console.error(erro);
+                 });
                 axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.subjectId).then(response2 => {
                     this.paginatedItems=response2.data
                     axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => { // 프로젝트 이름 가져오기

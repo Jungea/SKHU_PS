@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.skhu.domain.Comment;
 import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Timeline;
-import net.skhu.domain.User;
 import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.WriteNoticeModel;
+import net.skhu.repository.CommentRepository;
 import net.skhu.repository.DetailRepository;
 import net.skhu.repository.FileRepository;
 import net.skhu.repository.PostRepository;
@@ -43,6 +44,8 @@ public class PostService {
 	ProjectService projectService;
 	@Autowired
 	TimelineRepository timelineRepository;
+	@Autowired
+	CommentRepository commentRepository;
 	
 	public List<Post> noticeBoard(int page,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
@@ -147,5 +150,43 @@ public class PostService {
 		post.setUser(userRepository.findById(userId).get());
 		post.setDetail(detailRepository.findById(14).get());
 		return postRepository.save(post).getPostId();
+	}
+	public List<Integer> commentNum(int page,int projectId) {
+		List<Post> posts=postRepository.findByProject_projectId(projectId);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<Comment> comments=commentRepository.findByPost_PostId(p.getPostId());
+			if(comments==null) {
+				num.add(0);
+			} else {
+				num.add(comments.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+	}
+	public List<Integer> commentNum2(int page,int subjectId) {
+		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<Comment> comments=commentRepository.findByPost_PostId(p.getPostId());
+			if(comments==null) {
+				num.add(0);
+			} else {
+				num.add(comments.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
 	}
 }

@@ -12,7 +12,7 @@
                         <th class="th1">제출 연장일</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td style="width: 40%"> <b> {{ item.title }} </b> </td>
+                        <td style="width: 40%"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
                         <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
@@ -96,7 +96,8 @@ export default {
             deadline: '',
             extention: '',
             userType: '',
-            files: ''
+            files: '',
+            commentNum:[],
         } 
     },
     watch: {
@@ -108,6 +109,11 @@ export default {
                 }).catch((erro) => {
                 console.error(erro);
              });
+            axios.get('/api/noticeBoard/commentNum?page='+this.$route.query.page+'&subjectId='+ this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+                    this.commentNum=response.data
+                }).catch((erro) => {
+                    console.error(erro);
+            });
         }
     },
     mounted() {
@@ -117,6 +123,11 @@ export default {
             query:{page:1}
             })
         }
+        axios.get('/api/noticeBoard/commentNum?page='+this.$route.query.page+'&subjectId='+ this.$route.params.subjectId).then(response => { // 프로젝트 이름 가져오기
+                    this.commentNum=response.data
+                }).catch((erro) => {
+                    console.error(erro);
+        });
         axios.get('/api/user')
         .then(response => {
             this.userType = response.data.userType

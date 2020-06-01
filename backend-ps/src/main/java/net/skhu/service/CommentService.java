@@ -1,6 +1,7 @@
 package net.skhu.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,12 +81,26 @@ public class CommentService {
 		postRepository.delete(postRepository.findById(postId).get());
 	}
 	@Transactional
-	public void commentCheck(int commentId) {
+	public int commentCheck(int commentId,int postId) {
 		Comment c=commentRepository.findById(commentId).get();
-		if(c.getChoice()==0) 
-			c.setChoice(1);
-		else
+		List<Comment> comments=commentRepository.findByPost_PostId(postId);
+		if(c.getChoice()==1) { // 현재 채택된 댓글을 다시 선택한 것일때 
 			c.setChoice(0);
-		commentRepository.save(c);
+			commentRepository.save(c);
+			return 1; // ok
+		}
+		int num=0;
+		for(Comment comment:comments) {
+			if(comment.getChoice()==0) {
+				num++;
+			}
+		}
+		if(num==comments.size()) { // 채택된 댓글이 없을때
+			c.setChoice(1);
+			commentRepository.save(c);
+			return 1; // ok
+		} 
+		return 0; // not ok!
+
 	}
 }

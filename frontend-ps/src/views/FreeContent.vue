@@ -55,7 +55,7 @@
                                 <b> {{ item.user.name }} </b> 
                                 <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
                                 <b-icon-x scale="2" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)" style="float: right ; cursor:pointer"></b-icon-x>
-                                 <b-icon-check-circle scale="2" v-if="item.choice==0" @click="commentSelect(item.commentId)" style="cursor:pointer"></b-icon-check-circle>
+                                 <b-icon-check-circle scale="2" @click="commentSelect(item.commentId)" style="cursor:pointer"></b-icon-check-circle>
                             </div>
                             <div style="margin-top: 3px"> {{ item.content }} </div>
                        </td>
@@ -107,7 +107,8 @@ export default {
             userId:null,  
             files:null,
             deadlineTime: '',
-            extentionTime: ''
+            extentionTime: '',
+            isPostLiked:null, // 현재 게시글 좋아요 상태표시
         }
     },
     mounted() { 
@@ -129,6 +130,10 @@ export default {
         axios.get('/api/noticeBoard/comment/'+this.$route.params.postId)
         .then(response => {
             this.comment=response.data
+        })
+        axios.get('/api/freeBoard/postLike/'+this.$route.params.postId)
+        .then(response => {
+            this.isPostLiked=response.data
         })
         this.postId = this.$route.params.postId
     },
@@ -226,9 +231,13 @@ export default {
         },
         commentSelect(commentId) {
             if(this.userId==this.list.user.userId) { // 현 게시글 작성한 사람만 check 할 권한 부여
-                 axios.post('/api/freeBoard/commentCheck/'+commentId)
+                 axios.post('/api/freeBoard/commentCheck/'+commentId,{
+                     postId:this.$route.params.postId,
+                 })
                 .then(response => {
-                    console.log(response.data)
+                    if(response.data==0) {
+                        alert('이미 채택된 댓글이 존재합니다.')
+                    }
                     
                 })
             } else {
@@ -239,6 +248,7 @@ export default {
             axios.post('/api/freeBoard/postLike/'+this.$route.params.postId)
                 .then(response => {
                     console.log(response.data)
+                    this.isPostLiked=!this.isPostLiked
             })
         },
         
