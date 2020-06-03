@@ -9,56 +9,62 @@
       </p>
       <b-nav-item disabled><hr></b-nav-item>
 
-      <div v-if="!this.type"> <!--학생일때-->
-          <b-nav-item disabled>내가 pin한 프로젝트</b-nav-item>
-          <b-nav-item> 
-            <b-form-select 
-            v-model="pinProjectId"
-            :options="this.myProjects"
-            class="mb-1"
-            value-field="projectId"
-            text-field="projectName"
-            @change="changeSelect()"></b-form-select>
-          </b-nav-item>
-          <b-nav-item><hr></b-nav-item>
-
-          <div disabled v-show="this.pinProjectId">
-            <ul style="list-style-type: none ; padding: 0px">
-              <b-nav-item disabled><strong>{{ this.projectName }}</strong></b-nav-item>
-              <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
-              <li><b-nav-item>캘린더</b-nav-item></li>
-              <li><b-nav-item @click="projectInfoChange('weekly')">주차별 목표(to-do-list)</b-nav-item></li>
-              <li v-if="pinProjectSubjectId > 0 && isJoined"><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
-              <li><b-nav-item>토론 게시판</b-nav-item></li>
-              <li><b-nav-item @click="freeBoard()">자유 게시판</b-nav-item></li>
-              <li v-if="this.name == this.capName"><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
-            </ul>
-            <hr>
-          </div>
+      <!-- 셀렉션(학생) -->
+      <div v-if="!this.type">
+        <b-nav-item disabled>내가 pin한 프로젝트</b-nav-item>
+        <b-nav-item> 
+          <b-form-select 
+          v-model="pinProjectId"
+          :options="this.myProjects"
+          class="mb-1"
+          value-field="projectId"
+          text-field="projectName"
+          @change="changeSelect()"></b-form-select>
+        </b-nav-item>
+        <b-nav-item><hr></b-nav-item>
       </div>
-      <div v-else> <!--교수일때-->
-          <b-nav-item disabled>내가 pin한 과목</b-nav-item>
-          <b-nav-item> 
-            <b-form-select 
-            v-model="pinSubjectId"
-            :options="this.mysubjects"
-            class="mb-1"
-            value-field="subjectId"
-            text-field="title"
-            @change="changeSelect()"></b-form-select>
-          </b-nav-item>
-          <b-nav-item><hr></b-nav-item>
 
-          <div disabled v-show="this.pinSubjectId">
-            <ul style="list-style-type: none ; padding: 0px">
-              <b-nav-item @click="subjectInfo()"><strong>{{ this.subjectName }}</strong></b-nav-item>
-              <li><b-nav-item @click="viewTeam()">팀별 확인</b-nav-item></li>
-              <li><b-nav-item @click="viewScore()">점수 모아보기</b-nav-item></li>
-              <li><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
-            </ul>
-            <hr>
-          </div>
+      <!-- 셀렉션(교수) -->
+      <div v-else>
+        <b-nav-item disabled>내가 pin한 과목</b-nav-item>
+        <b-nav-item> 
+          <b-form-select 
+          v-model="pinSubjectId"
+          :options="this.mysubjects"
+          class="mb-1"
+          value-field="subjectId"
+          text-field="title"
+          @change="changeSelect()"></b-form-select>
+        </b-nav-item>
+        <b-nav-item><hr></b-nav-item>
       </div>
+
+      <!-- url이 /project 일 때 -->
+      <div disabled v-show="this.pinProjectId">
+        <ul style="list-style-type: none ; padding: 0px">
+          <b-nav-item disabled><strong>{{ this.projectName }}</strong></b-nav-item>
+          <li><b-nav-item @click="projectInfoChange('summary')">프로젝트 정보</b-nav-item></li>
+          <li><b-nav-item>캘린더</b-nav-item></li>
+          <li><b-nav-item @click="projectInfoChange('weekly')">주차별 목표(to-do-list)</b-nav-item></li>
+          <li v-if="pinProjectSubjectId > 0 && isJoined"><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
+          <li><b-nav-item>토론 게시판</b-nav-item></li>
+          <li><b-nav-item @click="freeBoard()">자유 게시판</b-nav-item></li>
+          <li v-if="this.name == this.capName"><b-nav-item @click="projectInfoChange('manage')">관리</b-nav-item></li>
+        </ul>
+        <hr>
+      </div>
+
+      <!-- url이 /subject 일 때 -->
+      <div disabled v-show="this.pinSubjectId">
+        <ul style="list-style-type: none ; padding: 0px">
+          <b-nav-item @click="subjectInfo()"><strong>{{ this.subjectName }}</strong></b-nav-item>
+          <li><b-nav-item @click="viewTeam()">팀별 확인</b-nav-item></li>
+          <li><b-nav-item @click="viewScore()">점수 모아보기</b-nav-item></li>
+          <li><b-nav-item @click="viewNotice()">공지 게시판</b-nav-item></li>
+        </ul>
+        <hr>
+      </div>
+      
       <b-nav-item>it 경진대회</b-nav-item>
       <b-nav-item @click="projectBoard">프로젝트 게시판</b-nav-item>
       <b-nav-item >커뮤니티 게시판</b-nav-item>
@@ -99,7 +105,6 @@ export default {
         projectName:null, // 현재 셀렉트 된 projectName
         pinProjectId:null, // 현재 셀렉트 된 projectId
         myProjects:[],
-        allProjects:[],
         type:null, // 현재 유저가 학생인지 교수인지 
         mysubjects:[],
         pinSubjectId:null,
@@ -108,7 +113,7 @@ export default {
         checkTime1: '',
         beforeList: [],
         arrIndex: '',
-        pinProjectSubjectId: '',
+        pinProjectSubjectId: '',  //과목이 있는 프로젝트(공지게시판)
         capName: '',
         userId: '',
 
@@ -118,18 +123,14 @@ export default {
     },
    
     mounted() {
+      // sidebar 셀렉션
       axios.get('/api/user')
         .then(response => {
           this.type=response.data.userType
           this.name = response.data.name
           this.userId = response.data.userId
 
-          if(this.type==false)  { // 학생이라면
-            // axios.get('/api/user/checkJoinMember/'+this.pinProjectId).then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인
-            //     this.isJoined = response.data
-            //   }).catch((erro)=> {
-            //   console.error(erro);
-            // });
+          if(this.type==false)  { 
             axios.get('/api/pinList').then(response => {
                 this.myProjects = response.data
               }).catch((erro)=> {
@@ -149,53 +150,55 @@ export default {
         }).catch((erro)=> {
           console.error(erro);
         });
-        // axios.get('/api/allProjects').then(response => {
-        //     this.allProjects = response.data
-        //   }).catch((erro)=> {
-        //   console.error(erro);
-        // });
+        
+      this.reload();
     },
     watch: {
       '$route' () {
-        if(this.type==false) { // 학생일때
-          if(this.$route.params.projectId != undefined) { // 프로젝트를 선택한 상태일때
-            this.pinProjectId = this.$route.params.projectId
-            axios.get('/api/project/projectName/'+this.pinProjectId).then(response => { // 프로젝트 이름 가져오기
-                let project = response.data
-                this.projectName=project.projectName
-
-                 axios.get('/api/user/checkJoinMember/'+this.pinProjectId).then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인
-                  this.isJoined = response.data
-                }).catch((erro)=> {
-                  console.error(erro);
-                });
-
-                this.capName = project.user.name
-                if(project.subject == null)
-                  this.pinProjectSubjectId = 0
-                else
-                  this.pinProjectSubjectId = project.subject.subjectId
-                if(project.subject != null) {
-                  this.checkSubject = true;
-                } else
-                  this.checkSubject = false;
-              }).catch((erro) => {
-              console.error(erro);
-            });
-          } 
-        } else { // 교수일때 
-          if(this.$route.params.subjectId != undefined) { 
-            this.pinSubjectId = this.$route.params.subjectId
-            axios.get('/api/subject/subjectName/'+this.pinSubjectId).then(response => { // 과목 이름 가져오기
-                this.subjectName=response.data.title
-              }).catch((erro) => {
-              console.error(erro);
-            });
-          }
-        }
+        this.reload();
       }   
     },
     methods: {
+      reload() {  //url에 따라 변경
+        if(this.$route.params.projectId != undefined) { // 프로젝트를 선택한 상태일때
+          this.pinProjectId = this.$route.params.projectId
+          this.pinSubjectId = null;
+          axios.get('/api/project/projectName/'+this.pinProjectId).then(response => { // 프로젝트 이름 가져오기
+              let project = response.data
+              this.projectName=project.projectName
+
+              if(this.type == false) { // 교수의 팀별 확인 거르는 조건
+                axios.get('/api/user/checkJoinMember/'+this.pinProjectId)
+                  .then(response => { // 현재 유저가 현재 프로젝트에 참여한 상태인지 확인(공지게시판)
+                    this.isJoined = response.data
+                  }).catch((erro)=> {
+                    console.error(erro);
+                  });
+              }
+
+              this.capName = project.user.name
+              if(project.subject == null)
+                this.pinProjectSubjectId = 0
+              else
+                this.pinProjectSubjectId = project.subject.subjectId
+              if(project.subject != null) {
+                this.checkSubject = true;
+              } else
+                this.checkSubject = false;
+            }).catch((erro) => {
+            console.error(erro);
+          });
+        } 
+        else if(this.$route.params.subjectId != undefined) { 
+          this.pinSubjectId = this.$route.params.subjectId
+          this.pinProjectId = null;
+          axios.get('/api/subject/subjectName/'+this.pinSubjectId).then(response => { // 과목 이름 가져오기
+              this.subjectName=response.data.title
+            }).catch((erro) => {
+            console.error(erro);
+          });
+        }
+      },
       record() {
         let checkTime = this.checkTime1
         this.beforeList = this.data.filter(function(item) {
@@ -205,11 +208,8 @@ export default {
       },
       projectBoard(evt) {
         evt.preventDefault()
-
-        if(this.type == false)
-          this.pinProjectId = null;
-        else
-          this.pinSubjectId = null;
+        // this.pinProjectId = null;
+        // this.pinSubjectId = null;
 
         this.$router.push({
             path: '/projectBoard',
@@ -219,7 +219,9 @@ export default {
       home(evt) {
         evt.preventDefault()
         // location.href="/home"
-        this.pinProjectId = null;
+        // this.pinProjectId = null;
+        // this.pinSubjectId = null;
+        
         if(this.type==false) { // 학생이라면
           this.$router.push({
             path: '/home'
