@@ -3,7 +3,6 @@
         <b-row>
             <h4>프로젝트 게시판</h4>
         </b-row>
-
         <!--필터검색-->
         <b-row class="text-right mb-4">
             <b-col><b-button v-b-toggle.my-collapse variant="outline-secondary" style="height: 70px;">프로젝트 검색</b-button></b-col>         
@@ -33,7 +32,8 @@
         <!--전체 프로젝트 목록-->
         <b-row cols-md="3" cols="1">
             <b-col class="mb-5" :key="index" v-for="(item, index) in paginatedItems">
-                <b-card align="left" bg-variant="dark" text-variant="white" style="height:250px">
+                <!--프로젝트 카드-->
+                <b-card align="left" bg-variant="dark" text-variant="white" style="height:250px;" :ref="`card${item.project.projectId}`">
                     <template v-slot:header>
                         <h5 style="display:inline"><b>{{item.project.projectName}}</b></h5>
                     </template>
@@ -41,14 +41,18 @@
                         <p style="font-size:17px">
                             <b-icon-people-fill scale=1.1 style="margin-right:10px"></b-icon-people-fill><b>{{item.project.memNum}}</b>
                         </p>
+                    </b-card-text>
+                    <b-card-text>
                         <h6><b-badge variant="secondary" v-for="(tag,index) in item.project.tag.split(',')" :key="index" style="margin-right:5px">
                             {{tag}}
                         </b-badge></h6>
+                    </b-card-text>
+                    <b-card-text>
                         <div style="margin-top:10px">
-                            <h5 style="display:inline-block;"><b-badge variant="success" v-if="item.project.progState==false">진행중</b-badge></h5>
-                            <h5 style="display:inline-block;"><b-badge variant="danger" v-if="item.project.progState==true">진행완료</b-badge></h5>
-                            <h5 style="display:inline-block; margin-left:10px"><b-badge variant="success" v-if="item.project.rcrtState==false">모집중</b-badge></h5>
-                            <h5 style="display:inline-block; margin-left:10px"><b-badge variant="danger" v-if="item.project.rcrtState==true">모집완료</b-badge></h5>
+                            <h5 style="display:inline-block;"><b-badge variant="success" v-if="!item.project.progState">진행중</b-badge></h5>
+                            <h5 style="display:inline-block;"><b-badge variant="danger" v-if="item.project.progState">진행완료</b-badge></h5>
+                            <h5 style="display:inline-block; margin-left:10px"><b-badge variant="success" v-if="!item.project.rcrtState">모집중</b-badge></h5>
+                            <h5 style="display:inline-block;"><b-badge variant="danger" v-if="item.project.rcrtState">모집완료</b-badge></h5>
                         </div>
                     </b-card-text>
                     <template v-slot:footer>
@@ -67,79 +71,80 @@
         </b-row>
 
         <!--프로젝트 정보 모달-->
-        <b-modal id="modal-xl" size="lg" title="프로젝트 개요" ref="modal" data-backdrop="static">
-            <table class="table table-bordered" id="ProjectSummary" v-bind="this.summaryData">
+        <b-modal id="modal-xl" size="lg" title="프로젝트 개요" @hidden="resetModal">
+            <table class="table table-bordered" id="ProjectSummary" >
                 <tbody>
                     <tr>
                         <th scope="row" style="width:28%">프로젝트명</th>
                         <td>
-                            {{this.summaryData.project.projectName }}
+                            {{summaryData.project.projectName}}
+                            <b-button @click="moveToProject(summaryData.project.projectId)" style="margin-left:20px" size="sm">이동</b-button>
                         </td>
                     </tr>
                         <tr>
                         <th scope="row" style="width:28%">개설자</th>
                         <td>
-                            {{ this.summaryData.createName}}
+                            {{summaryData.createName}}
                         </td>
                     </tr>
                         <tr>
                         <th scope="row" style="width:28%">참여자 학년</th>
                         <td>
-                            {{ this.summaryData.allMemGrade}}
+                            {{summaryData.allMemGrade}}
                         </td>
                     </tr>
                         <tr>
                         <th scope="row" style="width:28%">멤버 수</th>
                         <td>
-                            {{ this.summaryData.project.memNum }}
+                            {{summaryData.project.memNum }}
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">주제</th>
                         <td>
-                            {{ this.summaryData.project.theme }}
+                            {{summaryData.project.theme }}
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">내용</th>
                         <td>
-                            {{ this.summaryData.project.content }}
+                            {{summaryData.project.content }}
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">사용기술과 언어</th>
                         <td>
-                            <b-badge variant="secondary" v-for="(tag,index) in this.summaryData.project.tag.split(',')" :key="index" style="margin-right:5px">{{tag}}</b-badge>
+                            <b-badge variant="secondary" v-for="(tag,index) in summaryData.project.tag.split(',')" :key="index" style="margin-right:5px">{{tag}}</b-badge>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">깃허브 리포지토리 주소</th>
                         <td>
-                            {{ this.summaryData.project.github }}
+                            {{summaryData.project.github }}
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">인원 모집 상태</th>
                         <td>
-                            {{this.summaryData.project.rcrtState==false?"모집중":"모집완료" }}
+                            {{summaryData.project.rcrtState==false?"모집중":"모집완료" }}
                         </td>
                     <tr>
                         <tr>
                         <th scope="row">진행 상태</th>
                         <td>
-                            {{this.summaryData.project.progState==false?"진행중":"진행완료" }}
+                            {{summaryData.project.progState==false?"진행중":"진행완료" }}
                         </td>
                     <tr>
                         <th scope="row">과목</th>
                         <td>
-                            {{this.summaryData.subjectName==null?"-":this.summaryData.subjectName }}
+                            {{summaryData.subjectName==null?"-":summaryData.subjectName }}
                         </td>
                     </tr>
                 </tbody>
             </table>
-                <b-button variant="danger" v-if="this.userType!=1&& this.summaryData.state==2&& this.summaryData.project.rcrtState==false" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
-                <b-button variant="warning" v-else-if="this.userType!=1&&this.summaryData.state==0" >승인 대기</b-button>
-                <b-button variant="success" v-else-if="this.userType!=1&&this.summaryData.state==1" >참가중</b-button>
+                <b-button variant="danger" v-if="userType!=1&& summaryData.state==2&& summaryData.project.rcrtState==false" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
+                <b-button variant="warning" v-else-if="userType!=1&&summaryData.state==0" >승인 대기</b-button>
+                <b-button variant="success" v-else-if="userType!=1&&summaryData.state==1" >참가중</b-button>
 
             <template v-slot:modal-footer="{cancel}">
                 <b-button size="sm" @click="cancel()">닫기</b-button>
@@ -216,6 +221,7 @@ export default {
       }
   },
   mounted() {
+      //console.log(this.$refs)
       axios.get('/api/user').then(response => { // 프로젝트 이름 가져오기
                this.userType=response.data.userType
               }).catch((erro) => {
@@ -262,15 +268,32 @@ export default {
         });
     },
   computed: {
-    // pageCount() {
-    //   let l = this.totalRows,
-    //     s = this.perPage;
-    //   return Math.floor(l / s);
-    // },
-    
   },
   methods: {
-     paginate (page_size, page_number) {
+      moveToProject(pId){
+          let Url='/project/'+pId+'/summary'
+          this.$router.push({
+              path: Url,
+          })
+      },
+    resetModal(){
+        this.summaryData={
+          project: {
+              projectName:'',
+              memNum:null,
+              theme:'',
+              content:'',
+              tag:'',
+              github:null,
+              rcrtState:false,
+              progState:false,
+          },
+          createName:'',
+          allMemGrade:[],
+          subjectName:'',
+        }
+    },
+    paginate (page_size, page_number) {
          this.$router.push({
             path: '/projectBoard',
             query:{page:page_number+1}
@@ -307,7 +330,6 @@ export default {
       //this.summaryData=item
        axios.get('/api/projectBoard/modal/'+projectId).then(response => { // 프로젝트 이름 가져오기
                 this.summaryData=response.data
-                this.$refs['modal'].show()
               }).catch((erro) => {
               console.error(erro);
             });
