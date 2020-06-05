@@ -146,7 +146,11 @@
                 <b-button class="mr-3" variant="dark" @click="edit = false">취소</b-button>
                 <b-button variant="dark" @click="stateEdit()">저장</b-button>
             </div>
+            <div class="mb-4" style="text-align: right">
+                <b-button variant="danger" @click="deleteProject()">프로젝트 삭제</b-button>
             </div>
+            </div>
+
         </div>
 
 
@@ -308,6 +312,20 @@ export default {
                 console.error(erro);
             });
         },
+        // 프로젝트 삭제
+        deleteProject() {
+            let result=confirm('이 프로젝트를 삭제하시겠습니까?')
+            if(result) {
+                axios.post('/api/project/delete',{
+                    projectId:this.$route.params.projectId
+                })
+                .then(() => {
+                    this.$router.push({
+                        path: '/home',
+                    })
+                })
+            }
+         }
     },
 }
 </script>

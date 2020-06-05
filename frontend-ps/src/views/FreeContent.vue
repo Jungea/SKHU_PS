@@ -37,7 +37,7 @@
                             <b-button v-if="userType" @click="viewFileList()" variant="dark">제출물 보기</b-button>
                         </div>
                         <div style="display: inline-block ; margin-right: 5% ; float: right">
-                             <b-button class="mr-3" v-if="userId==list.user.userId" @click="deletePost()" variant="danger">삭제</b-button>
+                             <b-button class="mr-3" v-if="admin=='1' ||userId==list.user.userId" @click="deletePost()" variant="danger">삭제</b-button>
                             <b-button style="margin-right: 10px" v-if="userId==list.user.userId" @click="edit()" variant="dark">수정</b-button>
                             <b-button @click="viewList()" variant="dark">목록으로</b-button>
                             <b-button @click="postLike()" variant="primary">좋아요</b-button>
@@ -54,7 +54,7 @@
                             <div> 
                                 <b> {{ item.user.name }} </b> 
                                 <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
-                                <b-icon-x scale="2" v-if="item.user.userId==userId" @click="deleteComment(item.commentId)" style="float: right ; cursor:pointer"></b-icon-x>
+                                <b-icon-x scale="2" v-if="admin=='1' || item.user.userId==userId" @click="deleteComment(item.commentId)" style="float: right ; cursor:pointer"></b-icon-x>
                                  <b-icon-check-circle scale="2" @click="commentSelect(item.commentId)" style="cursor:pointer"></b-icon-check-circle>
                             </div>
                             <div style="margin-top: 3px"> {{ item.content }} </div>
@@ -109,6 +109,7 @@ export default {
             deadlineTime: '',
             extentionTime: '',
             isPostLiked:null, // 현재 게시글 좋아요 상태표시
+            admin:null,
         }
     },
     mounted() { 
@@ -126,6 +127,7 @@ export default {
             this.userType = response.data.userType
             this.userName = response.data.name
             this.userId=response.data.userId
+            this.admin=response.data.admin
         })
         axios.get('/api/noticeBoard/comment/'+this.$route.params.postId)
         .then(response => {

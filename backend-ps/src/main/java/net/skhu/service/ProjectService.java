@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.ProjectStar;
@@ -691,6 +690,11 @@ public class ProjectService {
 		} else
 			return null;
 	}
-	
+	// 프로젝트 삭제
+	@Transactional
+	public void delete(int projectId) {
+		Project project=projectRepository.findById(projectId).get();
+		projectRepository.delete(project);
+	}
 	
 }

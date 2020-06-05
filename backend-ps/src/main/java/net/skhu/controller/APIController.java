@@ -743,4 +743,10 @@ public class APIController {
 	public List<Integer> commentNum2(@RequestParam("page") int page,@RequestParam("subjectId") int subjectId) {
 		return postService.commentNum2(page,subjectId);
 	}
+	// 프로젝트 삭제
+	@RequestMapping(value = "project/delete", method = RequestMethod.POST)
+	public void projectDelete(@RequestBody Project project) {
+		projectService.delete(project.getProjectId());
+	}
+
 }

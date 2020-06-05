@@ -39,6 +39,7 @@ public class User {
 	String language;
 	boolean emailCheck;
 	String authKey;
+	String admin; // 관리자이면 1 아니면 null
 
    @ManyToOne(fetch = FetchType.EAGER)
    @JoinColumn(name = "detDeptId")
