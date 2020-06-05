@@ -143,9 +143,9 @@
                         </tr>
                     </tbody>
                 </table>
-                <b-button variant="danger" v-if="this.summaryData.state==2&& this.summaryData.project.rcrtState==false" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
-                <b-button variant="warning" v-else-if="this.summaryData.state==0" >승인 대기</b-button>
-                <b-button variant="success" v-else-if="this.summaryData.state==1" >참가중</b-button>
+                <b-button variant="danger" v-if="this.userType!=1 && this.summaryData.state==2&& this.summaryData.project.rcrtState==false" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
+                <b-button variant="warning" v-else-if="this.userType!=1 &&this.summaryData.state==0" >승인 대기</b-button>
+                <b-button variant="success" v-else-if="this.userType!=1 &&this.summaryData.state==1" >참가중</b-button>
         </b-modal>  
         
             <div style="position:fixed;bottom:20px;right:20px;">
@@ -202,6 +202,7 @@ export default {
        selectedGrade:'',
        selectedYear:'',
        selectedSubject:'',
+       userType:null,
     }
   },
   watch: {
@@ -248,6 +249,11 @@ export default {
             query:{page:1}
           })
       }
+      axios.get('/api/user').then(response => { // 프로젝트 이름 가져오기
+               this.userType=response.data.userType
+              }).catch((erro) => {
+              console.error(erro);
+        });
        axios.get('/api/projectBoard/subjects') // 모든 과목 정보
         .then(response => {
             for(let i=0;i<response.data.length;i++) {

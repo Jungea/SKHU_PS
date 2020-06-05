@@ -137,9 +137,9 @@
                     </tr>
                 </tbody>
             </table>
-                <b-button variant="danger" v-if="this.summaryData.state==2&& this.summaryData.project.rcrtState==false" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
-                <b-button variant="warning" v-else-if="this.summaryData.state==0" >승인 대기</b-button>
-                <b-button variant="success" v-else-if="this.summaryData.state==1" >참가중</b-button>
+                <b-button variant="danger" v-if="this.userType!=1&& this.summaryData.state==2&& this.summaryData.project.rcrtState==false" @click="projectJoin(summaryData.project.projectId)">참가 신청하기</b-button>
+                <b-button variant="warning" v-else-if="this.userType!=1&&this.summaryData.state==0" >승인 대기</b-button>
+                <b-button variant="success" v-else-if="this.userType!=1&&this.summaryData.state==1" >참가중</b-button>
 
             <template v-slot:modal-footer="{cancel}">
                 <b-button size="sm" @click="cancel()">닫기</b-button>
@@ -197,6 +197,7 @@ export default {
        selectedGrade:'',
        selectedYear:'',
        selectedSubject:'',
+       userType:null,
     }
   },
    watch: {
@@ -215,6 +216,11 @@ export default {
       }
   },
   mounted() {
+      axios.get('/api/user').then(response => { // 프로젝트 이름 가져오기
+               this.userType=response.data.userType
+              }).catch((erro) => {
+              console.error(erro);
+        });
       for(let i=2019;i<=new Date().getFullYear();i++) {
           let obj={}
           obj.value=String(i)

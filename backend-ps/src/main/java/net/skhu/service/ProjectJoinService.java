@@ -148,16 +148,24 @@ public class ProjectJoinService {
 	// 유저가 프로젝트 참여 신청 함.
 	@Transactional
 	public boolean joinProject(int projectId, int userId) {
-		ProjectJoin projectJoin = new ProjectJoin();
-		projectJoin.setUser(userRepository.findById(userId).get());
-		projectJoin.setProject(projectRepository.findById(projectId).get());
-		projectJoin.setJoinTime(LocalDateTime.now());
-		projectJoin.setColor("#000000");
-		projectJoin.setState(0);
-		projectJoin.setType(2);
-
-		projectJoinRepository.save(projectJoin);
-		
+		ProjectJoin projectJoin=projectJoinRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId);
+		// 거절당한 상태라면
+		if(projectJoin!=null) {
+			projectJoin.setJoinTime(LocalDateTime.now());
+			projectJoin.setState(0);
+			projectJoin.setType(2);
+			projectJoinRepository.save(projectJoin);
+		} else {
+			projectJoin = new ProjectJoin();
+			projectJoin.setUser(userRepository.findById(userId).get());
+			projectJoin.setProject(projectRepository.findById(projectId).get());
+			projectJoin.setJoinTime(LocalDateTime.now());
+			projectJoin.setColor("#000000");
+			projectJoin.setState(0);
+			projectJoin.setType(2);
+	
+			projectJoinRepository.save(projectJoin);
+		}
 		//TIMELINE 프로젝트에 유저가 참가 신청 함 [팀장 받음].
 		String content = projectJoin.getUser().getName()+"님에게 "+projectJoin.getProject().getProjectName()+" 참가 신청을 받았습니다.";
 		String url = "/project/"+projectJoin.getProject().getProjectId()+"/manage";

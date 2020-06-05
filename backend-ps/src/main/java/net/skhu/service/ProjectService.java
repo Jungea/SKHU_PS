@@ -346,7 +346,7 @@ public class ProjectService {
 		}
 		model.setAllMemGrade(allGrade);
 		ProjectJoin pj = projectJoinRepository.findByUser_userIdAndProject_projectId(userId, p.getProjectId());
-		if (pj == null)
+		if (pj == null || pj.getState()==2) // 거절 상태이거나 신청 이력이 없을때
 			model.setState(2); // 프로젝트 신청할수 있는 상태
 		else if (pj.getState() == 0)
 			model.setState(0); // 승인대기 상태
