@@ -2,6 +2,7 @@
     <div class="containerStyle">
         <h3 style="margin-left: 5%">자유 게시판</h3>
         <hr style="width: 90%">
+        <!--게시글 목록 테이블-->
         <center>
             <b-form-group label-for="SubjectNotice">
                 <table class="table table-bordered" id="SubjectNotice" style="width: 90%">
@@ -10,7 +11,7 @@
                         <th class="th1">작성일</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td style="width: 40%"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
+                        <td class="title" style="width: 40%; cursor:pointer"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                     </tr>
                 </table>
@@ -21,45 +22,43 @@
             <b-pagination style="float: right ; margin-right: 5%" @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
         </center>
 
-
-     <b-modal id="modal-newBoard" size="lg"  @show="resetModal" @hidden="resetModal" title="게시글 작성" :ok-disabled="!checkForm() || checkTime()" @ok="newBoard">
-        <center>
+        <!--게시글 작성 모달-->
+        <b-modal id="modal-newBoard" size="lg"  @show="resetModal" @hidden="resetModal" title="게시글 작성" :ok-disabled="!checkForm() || checkTime()" @ok="newBoard">
             <b-form-group label-for="newNotice" enctype="multipart/form-data">
                 <table class="table table-bordered" id="newNotice" >
                     <tr>
-                       <th style="width:20%">제목</th>
-                            <td>
-                                <b-form-input v-model.trim="title" placeholder="게시글 제목을 입력하세요."></b-form-input>
-                            </td>
+                        <th style="width:20%">제목</th>
+                        <td>
+                            <b-form-input v-model.trim="title" placeholder="게시글 제목을 입력하세요."></b-form-input>
+                        </td>
                     </tr>
                     <tr>
-                       <th>내용</th>
-                            <td>
-                                <b-form-textarea rows="9" v-model="content" placeholder="게시글 내용을 입력하세요."></b-form-textarea>
-                            </td>
-                            
+                        <th>내용</th>
+                        <td>
+                            <b-form-textarea rows="9" v-model="content" placeholder="게시글 내용을 입력하세요."></b-form-textarea>
+                        </td>
                     </tr>
                      <tr>
-                       <th>파일 업로드</th>
-                            <td>
-                                <b-form-file multiple v-model="files" class="mt-3" plain ></b-form-file>          
-                                <!-- <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/> -->
-                            </td>
+                        <th>파일 업로드</th>
+                        <td>
+                            <b-form-file multiple v-model="files" class="mt-3" plain ></b-form-file>          
+                            <!-- <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/> -->
+                        </td>
                     </tr>
                 </table>
             </b-form-group>
-        </center>
-    </b-modal>
+        </b-modal>
 
-    <b-modal id="calendar1" ok-only no-close-on-backdrop>
-        <b-calendar block @context="onContext1" :date-disabled-fn="dateDisabled1"></b-calendar>
-    </b-modal>
-    <b-modal id="calendar2" ok-only no-close-on-backdrop>
-        <b-calendar block @context="onContext2" :date-disabled-fn="dateDisabled2"></b-calendar>
-    </b-modal>
-
+        <!--날짜선택-->
+        <b-modal id="calendar1" ok-only no-close-on-backdrop>
+            <b-calendar block @context="onContext1" :date-disabled-fn="dateDisabled1"></b-calendar>
+        </b-modal>
+        <b-modal id="calendar2" ok-only no-close-on-backdrop>
+            <b-calendar block @context="onContext2" :date-disabled-fn="dateDisabled2"></b-calendar>
+        </b-modal>
     </div>    
 </template>
+
 <script>
 import axios from 'axios'
 export default {
@@ -74,7 +73,7 @@ export default {
             content: '',
             nowDate: '',
             userType: '',
-            files: '',
+            files: [],
             isjoinMember:true,
             commentNum:[],
         } 
@@ -96,44 +95,50 @@ export default {
         }
     },
     mounted() {
-         axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
-        .then(response => {
-            this.isjoinMember=response.data
-        });
-        if(this.currentPage==1) {
-            this.$router.push({
-            path: '/project/'+this.$route.params.projectId+'/freeBoard',
-            query:{page:1}
-            })
-        }
-        // axios.get('/api/user')
-        // .then(response => {
-        //     this.userType = response.data.userType
-        // });
-        axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
-                this.paginatedItems=response.data
-                }).catch((erro) => {
-                console.error(erro);
-        });
-        axios.get('/api/freeListNum?projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
-                this.totalRows=response.data
-                }).catch((erro) => {
-                console.error(erro);
-        });
-         axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
-                this.commentNum=response.data
-                }).catch((erro) => {
-                console.error(erro);
-        });
+        this.loadPage();
     },
     methods: {
+        loadPage(){
+            axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
+            .then(response => {
+                this.isjoinMember=response.data
+            });
+            if(this.currentPage==1) {
+                this.$router.push({
+                    path: '/project/'+this.$route.params.projectId+'/freeBoard',
+                    query:{page:1}
+                }).catch(error => {       //일단 네비게이션 중복 에러 뜨는 부분은 throw해둠..
+                    if(error.name != "NavigationDuplicated" ){
+                        throw error;
+                    }
+                });
+            }
+            // axios.get('/api/user')
+            // .then(response => {
+            //     this.userType = response.data.userType
+            // });
+            axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                    this.paginatedItems=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
+            axios.get('/api/freeListNum?projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                    this.totalRows=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
+            axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                    this.commentNum=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
+        },
         resetModal() {
             this.title = '',
             this.content = '',
             this.deadline = '',
             this.extention = '',
             this.nowDate = ''
-    
         },
         checkForm() {
             if(this.title && this.content)
@@ -162,7 +167,7 @@ export default {
                     title:this.title,
                     content:this.content,
                 }).then(response => {
-                alert('id:'+response.data)
+                //alert('id:'+response.data)
                 let newPostId=response.data
                 for(let i=0;i<this.files.length;i++) {
                     formData.append("file", this.files[i]);
@@ -177,16 +182,17 @@ export default {
                 )
                 .then(response => {
                     console.log(response.data)
+                    this.loadPage();
                 })
             
-                if(this.$route.query.page!=1) {
-                    this.$router.push({
-                        path: '/project/'+this.$route.params.projectId+'/freeBoard',
-                        query:{page:1}
-                    })
-                } else {
-                    this.$router.go()
-                }
+                // if(this.$route.query.page!=1) {
+                //     this.$router.push({
+                //         path: '/project/'+this.$route.params.projectId+'/freeBoard',
+                //         query:{page:1}
+                //     })
+                // } else {
+                //     this.$router.go()
+                // }
             })
         },
         handleFilesUpload(){
@@ -229,10 +235,14 @@ export default {
             })
         },
         paginate (page_size, page_number) {
-         this.$router.push({
-            path: '/project/'+this.$route.params.projectId+'/freeBoard',
-            query:{page:page_number+1}
-          })
+            this.$router.push({
+                path: '/project/'+this.$route.params.projectId+'/freeBoard',
+                query:{page:page_number+1}
+            }).catch(error => {       //일단 네비게이션 중복 에러 뜨는 부분은 throw해둠..
+                if(error.name != "NavigationDuplicated" ){
+                    throw error;
+                }
+            });
         },
         onPageChanged(page){
             this.currentPage=this.$route.query.page
@@ -249,3 +259,9 @@ export default {
     }
 }
 </script> 
+
+<style scoped>
+    .title:hover{
+        background: #f3f3f3;
+    }
+</style>
