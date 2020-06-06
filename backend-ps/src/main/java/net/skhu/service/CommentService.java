@@ -62,25 +62,8 @@ public class CommentService {
 	public void noticedeleteComment(int commentId) {
 		commentRepository.delete(commentRepository.findById(commentId).get());
 	}
-	
-	//FIXME PostService로 이동
 	@Transactional
-	public void noticedeletePost(int postId) {
-		//TIMELINE 새로운 공지게시글 삭제 [과목 선택 프로젝트 모든 참가자가 받음]
-		//어떤 과목의 공지 게시글이 삭제되었습니다.
-		Post p = postRepository.findById(postId).get();
-		for(Project project : projectService.subjectProjects(p.getSubject().getSubjectId())) {
-			for(ProjectJoin join : projectService.allMember(project.getProjectId())) {
-				String content = p.getSubject().getTitle()+"의 공지 게시글이 삭제되었습니다. ("+p.getTitle()+")";
-				String url = "/project/"+project.getProjectId()+"/noticeBoard?page=1";
-				
-				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
-			}
-		}
-		
-		postRepository.delete(postRepository.findById(postId).get());
-	}
-	@Transactional
+	// FIXME 채택 해제 불가, 채택은 한 개만
 	public int commentCheck(int commentId,int postId) {
 		Comment c=commentRepository.findById(commentId).get();
 		List<Comment> comments=commentRepository.findByPost_PostId(postId);
@@ -98,6 +81,17 @@ public class CommentService {
 		if(num==comments.size()) { // 채택된 댓글이 없을때
 			c.setChoice(1);
 			commentRepository.save(c);
+			
+			//TIMELINE 댓글 채택 [댓글 작성자에게]
+			Post p = c.getPost();
+			if(c.getUser().getUserId() != p.getUser().getUserId()) { //댓글 작성자가 게시글 작성자가 아닌 경우
+				String subContent = c.getContent().length() > 9? c.getContent().substring(0, 10)+"..." : c.getContent();
+				String text = "내 댓글이 채택되었습니다. (" + subContent + ")";
+				String url = "/project/"+p.getProject().getProjectId()+"/freeBoard/"+postId;
+				
+				timelineRepository.save(new Timeline(0, text, LocalDateTime.now(), url, c.getUser()));
+			}
+			
 			return 1; // ok
 		} 
 		return 0; // not ok!

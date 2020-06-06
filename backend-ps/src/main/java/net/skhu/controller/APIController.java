@@ -552,15 +552,15 @@ public class APIController {
 	public void noticedeleteComment(@PathVariable("commentId") int commentId) {
 		commentService.noticedeleteComment(commentId);
 	}
-	// 공지사항 게시글 삭제
-	@RequestMapping(value = "noticeBoard/deletePost", method = RequestMethod.POST)
-	public void noticedeletePost(@RequestBody Post post) {
-		commentService.noticedeletePost(post.getPostId());
+	// 게시글 삭제(공지,자유)
+	@RequestMapping(value = "board/deletePost", method = RequestMethod.POST)
+	public void deletePost(@RequestBody Post post) {
+		postService.deletePost(post.getPostId());
 	}
-	// 공지사항 게시글 수정
+	// 게시글 수정(공지,자유)
 	@RequestMapping(value = "noticeBoard/modifyPost", method = RequestMethod.POST)
-	public void noticeModifyPost(@RequestBody ModifyNoticePostModel post) {
-		postService.noticeModifyPost(post);
+	public void modifyPost(@RequestBody ModifyNoticePostModel post) {
+		postService.modifyPost(post);
 	}
 	
 	//프로젝트 관리-설정 수정

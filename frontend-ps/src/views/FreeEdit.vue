@@ -163,7 +163,7 @@ export default {
                     this.extentionTime='1000-01-01'
                 }
                 
-                axios.post('/api/noticeBoard/modifyPost', {
+                axios.post('/api/board/modifyPost', {
                     postId:this.$route.params.postId,
                     title:this.list.title,
                     content:this.list.content,

@@ -93,8 +93,28 @@ public class PostService {
 		
 		return postId;
 	}
+	
 	@Transactional
-	public void noticeModifyPost(ModifyNoticePostModel post) {
+	public void deletePost(int postId) {
+		Post p = postRepository.findById(postId).get();
+		
+		//TIMELINE 공지 게시글 삭제 [과목 선택 프로젝트 모든 참가자가 받음]
+		if(p.getSubject() != null) {
+			for(Project project : projectService.subjectProjects(p.getSubject().getSubjectId())) {
+				for(ProjectJoin join : projectService.allMember(project.getProjectId())) {
+					String content = p.getSubject().getTitle()+"의 공지 게시글이 삭제되었습니다. ("+p.getTitle()+")";
+					String url = "/project/"+project.getProjectId()+"/noticeBoard?page=1";
+					
+					timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+				}
+			}
+		}
+		
+		postRepository.delete(postRepository.findById(postId).get());
+	}
+	
+	@Transactional
+	public void modifyPost(ModifyNoticePostModel post) {
 		Post p=postRepository.findById(post.getPostId()).get();
 		p.setTitle(post.getTitle());
 		p.setContent(post.getContent());
@@ -102,16 +122,19 @@ public class PostService {
 		p.setExtentionTime(post.getExtentionTime().atTime(0,0,0));
 		postRepository.save(p);
 		
-		//TIMELINE 새로운 공지게시글 수정 [과목 선택 프로젝트 모든 참가자가 받음]
-		for(Project project : projectService.subjectProjects(p.getSubject().getSubjectId())) {
-			for(ProjectJoin join : projectService.allMember(project.getProjectId())) {
-				String content = p.getSubject().getTitle()+"의 공지 게시글이 수정되었습니다. ("+p.getTitle()+")";
-				String url = "/project/"+project.getProjectId()+"/noticeBoard/"+p.getPostId();
-				
-				timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+		//TIMELINE 공지 게시글 수정 [과목 선택 프로젝트 모든 참가자가 받음]
+		if(p.getSubject() != null) {
+			for(Project project : projectService.subjectProjects(p.getSubject().getSubjectId())) {
+				for(ProjectJoin join : projectService.allMember(project.getProjectId())) {
+					String content = p.getSubject().getTitle()+"의 공지 게시글이 수정되었습니다. ("+p.getTitle()+")";
+					String url = "/project/"+project.getProjectId()+"/noticeBoard/"+p.getPostId();
+					
+					timelineRepository.save(new Timeline(0, content, LocalDateTime.now(), url, join.getUser()));
+				}
 			}
 		}
-	}
+		//TIMELINE 자유 게시글은 수정되어도 알림가지 않음.
+	}	
 	public List<String> fileSubmitList(int page,int projectId,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
 		Collections.reverse(posts);

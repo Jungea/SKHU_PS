@@ -242,7 +242,7 @@ export default {
         deletePost() {
             let result=confirm('삭제하시겠습니까?')
             if(result) {
-                axios.post('/api/noticeBoard/deletePost', {
+                axios.post('/api/board/deletePost', {
                     postId:this.$route.params.postId
                 })
                 .then(response => {
