@@ -558,7 +558,7 @@ public class APIController {
 		postService.deletePost(post.getPostId());
 	}
 	// 게시글 수정(공지,자유)
-	@RequestMapping(value = "noticeBoard/modifyPost", method = RequestMethod.POST)
+	@RequestMapping(value = "board/modifyPost", method = RequestMethod.POST)
 	public void modifyPost(@RequestBody ModifyNoticePostModel post) {
 		postService.modifyPost(post);
 	}

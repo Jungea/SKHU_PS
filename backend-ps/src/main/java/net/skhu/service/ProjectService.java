@@ -3,6 +3,7 @@ package net.skhu.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -257,6 +258,7 @@ public class ProjectService {
 	public List<ProjectBoardModel> projectBoard(int userId,int page) {
 		List<Project> project = projectRepository.findAll();
 		List<ProjectBoardModel> board = new ArrayList<>();
+		Collections.reverse(project);
 		if(project.size()<page*6) {
 			project=project.subList((page-1)*6,project.size());
 		} else {
