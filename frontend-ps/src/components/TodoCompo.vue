@@ -492,7 +492,7 @@ export default {
                         this.todo=todoTemp;
                         this.state1=temp1; this.state2=temp2; this.state3=temp3;
                     }
-                    console.log('todo 로드합니다')
+                    // console.log('todo 로드합니다')
                 })
         }
 
@@ -510,7 +510,6 @@ export default {
                         return date1-date2
                     })
                     
-                    console.log(this.$route.params.week)
                     let week = goals.findIndex(p => p.weeklyId == this.$route.params.week) + 1;
                     
                     this.$router.push({

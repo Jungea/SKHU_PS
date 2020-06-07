@@ -212,7 +212,7 @@ export default {
             this.selectedYear=''
             this.selectedSubject=''
         //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
-          console.log('query111:'+this.$route.query.page)
+        //   console.log('query111:'+this.$route.query.page)
           axios.get('/api/projectBoard?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                 this.paginatedItems=response.data
               }).catch((erro) => {
@@ -256,10 +256,10 @@ export default {
             // this.totalRows=this.data.length
             // this.paginatedItems=this.data
             this.totalRows=response.data
-            console.log("totalRows:"+this.totalRows)
+            // console.log("totalRows:"+this.totalRows)
             //this.paginate(this.perPage, 0)
         });
-        console.log("query:"+this.$route.query.page)
+        // console.log("query:"+this.$route.query.page)
         axios.get('/api/projectBoard?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
             this.paginatedItems=response.data
             this.summaryData=response.data[0]

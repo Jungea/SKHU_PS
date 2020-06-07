@@ -96,14 +96,16 @@ export default {
                     progState: this.data.progState,
                     rcrtState: this.data.rcrtState
                     })
-                .then().catch((erro)=> { console.error(erro);
-                });
-                
-                location.href='/project/'+this.$route.params.projectId+'/summary'    
+                .then(() => {
+                    this.$router.push({
+                        path: '/project/'+this.$route.params.projectId+'/summary'
+                    })
+                }).catch(erro => console.error(erro));
+                    
             }        
          },
         cancle() {
-                    this.$router.push({
+                this.$router.push({
                     path: '/project/'+this.$route.params.projectId+'/summary'
                 })
         },

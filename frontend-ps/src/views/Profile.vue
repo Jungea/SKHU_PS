@@ -132,7 +132,6 @@ export default {
             this.gitUrl='https://github.com/'+response.data.github
             if(this.userInfo.language)
                 this.tagArray=this.userInfo.language.split(',')
-            console.log(this.userInfo.intro)
         }).catch((erro)=> {
           console.error(erro);
         });
@@ -144,8 +143,6 @@ export default {
                 for(let i in response.data){
                     if(response.data[i].state==0){
                         this.inviteList.push(response.data[i])
-                        console.log('상태')
-                        console.log(this.inviteList[i].state)
                     }
                 }
             })
@@ -154,7 +151,7 @@ export default {
             });
 
         axios.get('/api/user/applicationList')
-            .then(response => {console.log(response.data); this.applicationList=response.data})
+            .then(response => this.applicationList=response.data)
             .catch((erro)=> {
                 console.error(erro);
             });
@@ -165,9 +162,6 @@ export default {
             this.$router.push({
                 path: '/editProfile'
             })
-            let userInfo=this.userInfo
-            console.log("정보수정으로 이동")
-            console.log(userInfo)
         },
         turnState(invite, state){
             axios.post('/api/turnjoinstate/'+invite.joinId+'/'+state)

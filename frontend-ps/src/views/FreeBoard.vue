@@ -5,15 +5,19 @@
         <!--게시글 목록 테이블-->
         <center>
             <b-form-group label-for="SubjectNotice">
-                <table class="table table-bordered" id="SubjectNotice" style="width: 90%">
-                    <tr>
-                        <th class="th1">제목</th>
-                        <th class="th1">작성일</th>
-                    </tr>
-                    <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td class="title" style="width: 40%; cursor:pointer"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
-                        <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
-                    </tr>
+                <table class="table table-bordered table-hover" id="SubjectNotice" style="width: 90%">
+                    <thead>
+                        <tr>
+                            <th class="th1">제목</th>
+                            <th class="th1">작성일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
+                            <td class="td2" style="width: 40%; cursor:pointer"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
+                            <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
+                        </tr>
+                    </tbody>
                 </table>
                 <div style="text-align: right ; margin-right: 5%">
                     <b-button variant="dark" v-if="isjoinMember" v-b-modal.modal-newBoard>게시글 작성</b-button>
@@ -261,7 +265,4 @@ export default {
 </script> 
 
 <style scoped>
-    .title:hover{
-        background: #f3f3f3;
-    }
 </style>

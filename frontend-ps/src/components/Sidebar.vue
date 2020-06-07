@@ -218,7 +218,6 @@ export default {
       },
       home(evt) {
         evt.preventDefault()
-        // location.href="/home"
         // this.pinProjectId = null;
         // this.pinSubjectId = null;
         
@@ -319,14 +318,12 @@ export default {
           axios.get('/api/user/' + this.userId + '/timeline')
             .then(res => {
               this.data = res.data
-              console.log(a)
 
               this.checkTime1 = this.leadingZeros(a.getFullYear(), 4) + '-' + this.leadingZeros(a.getMonth() + 1, 2) + '-' + this.leadingZeros(a.getDate(), 2)
                     + ' ' + this.leadingZeros(a.getHours(), 2) + ':' + this.leadingZeros(a.getMinutes(), 2) + ':' + this.leadingZeros(a.getSeconds(), 2);
 
               for(let i = 0 ; i < res.data.length ; i++) {
                 let d = new Date(res.data[i].time);
-                console.log(i + "시간: " + d)
                 this.data[i].time = this.leadingZeros(d.getFullYear(), 4) + '-' + this.leadingZeros(d.getMonth() + 1, 2) + '-' + this.leadingZeros(d.getDate(), 2)
                     + ' ' + this.leadingZeros(d.getHours(), 2) + ':' + this.leadingZeros(d.getMinutes(), 2) + ':' + this.leadingZeros(d.getSeconds(), 2);
               }

@@ -145,21 +145,22 @@ export default {
    },
    methods:{
      onSubmit(evt) {
-          evt.preventDefault()
-          this.input.language=this.tagArray.join(',')
-          // alert(this.input.language)
-          axios.post('/api/user/profile', this.input).then()
-          .catch((erro)=> {
-            console.error(erro);
-          });
-
-          location.href="/profile"
-        },
-        cancle() {
-            this.$router.push({
+        evt.preventDefault()
+        this.input.language=this.tagArray.join(',')
+        
+        axios.post('/api/user/profile', this.input)
+        .then(() => {
+          this.$router.push({
             path: '/profile'
           })
-        },
+        })
+        .catch(error => console.error(error));
+      },
+      cancle() {
+        this.$router.push({
+          path: '/profile'
+        })
+      },
    }
 }
 </script>
