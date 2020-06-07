@@ -77,7 +77,7 @@
                     </tbody>
                 </table>
                 <div class="mb-4" style="text-align: right">
-                    <b-button variant="dark" @click="edit(data.projectId)">수정</b-button>
+                    <b-button variant="dark" v-show="isCap" @click="edit(data.projectId)">수정</b-button>
                 </div>
             </b-form-group>
             </form>
@@ -97,7 +97,9 @@ export default {
             tagArray:[],
             memList: [],
             capName: '',
-            grade: ''
+            grade: '',
+            isCap:null,
+    
         }
     },
 
@@ -114,6 +116,10 @@ export default {
 
     methods: {
         reload() {
+            axios.get('/api/project/isCap/'+this.$route.params.projectId)
+                .then(response => {
+                this.isCap=response.data
+            })
             // 프로젝트
             axios.get('/api/project/'+this.$route.params.projectId)
                 .then(response => {

@@ -698,5 +698,12 @@ public class ProjectService {
 		Project project=projectRepository.findById(projectId).get();
 		projectRepository.delete(project);
 	}
-	
+	public boolean isCap(int projectId,int userId) {
+		Project project=projectRepository.findById(projectId).get();
+		if(project.getUser().getUserId()==userId) {
+			return true;
+		}
+		else 
+			return false;
+	}
 }

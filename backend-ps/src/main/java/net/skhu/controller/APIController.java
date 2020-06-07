@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -747,6 +748,11 @@ public class APIController {
 	@RequestMapping(value = "project/delete", method = RequestMethod.POST)
 	public void projectDelete(@RequestBody Project project) {
 		projectService.delete(project.getProjectId());
+	}
+	// 프로젝트 수정 권한이 있는지(프로젝트의 조장인지)
+	@RequestMapping(value = "project/isCap/{projectId}", method = RequestMethod.GET)
+	public boolean isCap(@PathVariable("projectId") int projectId,HttpServletRequest request) {
+		return projectService.isCap(projectId,getLoginUserId(request));
 	}
 
 }
