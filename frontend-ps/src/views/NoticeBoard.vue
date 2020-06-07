@@ -12,7 +12,7 @@
                         <th class="th1">제출 연장일</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                        <td style="width: 40%"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
+                        <td style="width: 40%"> <b> {{ item.title }} [{{commentNum[index]}}] </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
                         <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
@@ -180,7 +180,6 @@ export default {
                     deadlineTime:this.deadline,
                     extensionTime:this.extention,
                 }).then(response => {
-                alert('id:'+response.data)
                 let newPostId=response.data
                 for(let i=0;i<this.files.length;i++) {
                     formData.append("file", this.files[i]);

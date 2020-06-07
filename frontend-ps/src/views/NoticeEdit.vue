@@ -215,7 +215,6 @@ export default {
                             console.log(response.data)
                         })
                     }
-                    alert("asadf")
                     this.$router.push({
                         path: '/subject/'+this.$route.params.subjectId+'/noticeBoard/' + this.$route.params.postId
                     })

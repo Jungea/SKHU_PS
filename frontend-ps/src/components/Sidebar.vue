@@ -346,7 +346,6 @@ export default {
                 return zero + n;
       },
       move(url) {
-        alert(url)
         axios.put('/api/user/timelineTime').then().catch(erro => console.error(erro))
         location.href = url
       },

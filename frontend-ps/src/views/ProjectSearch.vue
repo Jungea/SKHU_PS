@@ -87,6 +87,7 @@
                         <th scope="row" style="width:28%">프로젝트명</th>
                         <td>
                             {{summaryData.project.projectName}}
+                            <b-button @click="moveToProject(summaryData.project.projectId)" style="margin-left:20px" size="sm">이동</b-button>
                         </td>
                     </tr>
                         <tr>
@@ -387,10 +388,13 @@ export default {
                     tag:String(this.tags.toString())
                 }
             })
-
     },
-    
-  },
-  
+    moveToProject(pId){
+          let Url='/project/'+pId+'/summary'
+          this.$router.push({
+              path: Url,
+          })
+      },
+  }
 }
 </script>
