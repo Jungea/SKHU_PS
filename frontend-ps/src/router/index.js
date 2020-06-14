@@ -172,7 +172,7 @@ Vue.use(VueRouter)
     component: ProfessorSummary
   },
   {
-    path: '/score/:subjectId',
+    path: '/subject/:subjectId/score',
     name: 'score',
     component: Score
   },

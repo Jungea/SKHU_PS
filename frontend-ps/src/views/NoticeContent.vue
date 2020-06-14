@@ -40,7 +40,7 @@
                             <b-button @click="viewComment()" v-if="checkComment" variant="dark">댓글 접기</b-button>
                         </div>
                         <div style="display: inline-block ; margin-left: 10px">
-                            <b-button v-if="userType" @click="viewFileList()" variant="dark">제출물 보기</b-button>
+                            <b-button v-if="userType && list.deadlineTime!='1000-01-01T00:00:00'" @click="viewFileList()" variant="dark">제출물 보기</b-button>
                         </div>
                         <div style="display: inline-block ; margin-right: 5% ; float: right">
                              <b-button class="mr-3" v-if="userType" @click="deletePost()" variant="danger">삭제</b-button>

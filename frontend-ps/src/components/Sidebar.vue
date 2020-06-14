@@ -235,7 +235,8 @@ export default {
         evt.preventDefault()
         if(this.type==false) { // 학생이라면
           this.$router.push({
-              path: '/profile'
+              path: '/profile',
+              query: {page:1}
           })
         } else {
           this.$router.push({
@@ -264,7 +265,7 @@ export default {
       },
       viewScore(){
         this.$router.push({
-          path: '/Score/'+this.pinSubjectId+'/'
+          path: '/subject/'+this.pinSubjectId+'/score'
         })
       },
       changeSelect() {

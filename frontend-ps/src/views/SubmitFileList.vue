@@ -1,16 +1,17 @@
 <template>
     <div class="containerStyle">
         <center>
-            <h4 style="text-align: left ; margin-left: 20%">{{ title }}의 과제 제출 현황</h4>
-            <hr style="width: 60%">
+            <h4 style="text-align: left ; margin-left: 10%">{{ title }}의 과제 제출 현황</h4>
+            <hr style="width: 80%">
             <form ref="form">
                 <b-form-group label-for="SubjectStudent">
-                    <table class="table table-bordered" id="SubjectStudent" v-bind="data" style="width: 60%">
+                    <table class="table table-bordered" id="SubjectStudent" v-bind="data" style="width: 80%">
                         <tbody>
                             <tr>
-                                <th class="th1" style="width: 40%">프로젝트 이름</th>
+                                <th class="th1" style="width: 30%">프로젝트 이름</th>
                                 <th class="th1" style="width: 15%">팀장</th>
                                 <th class="th1">제출 파일</th>
+                                <th class="th1" style="width: 10%">점수</th>
                             </tr>
                             <tr :key="index" v-for="(item, index) in data">
                                 <td class="td1" style="vertical-align: middle">{{ item.project.projectName }}</td>
@@ -19,13 +20,14 @@
                                     <div v-for="(file, index) in item.files" :key="index" class="fileItem" style="cursor:pointer ; color:blue" @click="download(file)">
                                         <div>{{ file.name }}</div>
                                     </div>
-                                    <!-- <div v-for="(item, index) in files" :key="index" style="cursor:pointer;color:blue" @click="download(item)">
-                                        <div class="file">{{ item.name }}</div>
-                                    </div> -->
+                                </td>
+                                <td class="td1">
+                                    <center><b-input value="10" style="text-align: center ; width: 70%"></b-input></center>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    <div v-if="data" style="text-align: right ; margin-right: 10%"><b-button variant="dark" @click="save()">저장</b-button></div>
                 </b-form-group>
             </form>
         </center>
@@ -82,6 +84,11 @@ export default {
                 fileLink.click();
             })    
         },
+        save() {
+            alert("점수가 저장되었습니다.")
+            // axios.get()
+            // .then()
+        }
     }
 }
 </script>

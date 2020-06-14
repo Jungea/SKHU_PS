@@ -9,18 +9,21 @@
                         <th class="th1">제목</th>
                         <th class="th1">작성일</th>
                         <th class="th1">제출 마감일</th>
-                        <!-- <th class="th1">제출 연장일</th> -->
                         <th class="th1">제출 여부</th>
+                        <th class="th1">점수</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
                         <td style="width: 40%"> <b> {{ item.title }} [{{commentNum[index]}}]</b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
-                        <!-- <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td> -->
                         <td class="td1">
                             <div v-if="item.deadlineTime=='1000-01-01T00:00:00'"> - </div>
                             <b-icon-check v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] != '0')" style="color: green" scale="1.5"></b-icon-check>
                             <b-icon-x v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] == '0')" style="color: red" scale="1.5"></b-icon-x>
+                        </td>
+                        <td class="td1">
+                            <div v-if="item.deadlineTime!='1000-01-01T00:00:00'">10/10</div>
+                            <div v-else>-</div>
                         </td>
                     </tr>
                 </table>
