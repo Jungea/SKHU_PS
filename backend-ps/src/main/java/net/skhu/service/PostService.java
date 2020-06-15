@@ -212,4 +212,44 @@ public class PostService {
 		}
 		return num;
 	}
+	public List<Post> community(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		if(posts.size()<page*6) {
+			posts=posts.subList((page-1)*6,posts.size());
+		} else {
+			posts=posts.subList((page-1)*6,page*6);
+		}
+		return posts;
+	}
+	@Transactional
+	public int writeCommunity(WriteNoticeModel notice,int userId) {
+		Post post=new Post();
+		post.setProject(projectRepository.findById(notice.getProjectId()).get());
+		post.setTitle(notice.getTitle());
+		post.setContent(notice.getContent());
+		post.setWriteTime(LocalDateTime.now());
+		post.setUser(userRepository.findById(userId).get());
+		post.setDetail(detailRepository.findById(15).get());
+		return postRepository.save(post).getPostId();
+	}
+	public List<Integer> communityCommentNum(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<Comment> comments=commentRepository.findByPost_PostId(p.getPostId());
+			if(comments==null) {
+				num.add(0);
+			} else {
+				num.add(comments.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+	}
 }

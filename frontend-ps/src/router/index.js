@@ -27,7 +27,9 @@ import SubmitFileList from '../views/SubmitFileList.vue'
 import FreeBoard from '../views/FreeBoard.vue'
 import FreeContent from '../views/FreeContent.vue'
 import FreeEdit from '../views/FreeEdit.vue'
-
+import CommunityBoard from '../views/CommunityBoard.vue'
+import CommunityContent from '../views/CommunityContent.vue'
+import CommunityEdit from '../views/CommunityEdit.vue'
 
 import StudentNoticeBoard from '../views/StudentNoticeBoard.vue'
 import StudentNoticeContent from '../views/StudentNoticeContent.vue'
@@ -225,6 +227,21 @@ Vue.use(VueRouter)
     path: '/project/:projectId/freeBoard/:postId/edit',
     name: 'freeEdit',
     component: FreeEdit
+  },
+  {
+    path: '/community',
+    name: 'communityBoard',
+    component: CommunityBoard
+  },
+  {
+    path: '/community/:postId',
+    name: 'communityContent',
+    component: CommunityContent
+  },
+  {
+    path: '/community/:postId/edit',
+    name: 'communityEdit',
+    component: CommunityEdit
   },
   
 ]

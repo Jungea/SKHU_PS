@@ -754,5 +754,25 @@ public class APIController {
 	public boolean isCap(@PathVariable("projectId") int projectId,HttpServletRequest request) {
 		return projectService.isCap(projectId,getLoginUserId(request));
 	}
+	// 커뮤니티  게시판에서 페이징  
+	@RequestMapping(value = "community", method = RequestMethod.GET)
+	public List<Post> community(@RequestParam("page") int page) {
+		return postService.community(page);
+	}
+	// 커뮤니티 게시판에서 전체 개수
+	@RequestMapping(value = "communityListNum", method = RequestMethod.GET)
+	public int communityListNum() {
+		return postRepository.findByDetail_detId(15).size();
+	}
+	// 커뮤니티게시판 게시글 쓰기
+	@RequestMapping(value = "writeCommunity", method = RequestMethod.POST)
+	public int  writeCommunity(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
+		return postService.writeCommunity(notice,getLoginUserId(request));
+	}
+	// 커뮤니티 게시판에서 댓글 수 리턴
+	@RequestMapping(value = "community/commentNum", method = RequestMethod.GET)
+	public List<Integer> commentNum(@RequestParam("page") int page) {
+		return postService.communityCommentNum(page);
+	}
 
 }
