@@ -3,6 +3,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 /src/main/java/net/skhu/etc/PersonalInfo.java
 !**/src/test/**
+/.metadata/
 
 ### STS ###
 .apt_generated

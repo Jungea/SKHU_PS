@@ -240,7 +240,7 @@ public class PostService {
 		} else { //커뮤니티 게시판
 			return "커뮤니티 게시판";
 		}
-
+	}
 	public List<Post> community(int page) {
 		List<Post> posts=postRepository.findByDetail_detId(15);
 		Collections.reverse(posts);
