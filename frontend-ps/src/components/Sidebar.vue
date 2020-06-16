@@ -240,7 +240,8 @@ export default {
           })
         } else {
           this.$router.push({
-              path: '/professorProfile'
+              path: '/professorProfile',
+              query: {page:1}
           })
         }
       },
