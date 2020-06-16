@@ -39,5 +39,8 @@ public interface ProjectJoinRepository extends JpaRepository<ProjectJoin, Intege
 	
 	//과목의 프로젝트 참가자들
 	List<ProjectJoin> findByProject_Subject_SubjectIdOrderByUser_userNum(int subjectId);
+	
+	//해당 유저의 과목을 등록한 프로젝트
+	ProjectJoin findByUser_UserIdAndProject_Subject_SubjectId(int userId, int subjectId);
 
 }

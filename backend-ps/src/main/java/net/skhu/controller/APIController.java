@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +35,7 @@ import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
+import net.skhu.model.ListModel;
 import net.skhu.model.MakeProjectModel;
 import net.skhu.model.ManagerSettingModel;
 import net.skhu.model.ModifyNoticePostModel;
@@ -753,6 +753,32 @@ public class APIController {
 	@RequestMapping(value = "project/isCap/{projectId}", method = RequestMethod.GET)
 	public boolean isCap(@PathVariable("projectId") int projectId,HttpServletRequest request) {
 		return projectService.isCap(projectId,getLoginUserId(request));
+	}
+	
+	// 내가 작성한 게시글
+	@RequestMapping(value = "user/posts", method = RequestMethod.GET)
+	public List<ListModel> userPosts(HttpServletRequest request) {
+		return userService.userPosts(getLoginUserId(request));
+	}
+	// 내가 작성한 댓글
+	@RequestMapping(value = "user/comments", method = RequestMethod.GET)
+	public List<Comment> userComments(HttpServletRequest request) {
+		return userService.userComments(getLoginUserId(request));
+	}
+	// 내가 좋아요한 프로젝트
+	@RequestMapping(value = "user/likeProjects", method = RequestMethod.GET)
+	public List<ProjectBoardModel> userLikeProjects(@RequestParam("page") int page, HttpServletRequest request) {
+		return userService.userLikeProjects(getLoginUserId(request), page);
+	}
+	// 내가 좋아요한 게시글
+	@RequestMapping(value = "user/likePosts", method = RequestMethod.GET)
+	public List<ListModel> userLikePosts(HttpServletRequest request) {
+		return userService.userLikePosts(getLoginUserId(request));
+	}
+	// 게시글 이동
+	@RequestMapping(value = "user/post/{postId}/url", method = RequestMethod.GET)
+	public String userPostUrl(@PathVariable("postId") int postId, HttpServletRequest request) {
+		return postService.userPostUrl(postId, getLoginUserId(request));
 	}
 
 }

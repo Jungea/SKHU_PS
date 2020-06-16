@@ -15,12 +15,14 @@ import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Timeline;
+import net.skhu.domain.User;
 import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.CommentRepository;
 import net.skhu.repository.DetailRepository;
 import net.skhu.repository.FileRepository;
 import net.skhu.repository.PostRepository;
+import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.TimelineRepository;
@@ -46,6 +48,8 @@ public class PostService {
 	TimelineRepository timelineRepository;
 	@Autowired
 	CommentRepository commentRepository;
+	@Autowired
+	ProjectJoinRepository projectJoinRepository;
 	
 	public List<Post> noticeBoard(int page,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
@@ -211,5 +215,26 @@ public class PostService {
 			num=num.subList((page-1)*6,page*6);
 		}
 		return num;
+	}
+	
+	// 내가 쓴 게시글, 댓글 클릭 이동
+	public String userPostUrl(int postId, int loginUserId) {
+		Post post = postRepository.findById(postId).get();
+		
+		if(post.getProject() != null) { // 자유게시판
+			return "/project/"+post.getProject().getProjectId()+"/freeBoard/"+postId;
+			
+		}else if(post.getSubject() != null) { // 공지게시판
+			
+			if(userRepository.findById(loginUserId).get().getUserType() == false) { //학생
+				ProjectJoin pj = projectJoinRepository.findByUser_UserIdAndProject_Subject_SubjectId(loginUserId, post.getSubject().getSubjectId());
+				return "/project/"+pj.getProject().getProjectId()+"/noticeBoard/"+postId;
+			
+			} else //교수
+				return "/subject/"+post.getSubject().getSubjectId()+"/noticeBoard/"+postId;
+				
+		} else { //커뮤니티 게시판
+			return "커뮤니티 게시판";
+		}
 	}
 }
