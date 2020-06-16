@@ -812,7 +812,30 @@ public class APIController {
 	@RequestMapping(value = "community/content/likeNum", method = RequestMethod.GET)
 	public int contentLikeNum(@RequestParam("postId") int postId) {
 		return postLikeRepository.findByPost_PostId(postId).size();
-
 	}
-
+	// 커뮤니티  게시판 검색 페이징  
+	@RequestMapping(value = "communitySearch", method = RequestMethod.GET)
+	public List<Post> communitySearch(@RequestParam("page") int page,@RequestParam("type") int type,@RequestParam("text") String text) {
+		return postService.communitySearch(page,type,text);
+	}
+	// 커뮤니티 게시판에서 검색 전체 개수
+	@RequestMapping(value = "communitySearchListNum", method = RequestMethod.GET)
+	public int communitySearchListNum(@RequestParam("type") int type,@RequestParam("text") String text) {
+		return postService.communitySearchListNum(type,text);
+	}
+	// 커뮤니티 게시판에서 검색 댓글 수 리턴
+	@RequestMapping(value = "communitySearch/commentNum", method = RequestMethod.GET)
+	public List<Integer> communitySearchCommentNum(@RequestParam("page") int page,@RequestParam("type") int type,@RequestParam("text") String text) {
+		return postService.communitySearchCommentNum(page,type,text);
+	}
+	// 커뮤니티 게시판에서 검색 좋아요 수 리턴
+	@RequestMapping(value = "communitySearch/likeNum", method = RequestMethod.GET)
+	public List<Integer> communitySearchLikeNum(@RequestParam("page") int page,@RequestParam("type") int type,@RequestParam("text") String text) {
+		return postService.communitySearchLikeNum(page,type,text);
+	}
+	// 자유 게시판에서 좋아요 수 리턴
+	@RequestMapping(value = "freeBoard/likeNum", method = RequestMethod.GET)
+	public List<Integer> freeBoardLikeNum(@RequestParam("page") int page,@RequestParam("projectId") int projectId) {
+		return postService.freeBoardLikeNum(page,projectId);
+	}
 }

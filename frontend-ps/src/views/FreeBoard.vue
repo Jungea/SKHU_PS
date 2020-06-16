@@ -9,12 +9,16 @@
                     <thead>
                         <tr>
                             <th class="th1">제목</th>
+                            <th class="th1">작성자</th>
+                            <th class="th1">좋아요</th>
                             <th class="th1">작성일</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
                             <td class="td2" style="width: 40%; cursor:pointer"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
+                            <td class="td1" style="width: 10%; cursor:pointer"> <b> {{item.user.name}}</b> </td>
+                            <td class="td1" style="width: 10%; cursor:pointer"> <b> {{likeNum[index]}}</b> </td>
                             <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         </tr>
                     </tbody>
@@ -80,6 +84,7 @@ export default {
             files: [],
             isjoinMember:true,
             commentNum:[],
+            likeNum:[],
         } 
     },
     watch: {
@@ -133,6 +138,11 @@ export default {
             });
             axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                     this.commentNum=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
+            axios.get('/api/freeBoard/likeNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+                    this.likeNum=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });

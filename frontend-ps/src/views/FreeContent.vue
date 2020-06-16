@@ -12,6 +12,14 @@
                     <td>{{post.title}}</td>
                 </tr>
                 <tr>
+                    <th class="th1" style="width: 14%">작성자</th>
+                    <td>{{post.user.name}}</td>
+                </tr>
+                <tr>
+                    <th class="th1" style="width: 14%">좋아요</th>
+                    <td>{{likeNum}}</td>
+                </tr>
+                <tr>
                     <th class="th1">작성일</th>
                     <td>{{post.writeTime}}</td>
                 </tr>
@@ -100,43 +108,11 @@ export default {
             userType: '',
             userName: '',
             admin:null,
+            likeNum:null,
         }
     },
     mounted() { 
         this.loadPage();
-        //현재 유저 정보 불러오기
-        // axios.get('/api/user')
-        // .then(response => {
-        //     this.userType = response.data.userType
-        //     this.userName = response.data.name
-        //     this.userId=response.data.userId
-        //     this.admin=response.data.admin
-        // })
-        // axios.get('/api/file1/list/'+this.$route.params.postId) 
-        // .then(response => {
-        //     this.files=response.data
-        // });
-
-        // //현재 게시글 정보
-        // axios.get('/api/noticeBoard/post/'+this.$route.params.postId)
-        // .then(response => {
-        //     this.post=response.data
-        //     console.log(this.post.user)
-        //     this.post.writeTime = this.post.writeTime.substring(0,10)+" "+this.post.writeTime.substring(11,16)
-        //     this.loading=true
-        // });
-        
-        // //현재 게시글에 대한 댓글 정보
-        // axios.get('/api/noticeBoard/comment/'+this.$route.params.postId)
-        // .then(response => {
-        //     this.comment=response.data
-        // })
-
-        // axios.get('/api/freeBoard/postLike/'+this.$route.params.postId)
-        // .then(response => {
-        //     this.isPostLiked=response.data
-        // })
-        // this.postId = this.$route.params.postId
     },
 
     computed:{
@@ -185,6 +161,11 @@ export default {
                 this.isPostLiked=response.data
             })
             this.postId = this.$route.params.postId
+             axios.get('/api/community/content/likeNum?postId='+this.$route.params.postId).then(response => { // 프로젝트 이름 가져오기
+                    this.likeNum=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
 
         },
         download(file) {

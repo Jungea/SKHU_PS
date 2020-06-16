@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,6 @@ import net.skhu.domain.PostLike;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Timeline;
-import net.skhu.domain.User;
 import net.skhu.model.ModifyNoticePostModel;
 import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.CommentRepository;
@@ -282,6 +283,130 @@ public class PostService {
 	}
 	public List<Integer> communitylikeNum(int page) {
 		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<PostLike> postLikes=postLikeRepository.findByPost_PostId(p.getPostId());
+			if(postLikes==null) {
+				num.add(0);
+			} else {
+				num.add(postLikes.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+
+	}
+	public List<Post> communitySearch(int page,int type,String text) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Set<Post> searchingList=new HashSet<>();
+		if(type==0) { // 제목+내용으로 검색
+			for(Post p:posts) {
+				if(p.getTitle().contains(text) || p.getContent().contains(text))
+					searchingList.add(p);
+			}
+		} else { // 작성자 이름으로 검색
+			for(Post p:posts) {
+				if(p.getUser().getName().contains(text))
+					searchingList.add(p);
+			}
+		}
+		posts= new ArrayList<>(searchingList);
+		Collections.reverse(posts);
+		if(posts.size()<page*6) {
+			posts=posts.subList((page-1)*6,posts.size());
+		} else {
+			posts=posts.subList((page-1)*6,page*6);
+		}
+		return posts;
+	}
+	public int communitySearchListNum(int type,String text) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Set<Post> searchingList=new HashSet<>();
+		if(type==0) { // 제목+내용으로 검색
+			for(Post p:posts) {
+				if(p.getTitle().contains(text) || p.getContent().contains(text))
+					searchingList.add(p);
+			}
+		} else { // 작성자 이름으로 검색
+			for(Post p:posts) {
+				if(p.getUser().getName().contains(text))
+					searchingList.add(p);
+			}
+		}
+		return searchingList.size();
+	}
+	public List<Integer> communitySearchCommentNum(int page,int type,String text) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Set<Post> searchingList=new HashSet<>();
+		if(type==0) { // 제목+내용으로 검색
+			for(Post p:posts) {
+				if(p.getTitle().contains(text) || p.getContent().contains(text))
+					searchingList.add(p);
+			}
+		} else { // 작성자 이름으로 검색
+			for(Post p:posts) {
+				if(p.getUser().getName().contains(text))
+					searchingList.add(p);
+			}
+		}
+		posts= new ArrayList<>(searchingList);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<Comment> comments=commentRepository.findByPost_PostId(p.getPostId());
+			if(comments==null) {
+				num.add(0);
+			} else {
+				num.add(comments.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+	}
+	public List<Integer> communitySearchLikeNum(int page,int type,String text) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Set<Post> searchingList=new HashSet<>();
+		if(type==0) { // 제목+내용으로 검색
+			for(Post p:posts) {
+				if(p.getTitle().contains(text) || p.getContent().contains(text))
+					searchingList.add(p);
+			}
+		} else { // 작성자 이름으로 검색
+			for(Post p:posts) {
+				if(p.getUser().getName().contains(text))
+					searchingList.add(p);
+			}
+		}
+		posts= new ArrayList<>(searchingList);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<PostLike> postLikes=postLikeRepository.findByPost_PostId(p.getPostId());
+			if(postLikes==null) {
+				num.add(0);
+			} else {
+				num.add(postLikes.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+
+	}
+	public List<Integer> freeBoardLikeNum(int page,int projectId) {
+		List<Post> posts=postRepository.findByProject_projectId(projectId);
 		Collections.reverse(posts);
 		List<Integer> num=new ArrayList<>();
 		for(Post p:posts) {

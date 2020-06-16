@@ -1,13 +1,12 @@
 <template>
     <div class="containerStyle">
         <h3 style="margin-left: 5%">커뮤니티 게시판</h3>
-        <hr style="width: 90%">
+        <hr style="width: 90%;">
         <b-row style="margin-bottom:30px">
             <b-col>
                 {{$route.query.type==0?'제목+내용으로':'작성자로'}} "{{$route.query.text}}"를 검색한 결과입니다
             </b-col>
         </b-row>
-        <div v-if="totalRows==0" style="margin-bottom:50px;">검색 결과가 없습니다.</div>
         <!--게시글 목록 테이블-->
         <center>
             <b-form-group label-for="SubjectNotice">
@@ -29,6 +28,7 @@
                         </tr>
                     </tbody>
                 </table>
+                
             </b-form-group>
             <b-pagination style="float: right ; margin-right: 5%" @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
             <b-row class="mt-4" style="">
@@ -38,14 +38,47 @@
         </b-row>
         </center>
 
-        
+        <!--게시글 작성 모달-->
+        <b-modal id="modal-newBoard" size="lg"  @show="resetModal" @hidden="resetModal" title="게시글 작성" :ok-disabled="!checkForm() || checkTime()" @ok="newBoard">
+            <b-form-group label-for="newNotice" enctype="multipart/form-data">
+                <table class="table table-bordered" id="newNotice" >
+                    <tr>
+                        <th style="width:20%">제목</th>
+                        <td>
+                            <b-form-input v-model.trim="title" placeholder="게시글 제목을 입력하세요."></b-form-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>내용</th>
+                        <td>
+                            <b-form-textarea rows="9" v-model="content" placeholder="게시글 내용을 입력하세요."></b-form-textarea>
+                        </td>
+                    </tr>
+                     <tr>
+                        <th>파일 업로드</th>
+                        <td>
+                            <b-form-file multiple v-model="files" class="mt-3" plain ></b-form-file>          
+                            <!-- <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/> -->
+                        </td>
+                    </tr>
+                </table>
+            </b-form-group>
+        </b-modal>
+
+        <!--날짜선택-->
+        <b-modal id="calendar1" ok-only no-close-on-backdrop>
+            <b-calendar block @context="onContext1" :date-disabled-fn="dateDisabled1"></b-calendar>
+        </b-modal>
+        <b-modal id="calendar2" ok-only no-close-on-backdrop>
+            <b-calendar block @context="onContext2" :date-disabled-fn="dateDisabled2"></b-calendar>
+        </b-modal>
     </div>    
 </template>
 
 <script>
 import axios from 'axios'
 export default {
-    name: 'CommunitySearch',
+    name: 'CommunitySearch2',
     data() {
         return {
             perPage: 6, // 각 페이지마다 보이는 리스트
@@ -68,41 +101,36 @@ export default {
             selected:null,
         } 
     },
-    watch: {
-        '$route'(){
-            //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
-            console.log('query111:'+this.$route.query.page)
-            axios.get('/api/communitySearch?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
-                    this.paginatedItems=response.data
-                    }).catch((erro) => {
-                    console.error(erro);
-            });
-            axios.get('/api/communitySearchListNum'+'?type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
-                    this.totalRows=response.data
-                    }).catch((erro) => {
-                    console.error(erro);
-            });
-            axios.get('/api/communitySearch/commentNum?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
-                    this.commentNum=response.data
-                    }).catch((erro) => {
-                    console.error(erro);
-            });
-            axios.get('/api/communitySearch/likeNum?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
-                    this.likeNum=response.data
-                    }).catch((erro) => {
-                    console.error(erro);
-            });
-        }
-    },
-    mounted() {
-        this.loadPage();
-    },
+    // watch: {
+    //     '$route'(){
+    //         //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
+    //         console.log('query111:'+this.$route.query.page)
+    //          axios.get('/api/community?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+    //             this.paginatedItems=response.data
+    //             }).catch((erro) => {
+    //             console.error(erro);
+    //          });
+    //         axios.get('/api/community/commentNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+    //             this.commentNum=response.data
+    //             }).catch((erro) => {
+    //             console.error(erro);
+    //         });
+    //          axios.get('/api/community/likeNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+    //                 this.likeNum=response.data
+    //                 }).catch((erro) => {
+    //                 console.error(erro);
+    //         });
+    //     }
+    // },
+    // mounted() {
+    //     this.loadPage();
+    // },
     methods: {
         loadPage(){
             if(this.currentPage==1) {
                 this.$router.push({
-                    path: '/communitySearch',
-                    query:{page:1,type:this.$route.query.type,text:this.$route.query.text}
+                    path: '/community',
+                    query:{page:1}
                 }).catch(error => {       //일단 네비게이션 중복 에러 뜨는 부분은 throw해둠..
                     if(error.name != "NavigationDuplicated" ){
                         throw error;
@@ -113,22 +141,22 @@ export default {
             // .then(response => {
             //     this.userType = response.data.userType
             // });
-            axios.get('/api/communitySearch?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/community?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                     this.paginatedItems=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/communitySearchListNum'+'?type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/communityListNum').then(response => { // 프로젝트 이름 가져오기
                     this.totalRows=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/communitySearch/commentNum?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/community/commentNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                     this.commentNum=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/communitySearch/likeNum?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/community/likeNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                     this.likeNum=response.data
                     }).catch((erro) => {
                     console.error(erro);
@@ -236,8 +264,8 @@ export default {
         },
         paginate (page_size, page_number) {
             this.$router.push({
-                path: '/communitySearch',
-                query:{page:page_number+1,type:this.$route.query.type,text:this.$route.query.text}
+                path: '/community',
+                query:{page:page_number+1}
             }).catch(error => {       //일단 네비게이션 중복 에러 뜨는 부분은 throw해둠..
                 if(error.name != "NavigationDuplicated" ){
                     throw error;
