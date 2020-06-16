@@ -1,7 +1,12 @@
 <template>
     <div class="containerStyle">
         <h3 style="margin-left: 5%">커뮤니티 게시판</h3>
-        <hr style="width: 90%">
+        <hr style="width: 90%;">
+        <b-row style="margin-bottom:30px">
+            <b-col>
+                {{$route.query.type==0?'제목+내용으로':'작성자로'}} "{{$route.query.text}}"를 검색한 결과입니다
+            </b-col>
+        </b-row>
         <!--게시글 목록 테이블-->
         <center>
             <b-form-group label-for="SubjectNotice">
@@ -23,9 +28,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <div style="text-align: right ; margin-right: 5%">
-                    <b-button variant="dark" v-if="isjoinMember" v-b-modal.modal-newBoard>게시글 작성</b-button>
-                </div>
+                
             </b-form-group>
             <b-pagination style="float: right ; margin-right: 5%" @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
             <b-row class="mt-4" style="">
@@ -75,7 +78,7 @@
 <script>
 import axios from 'axios'
 export default {
-    name: 'CommunityBoard',
+    name: 'CommunitySearch',
     data() {
         return {
             perPage: 6, // 각 페이지마다 보이는 리스트
@@ -98,30 +101,30 @@ export default {
             selected:null,
         } 
     },
-    watch: {
-        '$route'(){
-            //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
-            console.log('query111:'+this.$route.query.page)
-             axios.get('/api/community?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
-                this.paginatedItems=response.data
-                }).catch((erro) => {
-                console.error(erro);
-             });
-            axios.get('/api/community/commentNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
-                this.commentNum=response.data
-                }).catch((erro) => {
-                console.error(erro);
-            });
-             axios.get('/api/community/likeNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
-                    this.likeNum=response.data
-                    }).catch((erro) => {
-                    console.error(erro);
-            });
-        }
-    },
-    mounted() {
-        this.loadPage();
-    },
+    // watch: {
+    //     '$route'(){
+    //         //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
+    //         console.log('query111:'+this.$route.query.page)
+    //          axios.get('/api/community?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+    //             this.paginatedItems=response.data
+    //             }).catch((erro) => {
+    //             console.error(erro);
+    //          });
+    //         axios.get('/api/community/commentNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+    //             this.commentNum=response.data
+    //             }).catch((erro) => {
+    //             console.error(erro);
+    //         });
+    //          axios.get('/api/community/likeNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+    //                 this.likeNum=response.data
+    //                 }).catch((erro) => {
+    //                 console.error(erro);
+    //         });
+    //     }
+    // },
+    // mounted() {
+    //     this.loadPage();
+    // },
     methods: {
         loadPage(){
             if(this.currentPage==1) {

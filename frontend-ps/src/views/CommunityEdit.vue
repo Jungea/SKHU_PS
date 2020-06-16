@@ -51,7 +51,7 @@
 <script>
 import axios from 'axios'
 export default {
-    name: 'freeEdit',
+    name: 'CommunityEdit',
     data() {
         return {
             postId: '',
@@ -200,7 +200,7 @@ export default {
                         })
                     }
                     this.$router.push({
-                        path: '/project/'+this.$route.params.projectId+'/freeBoard/' + this.$route.params.postId
+                        path: '/community/'+this.$route.params.postId
                     })
                 })
             }

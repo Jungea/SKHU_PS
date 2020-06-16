@@ -30,6 +30,7 @@ import FreeEdit from '../views/FreeEdit.vue'
 import CommunityBoard from '../views/CommunityBoard.vue'
 import CommunityContent from '../views/CommunityContent.vue'
 import CommunityEdit from '../views/CommunityEdit.vue'
+import CommunitySearch from '../views/CommunitySearch.vue'
 
 import StudentNoticeBoard from '../views/StudentNoticeBoard.vue'
 import StudentNoticeContent from '../views/StudentNoticeContent.vue'
@@ -243,6 +244,12 @@ Vue.use(VueRouter)
     name: 'communityEdit',
     component: CommunityEdit
   },
+  {
+    path: '/communitySearch',
+    name: 'communitySearch',
+    component: CommunitySearch
+  },
+  
   
 ]
 

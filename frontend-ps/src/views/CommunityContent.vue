@@ -12,6 +12,14 @@
                     <td>{{post.title}}</td>
                 </tr>
                 <tr>
+                    <th class="th1" style="width: 14%">작성자</th>
+                    <td>{{post.user.name}}</td>
+                </tr>
+                <tr>
+                    <th class="th1" style="width: 14%">좋아요</th>
+                    <td>{{likeNum}}</td>
+                </tr>
+                <tr>
                     <th class="th1">작성일</th>
                     <td>{{post.writeTime}}</td>
                 </tr>
@@ -94,6 +102,7 @@ export default {
             userType: '',
             userName: '',
             admin:null,
+            likeNum:null,
         }
     },
     mounted() { 
@@ -147,6 +156,11 @@ export default {
             })
             this.postId = this.$route.params.postId
 
+            axios.get('/api/community/content/likeNum?postId='+this.$route.params.postId).then(response => { // 프로젝트 이름 가져오기
+                    this.likeNum=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
         },
         download(file) {
             axios({
@@ -209,7 +223,7 @@ export default {
                 .then(response => {
                     console.log(response.data)
                     this.$router.push({
-                        path: '/project/'+this.$route.params.projectId+'/freeBoard',
+                        path: '/community',
                         query:{page:1}
                     })
                 })

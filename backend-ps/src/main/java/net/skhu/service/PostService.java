@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.Comment;
 import net.skhu.domain.Post;
+import net.skhu.domain.PostLike;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Timeline;
@@ -20,6 +21,7 @@ import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.CommentRepository;
 import net.skhu.repository.DetailRepository;
 import net.skhu.repository.FileRepository;
+import net.skhu.repository.PostLikeRepository;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
@@ -46,6 +48,8 @@ public class PostService {
 	TimelineRepository timelineRepository;
 	@Autowired
 	CommentRepository commentRepository;
+	@Autowired
+	PostLikeRepository postLikeRepository;
 	
 	public List<Post> noticeBoard(int page,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
@@ -225,7 +229,6 @@ public class PostService {
 	@Transactional
 	public int writeCommunity(WriteNoticeModel notice,int userId) {
 		Post post=new Post();
-		post.setProject(projectRepository.findById(notice.getProjectId()).get());
 		post.setTitle(notice.getTitle());
 		post.setContent(notice.getContent());
 		post.setWriteTime(LocalDateTime.now());
@@ -243,6 +246,25 @@ public class PostService {
 				num.add(0);
 			} else {
 				num.add(comments.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+	}
+	public List<Integer> communitylikeNum(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<PostLike> postLikes=postLikeRepository.findByPost_PostId(p.getPostId());
+			if(postLikes==null) {
+				num.add(0);
+			} else {
+				num.add(postLikes.size());
 			}
 		}
 		if(posts.size()<page*6) {
