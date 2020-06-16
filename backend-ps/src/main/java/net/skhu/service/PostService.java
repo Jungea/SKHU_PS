@@ -239,7 +239,7 @@ public class PostService {
 				return "/subject/"+post.getSubject().getSubjectId()+"/noticeBoard/"+postId;
 				
 		} else { //커뮤니티 게시판
-			return "커뮤니티 게시판";
+			return "/community/"+postId;
 		}
 	}
 	public List<Post> community(int page) {
