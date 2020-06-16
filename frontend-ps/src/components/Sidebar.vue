@@ -67,7 +67,7 @@
       
       <b-nav-item>it 경진대회</b-nav-item>
       <b-nav-item @click="projectBoard">프로젝트 게시판</b-nav-item>
-      <b-nav-item >커뮤니티 게시판</b-nav-item>
+      <b-nav-item @click="communityBoard">커뮤니티 게시판</b-nav-item>
       <b-nav-item> <!-- 233px -->
         <hr>
         <b-button variant="dark" @click="logout">Logout</b-button>
@@ -354,6 +354,12 @@ export default {
       freeBoard() {
         this.$router.push({
             path: '/project/' + this.pinProjectId + '/freeBoard',
+            query:{page:1}
+        })
+      },
+      communityBoard() {
+        this.$router.push({
+            path: '/community',
             query:{page:1}
         })
       }

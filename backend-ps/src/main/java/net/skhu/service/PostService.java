@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.Comment;
 import net.skhu.domain.Post;
+import net.skhu.domain.PostLike;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Timeline;
@@ -21,6 +22,7 @@ import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.CommentRepository;
 import net.skhu.repository.DetailRepository;
 import net.skhu.repository.FileRepository;
+import net.skhu.repository.PostLikeRepository;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
@@ -50,6 +52,8 @@ public class PostService {
 	CommentRepository commentRepository;
 	@Autowired
 	ProjectJoinRepository projectJoinRepository;
+	@Autowired
+	PostLikeRepository postLikeRepository;
 	
 	public List<Post> noticeBoard(int page,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
@@ -236,5 +240,64 @@ public class PostService {
 		} else { //커뮤니티 게시판
 			return "커뮤니티 게시판";
 		}
+
+	public List<Post> community(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		if(posts.size()<page*6) {
+			posts=posts.subList((page-1)*6,posts.size());
+		} else {
+			posts=posts.subList((page-1)*6,page*6);
+		}
+		return posts;
+	}
+	@Transactional
+	public int writeCommunity(WriteNoticeModel notice,int userId) {
+		Post post=new Post();
+		post.setTitle(notice.getTitle());
+		post.setContent(notice.getContent());
+		post.setWriteTime(LocalDateTime.now());
+		post.setUser(userRepository.findById(userId).get());
+		post.setDetail(detailRepository.findById(15).get());
+		return postRepository.save(post).getPostId();
+	}
+	public List<Integer> communityCommentNum(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<Comment> comments=commentRepository.findByPost_PostId(p.getPostId());
+			if(comments==null) {
+				num.add(0);
+			} else {
+				num.add(comments.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+	}
+	public List<Integer> communitylikeNum(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<PostLike> postLikes=postLikeRepository.findByPost_PostId(p.getPostId());
+			if(postLikes==null) {
+				num.add(0);
+			} else {
+				num.add(postLikes.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+
 	}
 }

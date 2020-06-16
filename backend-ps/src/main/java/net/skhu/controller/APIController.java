@@ -51,6 +51,7 @@ import net.skhu.model.WeekGoalModel;
 import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.CommentRepository;
 import net.skhu.repository.FileRepository;
+import net.skhu.repository.PostLikeRepository;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
@@ -104,6 +105,8 @@ public class APIController {
 	FileRepository fileRepository;
 	@Autowired
 	PostLikeService postLikeService;
+	@Autowired
+	PostLikeRepository postLikeRepository;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -754,7 +757,7 @@ public class APIController {
 	public boolean isCap(@PathVariable("projectId") int projectId,HttpServletRequest request) {
 		return projectService.isCap(projectId,getLoginUserId(request));
 	}
-	
+
 	// 내가 작성한 게시글
 	@RequestMapping(value = "user/posts", method = RequestMethod.GET)
 	public List<ListModel> userPosts(HttpServletRequest request) {
@@ -779,6 +782,37 @@ public class APIController {
 	@RequestMapping(value = "user/post/{postId}/url", method = RequestMethod.GET)
 	public String userPostUrl(@PathVariable("postId") int postId, HttpServletRequest request) {
 		return postService.userPostUrl(postId, getLoginUserId(request));
+	}
+	// 커뮤니티  게시판에서 페이징  
+	@RequestMapping(value = "community", method = RequestMethod.GET)
+	public List<Post> community(@RequestParam("page") int page) {
+		return postService.community(page);
+	}
+	// 커뮤니티 게시판에서 전체 개수
+	@RequestMapping(value = "communityListNum", method = RequestMethod.GET)
+	public int communityListNum() {
+		return postRepository.findByDetail_detId(15).size();
+	}
+	// 커뮤니티게시판 게시글 쓰기
+	@RequestMapping(value = "writeCommunity", method = RequestMethod.POST)
+	public int  writeCommunity(@RequestBody WriteNoticeModel notice, HttpServletRequest request) {
+		return postService.writeCommunity(notice,getLoginUserId(request));
+	}
+	// 커뮤니티 게시판에서 댓글 수 리턴
+	@RequestMapping(value = "community/commentNum", method = RequestMethod.GET)
+	public List<Integer> commentNum(@RequestParam("page") int page) {
+		return postService.communityCommentNum(page);
+	}
+	// 커뮤니티 게시판에서 좋아요 수 리턴
+	@RequestMapping(value = "community/likeNum", method = RequestMethod.GET)
+	public List<Integer> likeNum(@RequestParam("page") int page) {
+		return postService.communitylikeNum(page);
+	}
+	// 좋아요 수 리턴
+	@RequestMapping(value = "community/content/likeNum", method = RequestMethod.GET)
+	public int contentLikeNum(@RequestParam("postId") int postId) {
+		return postLikeRepository.findByPost_PostId(postId).size();
+
 	}
 
 }
