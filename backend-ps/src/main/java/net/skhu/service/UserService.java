@@ -177,6 +177,10 @@ public class UserService {
 
 		// starId DESC
 		Collections.reverse(project);
+		
+		ProjectBoardModel saveOnlySatateForSize = new ProjectBoardModel();
+		saveOnlySatateForSize.setState(project.size());
+		board.add(saveOnlySatateForSize);
 
 		if (project.size() < page * 6) {
 			project = project.subList((page - 1) * 6, project.size());

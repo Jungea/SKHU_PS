@@ -14,7 +14,7 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Integer> {
 	PostLike findByPost_PostIdAndUser_UserId(int postId, int userId);
 
 	// 내가 좋아요한 프로젝트들
-	@Query("SELECT new net.skhu.model.ListModel(pl.post.postId, pl.post.detail.detId, pl.user.name, pl.post.title, pl.post.writeTime, pl.post.comments.size) FROM PostLike pl WHERE pl.user.userId = ?1 ORDER BY pl.likeId DESC")
+	@Query("SELECT new net.skhu.model.ListModel(pl.post.postId, pl.post.detail.detId, pl.post.user.name, pl.post.title, pl.post.writeTime, pl.post.comments.size) FROM PostLike pl WHERE pl.user.userId = ?1 ORDER BY pl.likeId DESC")
 	List<ListModel> findPostsAndCommentByUserId(int userId);
 
 	List<PostLike> findByPost_PostId(int postId);

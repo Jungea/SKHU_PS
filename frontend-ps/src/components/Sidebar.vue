@@ -236,12 +236,12 @@ export default {
         if(this.type==false) { // 학생이라면
           this.$router.push({
               path: '/profile',
-              query: {page:1}
+              // query: {page:1}
           })
         } else {
           this.$router.push({
               path: '/professorProfile',
-              query: {page:1}
+              // query: {page:1}
           })
         }
       },

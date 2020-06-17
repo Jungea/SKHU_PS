@@ -2,8 +2,8 @@
     <div class="profileContainer">
         <h3>마이페이지</h3>
         <hr style="margin: 30px 0 15px 0;">
-        <b-tabs pills align="right">
-            <b-tab title="내 정보" title-link-class="text-dark bg-white" active>
+        <b-tabs v-model="tapIndex" pills align="right">
+            <b-tab title="내 정보" title-link-class="text-dark bg-white" active @click="userInfoTap">
                 <div class="infoContainer">
                     <!-- <h5>내 정보</h5> -->
                     <div style="padding: 30px ;">
@@ -106,6 +106,9 @@
                                     <th class="th1">제목</th>
                                     <th class="th1">작성일</th>
                                 </tr>
+                                <tr v-if="postData.length == 0">
+                                    <td colspan="2">작성한 게시글이 없습니다.</td>
+                                </tr>
                                 <tr v-for="post in postData" :key="post.id" @click="viewPost(post.id)">
                                     <td style="width: 40%"> <b> {{ post.content }} [{{ post.commentNum }}] </b> </td>
                                     <td class="td1" style="width: 20%"> {{ post.writeTime.replace("T", " ") }} </td>
@@ -118,11 +121,14 @@
             <b-tab title="작성한 댓글" title-link-class="bg-white text-dark" @click="userComments">
                 <center>
                     <b-form-group class="mt-3">
+                        <div v-if="commentData.length == 0" style="border: 1px solid silver ; padding: 10px ; margin-bottom: 10px ; width: 80% ; text-align: left ; min-height: 80px">
+                            <div style="margin-top: 3px"> 작성한 댓글이 없습니다. </div>
+                        </div>
                         <div v-for="comment in commentData" :key="comment.commentId" @click="viewComment(comment.post.postId)" style="border: 1px solid silver ; padding: 10px ; margin-bottom: 10px ; width: 80% ; text-align: left ; min-height: 80px">
                             <div> <b> {{ userInfo.name }} </b> <span style="color: #9A9A9A"> ({{comment.writeTime.replace("T", " ")}}) </span>
                             </div>
                             <div style="margin-top: 3px"> {{comment.content}} </div>
-                        </div>                      
+                        </div>       
                     </b-form-group>
                 </center>
             </b-tab>
@@ -133,7 +139,7 @@
                 <div v-if="selected[0]">
                     <center>    
                         <b-container class="bv-row">
-                            <p style="color: silver ; margin:300px auto ;" v-if="false">좋아요한 프로젝트가 없습니다.</p>
+                            <p style="color: silver ; margin:300px auto ;" v-if="totalRows == 0">좋아요한 프로젝트가 없습니다.</p>
                             <b-row cols-md="3" cols="1">
                                 <b-col class="mb-5" :key="index" v-for="(item, index) in paginatedItems">
                                     <b-card align="left" bg-variant="dark" text-variant="white" style="height:250px;" :ref="`card${item.project.projectId}`">
@@ -259,6 +265,9 @@
                                     <th class="th1" style="width: 10%">작성자</th>
                                     <th class="th1">작성일</th>
                                 </tr>
+                                <tr v-if="likePostData.length == 0">
+                                    <td colspan="3">좋아요한 게시글이 없습니다.</td>
+                                </tr>
                                 <tr v-for="post in likePostData" :key="post.id" @click="viewPost(post.id)">
                                     <td style="width: 40%"> <b> {{ post.content }} [{{ post.commentNum }}] </b> </td>
                                     <td class="td1"> {{ post.userName }} </td>
@@ -289,12 +298,12 @@ export default {
         inviteList:[],
         applicationList:[],
         state: ["대기", "수락", "거절"],
-        selected: [ true, false ],
+        selected: [ false, true ],
 
         perPage: 6, // 각 페이지마다 보이는 카드 최대 수
         currentPage: 1,
-        totalRows: null,
-        paginatedItems:{},  //likePorjectData
+        totalRows: 0,
+        paginatedItems: [],  //likePorjectData
         data:{},
         rcrtState:false,
         userType: null,
@@ -311,27 +320,32 @@ export default {
             },
         },
 
-        postData: null,
-        commentData: null,
-        likePostData: null
+        postData: [],
+        commentData: [],
+        likePostData: [],
+        tapIndex: 0
     }
     },
     watch: {
-      '$route'(){
-          this.likeProjectsReload();
+        '$route'(){
+            if(this.selected[0] == true) {
+                if(this.$route.query.page == undefined) {
+                    this.tapIndex = 0;
+                    this.selected[0] = false;
+                    this.selected[1] = true;
+                }
+                else
+                    this.likeProjectsReload();
+            }else {
+                this.selected[0] = false;
+                this.selected[1] = true;
+            }
       }
     },
     mounted() {
-       axios.get('/api/all/projectsNum') // 내 프로젝트 모든 목록 갯수
-        .then(response => {
-            this.totalRows=response.data
-        });
-        axios.get('/api/user/likeProjects?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
-            this.paginatedItems=response.data
-            this.summaryData=response.data[0]
-            }).catch((erro) => {
-            console.error(erro);
-        });
+        if(this.selected[0] == true) {
+            this.likeProjectsReload();
+        }
 
         axios.get('/api/user')
         .then(response => {
@@ -376,6 +390,12 @@ export default {
 
    },
    methods:{
+        userInfoTap() {
+            if(this.$route.query.page != undefined)
+                this.$router.push({
+                    path: '/profile'
+                })
+        },
         editProfile() {
             this.$router.push({
                 path: '/editProfile'
@@ -404,7 +424,16 @@ export default {
 
         likeProjectsReload() {
             axios.get('/api/user/likeProjects?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
-                this.paginatedItems=response.data;
+                //response.data[0].state는 totalRow
+                if(response.data[1] != undefined) {
+                    let temp = response.data.shift();
+                    this.totalRows = temp.state;
+                    
+                    this.paginatedItems=response.data;
+                } else {
+                    this.totalRows = 0;
+                    this.paginatedItems = [];
+                }
                 }).catch((erro) => {
                 console.error(erro);
             });
@@ -422,11 +451,11 @@ export default {
                 this.likeProjectsReload();
             }
             else {
+                this.selected[0] = false;
+                this.selected[1] = true;
                 this.$router.push({
                     path: '/profile'
                 })
-                this.selected[1] = true;
-                this.selected[0] = false;
 
                 axios.get('/api/user/likePosts')
                     .then(response => this.likePostData = response.data);
@@ -447,8 +476,13 @@ export default {
 
         //내가 쓴 게시글관련
         userPosts() {
+            if(this.$route.query.page != undefined)
+                this.$router.push({
+                    path: '/profile'
+                })
+
             axios.get('/api/user/posts')
-                .then(response => this.postData = response.data);
+                .then(response => this.postData = response.data||[]);
         },
         viewPost(postId) {
             console.log(postId);
@@ -465,8 +499,12 @@ export default {
 
         //내가 쓴 댓글관련
         userComments() {
+            if(this.$route.query.page != undefined)
+                this.$router.push({
+                    path: '/profile'
+                })
             axios.get('/api/user/comments')
-                .then(response => this.commentData = response.data);
+                .then(response => this.commentData = response.data||[]);
         },
         viewComment(postId) { // 댓글을 작성한 게시글로 이동
             console.log(postId);
