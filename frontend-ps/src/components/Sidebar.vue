@@ -65,7 +65,7 @@
         <hr>
       </div>
       
-      <b-nav-item>it 경진대회</b-nav-item>
+      <b-nav-item @click="contest">IT 경진대회</b-nav-item>
       <b-nav-item @click="projectBoard">프로젝트 게시판</b-nav-item>
       <b-nav-item >커뮤니티 게시판</b-nav-item>
       <b-nav-item> <!-- 233px -->
@@ -215,6 +215,12 @@ export default {
             path: '/projectBoard',
             query:{page:1}
           })
+      },
+      contest(evt){
+        evt.preventDefault()
+        this.$router.push({
+          path: '/contest'
+        })
       },
       home(evt) {
         evt.preventDefault()
