@@ -25,9 +25,11 @@ export default {
 <style>
 html, body, #app {
   padding:0;
-  height: 100%
+  height: 100%;
+  scroll-behavior: smooth;
 }
+
 .mySidebar {
-  border:1px solid silver;
+  border:1px solid #dddddd;
 }
 </style>
