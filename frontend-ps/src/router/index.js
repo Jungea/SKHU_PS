@@ -28,10 +28,8 @@ import FreeBoard from '../views/FreeBoard.vue'
 import FreeContent from '../views/FreeContent.vue'
 import FreeEdit from '../views/FreeEdit.vue'
 
-
 import StudentNoticeBoard from '../views/StudentNoticeBoard.vue'
 import StudentNoticeContent from '../views/StudentNoticeContent.vue'
-
 
 import NoticeBoard from '../views/NoticeBoard.vue'
 import NoticeContent from '../views/NoticeContent.vue'
@@ -42,6 +40,7 @@ import Summary from '../views/summary.vue';
 import WeeklyGoal from '../views/WeeklyGoal.vue'
 import Todo from '../views/Todo.vue'
 
+import Contest from '../views/Contest.vue'
 
 // import test from '../views/test.vue';
 // import test2 from '../views/test2.vue';
@@ -226,6 +225,11 @@ Vue.use(VueRouter)
     name: 'freeEdit',
     component: FreeEdit
   },
+  {
+    path: '/contest',
+    name: 'Contest',
+    component: Contest
+  }
   
 ]
 
