@@ -754,5 +754,12 @@ public class APIController {
 	public boolean isCap(@PathVariable("projectId") int projectId,HttpServletRequest request) {
 		return projectService.isCap(projectId,getLoginUserId(request));
 	}
+	
+	//0625 임시 추가
+	//프로젝트보드 모델 포맷으로 페이지네이션 없는 전체 프로젝트 반환
+	@RequestMapping(value = "allProjects", method = RequestMethod.GET)
+	public List<ProjectBoardModel> projectBoard2(HttpServletRequest request) {
+		return projectService.projectBoard2(getLoginUserId(request));
+	}
 
 }

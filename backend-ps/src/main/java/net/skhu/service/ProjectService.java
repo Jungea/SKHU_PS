@@ -706,4 +706,39 @@ public class ProjectService {
 		else 
 			return false;
 	}
+	
+	
+	
+	//0625 페이지네이션 없는 프로젝트보드 모델 리턴
+	//기존 메소드로 불러올수 있으면 삭제해주셈
+	public List<ProjectBoardModel> projectBoard2(int userId) {
+		List<Project> project = projectRepository.findAll();
+		List<ProjectBoardModel> board = new ArrayList<>();
+		
+		for (Project p : project) {
+			ProjectBoardModel model = new ProjectBoardModel();
+			model.setProject(p);
+			ProjectStar ps = projectStarRepository.findByUser_userIdAndProject_ProjectId(userId, p.getProjectId());
+			model.setStar(ps != null ? true : false);
+			model.setSubjectName(p.getSubject() != null ? p.getSubject().getTitle() : null);
+			model.setCreateName(p.getUser().getName());
+			List<ProjectJoin> projectJoin = projectJoinRepository.findByProject_ProjectId(p.getProjectId());
+			Set<Integer> allGrade = new HashSet<>();
+			for (ProjectJoin pj : projectJoin) {
+				if(pj.getState()==1) {
+					allGrade.add(pj.getUser().getGrade());
+				}
+			}
+			model.setAllMemGrade(allGrade);
+			ProjectJoin pj = projectJoinRepository.findByUser_userIdAndProject_projectId(userId, p.getProjectId());
+			if (pj == null)
+				model.setState(2); // 프로젝트 신청할수 있는 상태
+			else if (pj.getState() == 0)
+				model.setState(0); // 승인대기 상태
+			else if (pj.getState() == 1)
+				model.setState(1); // 참가하고있는 상태
+			board.add(model);
+		}
+		return board;
+	}
 }
