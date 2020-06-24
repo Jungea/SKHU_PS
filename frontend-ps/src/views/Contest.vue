@@ -61,25 +61,25 @@
         <div class="containerStyle">
             <!--프로젝트 목록-->
             <div class="row" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
-                <div class="column mb-5" :key="project.projectId" v-for="project in projects">
+                <div class="column mb-5" :key="index" v-for="(p, index) in projectCard">
                     <div class="wrapper">
                         <b-card class="card" draggable="true">
                             <b-card-title class="cardTitle">
-                                <h4 class="etc"><b>{{project.projectName}}</b></h4>
+                                <h4 class="etc"><b>{{p.project.projectName}}</b></h4>
                             </b-card-title>
                             <b-card-text>
-                                <span class="mr-3">{{project.year}}</span>
+                                <span class="mr-3">{{p.project.year}}</span>
                                 <span class="mr-3">|</span>
-                                <span>{{project.user.name}}</span> <!--팀장명-->
-                                <span v-if="project.memNum>1">외 {{project.memNum-1}}명</span>
+                                <span>{{p.project.user.name}}</span> <!--팀장명-->
+                                <span v-if="p.project.memNum>1">외 {{p.project.memNum-1}}명</span>
                             </b-card-text>
                             <!--주제-->
                             <b-card-text class="mt-4">
-                                <p class="etc" style="font-size:11pt; font-weight:bold">{{project.theme}}</p>
+                                <p class="etc" style="font-size:11pt; font-weight:bold">{{p.project.theme}}</p>
                             </b-card-text>
                             <!--태그-->
                             <b-card-text class="tags">
-                                <span class="mr-2" style="font-size:12pt;" v-for="(tag, index) in project.tag.split(',')" :key="index">
+                                <span class="mr-2" style="font-size:12pt;" v-for="(tag, index) in p.project.tag.split(',')" :key="index">
                                     <b-badge variant="light" class="">#&nbsp;{{tag}}</b-badge>
                                 </span>
                             </b-card-text>
@@ -87,18 +87,19 @@
                             <b-card-text>
                                 <div style="font-size: 2rem;">
                                     <!--모달 띄우기-->
-                                    <b-button v-b-modal.project-modal squared variant="outline-secondary" size="sm" @click="getProjectInfo(project.projectId)">자세히</b-button>
+                                    <b-button v-b-modal.project-modal squared variant="outline-secondary" size="sm" @click="getProjectInfo(p.project.projectId)">자세히</b-button>
                                     <!--좋아요-->
                                     <b-icon 
-                                        :id="`tooltip-like-${project.projectId}`" 
-                                        :icon="project.star=true?'heart':'heart'" 
+                                        :id="`tooltip-like-${p.project.projectId}`" 
+                                        :icon="p.star==true?'heart-fill':'heart'" 
                                         scale="1.3" 
                                         class="like rounded-circle p-2" 
                                         variant="danger"
-                                        @click="like(project.projectId, project.star)"
+                                        @click="like(index, p.star)"
                                     ></b-icon>
-                                    <b-tooltip triggers="hover" :target="`tooltip-like-${project.projectId}`">좋아요</b-tooltip>
-                                    <!-- <b-icon icon="heart-fill" scale="1.3" class="rounded-circle bg-danger p-2" variant="light" style="float:right; margin-top:15px"></b-icon> -->
+                                    <b-tooltip triggers="hover" :target="`tooltip-like-${p.project.projectId}`">
+                                        <span>좋아요<span v-if="p.star">&nbsp;취소</span></span>
+                                    </b-tooltip>
                                 </div>
                             </b-card-text>
                         </b-card>
@@ -123,7 +124,10 @@
                 title="프로젝트 정보"
                 @hidden="resetModal"
             >
-                <div style="width:calc(100% - 1px);"><!--크롬 너비 내림-->
+                <div style="width:calc(100% - 1px);" class="p-3 text-center" v-if="!modalLoaded">
+                    <b-spinner label="Loading..."></b-spinner>
+                </div>
+                <div style="width:calc(100% - 1px);" v-if="modalLoaded"><!--크롬 너비 내림-->
                     <b-row cols="1" style="margin:0;">
                     <div class="board-header">
                         <p class="page-title etc">{{projectInfo.project.projectName}}</p>
@@ -223,7 +227,7 @@ export default {
     name: 'Contest',
     data() {
         return {
-            projects:[],
+            projectCard:[],
             busy: false,
             next: {},
             allLoaded:false,
@@ -249,10 +253,14 @@ export default {
             searchShow:false,
 
             //모달 정보
+            modalLoaded:false,
             projectInfo:{
                 project:{},
                 member:[]
-            }
+            },
+
+
+            test:[]
         }
     },
 
@@ -292,27 +300,36 @@ export default {
                 let arr=[];
                 //let lastOne;
                 for(let i=0;i<response.data.length;i++){
-                    if(response.data[i].contest==1)
+                    if(response.data[i].project.contest==1){
                         arr.push(response.data[i])
                         //lastOne=response.data[i]
+                    }
                 }
                 //참가 연도로 정렬
                 arr.sort(function(p1,p2){
-                    return p2.year-p1.year
+                    return p2.project.year-p1.project.year
                 })
-                let arr2 = arr.slice(this.projects.length,this.projects.length + limit)
+                let arr2 = arr.slice(this.projectCard.length,this.projectCard.length + limit)
                 if(arr2.length==0)
                     this.allLoaded=true
-                this.projects=this.projects.concat(arr2);
+                this.projectCard=this.projectCard.concat(arr2);
                 //this.next=lastOne;
             });
         },
 
-        //좋아요!
-        like(pid){
-            console.log('zzz')
-            axios.post('/api/changeStar', {projectId:pid})
-            .then()
+        //좋아요
+        like(index){
+            // let y=document.scrollingElement.scrollTop
+            // console.log(y)
+            let pc=this.projectCard[index]
+            axios.post('/api/changeStar', {projectId:pc.project.projectId})
+            .then(function(){
+                axios.get('/api/projectBoard/modal/'+pc.project.projectId)
+                .then(response=>{
+                    pc.star=response.data.star
+                })
+            }
+            )
         },
 
         //모달 정보
@@ -326,6 +343,7 @@ export default {
             .then(response => {
                 console.log(response.data)
                 this.projectInfo.member=response.data
+                // this.modalLoaded=true
             })
         },
 
@@ -333,6 +351,7 @@ export default {
             axios.get('/api/projectBoard/modal/'+pid)
             .then(response => {
                 this.projectInfo.project=response.data.project
+                this.modalLoaded=true
             })
         },
 
@@ -341,6 +360,7 @@ export default {
                 member:[],
                 project:{}
             }
+            this.modalLoaded=false
         },
 
         moveToProject(pId){
@@ -367,8 +387,13 @@ export default {
             if(this.filterTitle.length>0||this.filterCaptain.length>0||this.filterYear||this.filterYear)
                 return true;
             return false
-        }
+        },
+
     },
+
+    watch:{
+        
+    }
 
     
 }
