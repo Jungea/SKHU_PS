@@ -1,6 +1,6 @@
 <template>
     <div class="containerStyle">
-        <h3 style="margin-left: 5%">자유 게시판</h3>
+        <h3 style="margin-left: 5%">커뮤니티 게시판</h3>
         <hr style="width: 90%">
         <!--게시글 목록 테이블-->
         <center>
@@ -16,7 +16,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                            <td class="td2" style="width: 40%; cursor:pointer"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
+                            <td class="td1" style="width: 40%; cursor:pointer"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
                             <td class="td1" style="width: 10%; cursor:pointer"> <b> {{item.user.name}}</b> </td>
                             <td class="td1" style="width: 10%; cursor:pointer"> <b> {{likeNum[index]}}</b> </td>
                             <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
@@ -28,6 +28,11 @@
                 </div>
             </b-form-group>
             <b-pagination style="float: right ; margin-right: 5%" @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
+            <b-row class="mt-4" style="">
+                <b-col><b-form-select v-model="selected" :options="options"></b-form-select></b-col>
+                <b-col><b-form-input v-model="text"></b-form-input></b-col>
+                <b-col><b-button @click="search()">검색</b-button></b-col>
+        </b-row>
         </center>
 
         <!--게시글 작성 모달-->
@@ -70,7 +75,7 @@
 <script>
 import axios from 'axios'
 export default {
-    name: 'freeBoard',
+    name: 'CommunityBoard',
     data() {
         return {
             perPage: 6, // 각 페이지마다 보이는 리스트
@@ -85,21 +90,32 @@ export default {
             isjoinMember:true,
             commentNum:[],
             likeNum:[],
+
+            options: [
+                { value: '0', text: '제목+내용' },
+                { value: '1', text: '작성자' },
+            ],
+            selected:null,
         } 
     },
     watch: {
         '$route'(){
             //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
             console.log('query111:'+this.$route.query.page)
-             axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+             axios.get('/api/community?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                 this.paginatedItems=response.data
                 }).catch((erro) => {
                 console.error(erro);
              });
-            axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/community/commentNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                 this.commentNum=response.data
                 }).catch((erro) => {
                 console.error(erro);
+            });
+             axios.get('/api/community/likeNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
+                    this.likeNum=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
             });
         }
     },
@@ -108,13 +124,9 @@ export default {
     },
     methods: {
         loadPage(){
-            axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
-            .then(response => {
-                this.isjoinMember=response.data
-            });
             if(this.currentPage==1) {
                 this.$router.push({
-                    path: '/project/'+this.$route.params.projectId+'/freeBoard',
+                    path: '/community',
                     query:{page:1}
                 }).catch(error => {       //일단 네비게이션 중복 에러 뜨는 부분은 throw해둠..
                     if(error.name != "NavigationDuplicated" ){
@@ -126,22 +138,22 @@ export default {
             // .then(response => {
             //     this.userType = response.data.userType
             // });
-            axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/community?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                     this.paginatedItems=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/freeListNum?projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/communityListNum').then(response => { // 프로젝트 이름 가져오기
                     this.totalRows=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/community/commentNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                     this.commentNum=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/freeBoard/likeNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/community/likeNum?page='+this.$route.query.page).then(response => { // 프로젝트 이름 가져오기
                     this.likeNum=response.data
                     }).catch((erro) => {
                     console.error(erro);
@@ -176,8 +188,7 @@ export default {
                 //     formData.append('file[' + i + ']', f);
                 // }
             
-            axios.post('/api/writeFree', {
-                    projectId:this.$route.params.projectId,
+            axios.post('/api/writeCommunity', {
                     title:this.title,
                     content:this.content,
                 }).then(response => {
@@ -245,12 +256,12 @@ export default {
         },
         viewContent(postId) {
             this.$router.push({
-                path: '/project/'+this.$route.params.projectId+'/freeBoard/' + postId
+                path: '/community/'+postId
             })
         },
         paginate (page_size, page_number) {
             this.$router.push({
-                path: '/project/'+this.$route.params.projectId+'/freeBoard',
+                path: '/community',
                 query:{page:page_number+1}
             }).catch(error => {       //일단 네비게이션 중복 에러 뜨는 부분은 throw해둠..
                 if(error.name != "NavigationDuplicated" ){
@@ -269,7 +280,20 @@ export default {
             }
             else
                 this.extention = ''
-        }
+        },
+        search() {
+            if(this.selected==null) {
+                alert('셀렉트를 선택해주세요.')
+                return;
+            } else if(this.text.length==0) {
+                alert('내용을 입력하세요')
+                return;
+            }
+            this.$router.push({
+                path: '/communitySearch',
+                query:{page:1,type:this.selected,text:this.text}
+            })
+        },
     }
 }
 </script> 

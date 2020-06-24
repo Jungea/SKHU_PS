@@ -18,8 +18,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@ToString(exclude = { "departmentUsers" })
-@EqualsAndHashCode(exclude = { "departmentUsers" })
+@ToString(exclude = { "departmentUsers", "posts" })
+@EqualsAndHashCode(exclude = { "departmentUsers", "posts" })
 @Entity
 public class Detail {
 	@Id

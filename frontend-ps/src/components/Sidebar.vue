@@ -67,7 +67,7 @@
       
       <b-nav-item @click="contest">IT 경진대회</b-nav-item>
       <b-nav-item @click="projectBoard">프로젝트 게시판</b-nav-item>
-      <b-nav-item >커뮤니티 게시판</b-nav-item>
+      <b-nav-item @click="communityBoard">커뮤니티 게시판</b-nav-item>
       <b-nav-item> <!-- 233px -->
         <hr>
         <b-button variant="dark" @click="logout">Logout</b-button>
@@ -242,11 +242,12 @@ export default {
         if(this.type==false) { // 학생이라면
           this.$router.push({
               path: '/profile',
-              query: {page:1}
+              // query: {page:1}
           })
         } else {
           this.$router.push({
-              path: '/professorProfile'
+              path: '/professorProfile',
+              // query: {page:1}
           })
         }
       },
@@ -359,6 +360,12 @@ export default {
       freeBoard() {
         this.$router.push({
             path: '/project/' + this.pinProjectId + '/freeBoard',
+            query:{page:1}
+        })
+      },
+      communityBoard() {
+        this.$router.push({
+            path: '/community',
             query:{page:1}
         })
       }

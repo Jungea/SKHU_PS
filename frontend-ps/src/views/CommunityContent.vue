@@ -1,6 +1,6 @@
 <template>
     <div class="containerStyle">
-        <h3 style="margin-left: 5%">자유 게시판</h3>
+        <h3 style="margin-left: 5%">커뮤니티 게시판</h3>
         <hr style="width: 90%">
         <!--게시글-->
         <center>
@@ -60,16 +60,10 @@
                             <b> {{ item.user.name }} </b> 
                             <span style="color: #9A9A9A"> ({{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }}) </span>
                             <span v-if="admin=='1' || item.user.userId==userId" @click="deleteComment(item.commentId)" style="margin-left:10px; cursor:pointer">삭제</span>
-                            <!--채택 버튼: 작성자에게만 보이게/채택된 댓글이 없을 때 보이게-->
-                            <b-button v-if="post.user.userId==userId&&!isThereSelected" @click="commentSelect(item.commentId)" size="sm" style="float:right">채택</b-button>
                         </div>
                         <!--댓글 내용-->
                         <div style="margin-top: 3px">
                             {{item.content}}
-                            <!--채택 마크: 채택된 댓글에 보이게-->
-                            <span v-if="item.choice" style="float:right;">
-                                <b-icon-check-circle scale="1.7" style="margin-right:20px"></b-icon-check-circle><b>채택된 댓글</b>
-                            </span>
                         </div>
                     </td>
                 </tr>
@@ -88,7 +82,7 @@
 <script>
 import axios from 'axios'
 export default {
-    name: 'freeContent',
+    name: 'CommunityContent',
     data() {
         return {
             loading:false, //렌더링 오류 해결
@@ -161,12 +155,12 @@ export default {
                 this.isPostLiked=response.data
             })
             this.postId = this.$route.params.postId
-             axios.get('/api/community/content/likeNum?postId='+this.$route.params.postId).then(response => { // 프로젝트 이름 가져오기
+
+            axios.get('/api/community/content/likeNum?postId='+this.$route.params.postId).then(response => { // 프로젝트 이름 가져오기
                     this.likeNum=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-
         },
         download(file) {
             axios({
@@ -184,7 +178,7 @@ export default {
         },
         edit() {
             this.$router.push({
-                path: '/project/'+ this.$route.params.projectId+'/freeBoard/'+ this.postId + '/edit'
+                path: '/community/'+this.postId + '/edit'
             })
         },
         viewComment() {
@@ -205,7 +199,7 @@ export default {
         },
         viewList() {
             this.$router.push({
-                path: '/project/' + this.$route.params.projectId+'/freeBoard',
+                path: '/community',
                 quert:{page:1}
             })
         },
@@ -229,7 +223,7 @@ export default {
                 .then(response => {
                     console.log(response.data)
                     this.$router.push({
-                        path: '/project/'+this.$route.params.projectId+'/freeBoard',
+                        path: '/community',
                         query:{page:1}
                     })
                 })

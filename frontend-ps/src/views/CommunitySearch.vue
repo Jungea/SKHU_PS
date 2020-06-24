@@ -1,7 +1,13 @@
 <template>
     <div class="containerStyle">
-        <h3 style="margin-left: 5%">자유 게시판</h3>
+        <h3 style="margin-left: 5%">커뮤니티 게시판</h3>
         <hr style="width: 90%">
+        <b-row style="margin-bottom:30px">
+            <b-col>
+                {{$route.query.type==0?'제목+내용으로':'작성자로'}} "{{$route.query.text}}"를 검색한 결과입니다
+            </b-col>
+        </b-row>
+        <div v-if="totalRows==0" style="margin-bottom:50px;">검색 결과가 없습니다.</div>
         <!--게시글 목록 테이블-->
         <center>
             <b-form-group label-for="SubjectNotice">
@@ -16,61 +22,30 @@
                     </thead>
                     <tbody>
                         <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
-                            <td class="td2" style="width: 40%; cursor:pointer"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
+                            <td class="td1" style="width: 40%; cursor:pointer"> <b> {{ item.title }}[{{commentNum[index]}}] </b> </td>
                             <td class="td1" style="width: 10%; cursor:pointer"> <b> {{item.user.name}}</b> </td>
                             <td class="td1" style="width: 10%; cursor:pointer"> <b> {{likeNum[index]}}</b> </td>
                             <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         </tr>
                     </tbody>
                 </table>
-                <div style="text-align: right ; margin-right: 5%">
-                    <b-button variant="dark" v-if="isjoinMember" v-b-modal.modal-newBoard>게시글 작성</b-button>
-                </div>
             </b-form-group>
             <b-pagination style="float: right ; margin-right: 5%" @change="onPageChanged" :total-rows="totalRows" :per-page="perPage" v-model="$route.query.page" class="my-0"></b-pagination>
+            <b-row class="mt-4" style="">
+                <b-col><b-form-select v-model="selected" :options="options"></b-form-select></b-col>
+                <b-col><b-form-input v-model="text"></b-form-input></b-col>
+                <b-col><b-button @click="search()">검색</b-button></b-col>
+        </b-row>
         </center>
 
-        <!--게시글 작성 모달-->
-        <b-modal id="modal-newBoard" size="lg"  @show="resetModal" @hidden="resetModal" title="게시글 작성" :ok-disabled="!checkForm() || checkTime()" @ok="newBoard">
-            <b-form-group label-for="newNotice" enctype="multipart/form-data">
-                <table class="table table-bordered" id="newNotice" >
-                    <tr>
-                        <th style="width:20%">제목</th>
-                        <td>
-                            <b-form-input v-model.trim="title" placeholder="게시글 제목을 입력하세요."></b-form-input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>내용</th>
-                        <td>
-                            <b-form-textarea rows="9" v-model="content" placeholder="게시글 내용을 입력하세요."></b-form-textarea>
-                        </td>
-                    </tr>
-                     <tr>
-                        <th>파일 업로드</th>
-                        <td>
-                            <b-form-file multiple v-model="files" class="mt-3" plain ></b-form-file>          
-                            <!-- <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/> -->
-                        </td>
-                    </tr>
-                </table>
-            </b-form-group>
-        </b-modal>
-
-        <!--날짜선택-->
-        <b-modal id="calendar1" ok-only no-close-on-backdrop>
-            <b-calendar block @context="onContext1" :date-disabled-fn="dateDisabled1"></b-calendar>
-        </b-modal>
-        <b-modal id="calendar2" ok-only no-close-on-backdrop>
-            <b-calendar block @context="onContext2" :date-disabled-fn="dateDisabled2"></b-calendar>
-        </b-modal>
+        
     </div>    
 </template>
 
 <script>
 import axios from 'axios'
 export default {
-    name: 'freeBoard',
+    name: 'CommunitySearch',
     data() {
         return {
             perPage: 6, // 각 페이지마다 보이는 리스트
@@ -85,21 +60,37 @@ export default {
             isjoinMember:true,
             commentNum:[],
             likeNum:[],
+
+            options: [
+                { value: '0', text: '제목+내용' },
+                { value: '1', text: '작성자' },
+            ],
+            selected:null,
         } 
     },
     watch: {
         '$route'(){
             //   console.log('to:'+parseInt(to.params.page)+" from:"+parseInt(from.params.page))
             console.log('query111:'+this.$route.query.page)
-             axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
-                this.paginatedItems=response.data
-                }).catch((erro) => {
-                console.error(erro);
-             });
-            axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
-                this.commentNum=response.data
-                }).catch((erro) => {
-                console.error(erro);
+            axios.get('/api/communitySearch?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
+                    this.paginatedItems=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
+            axios.get('/api/communitySearchListNum'+'?type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
+                    this.totalRows=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
+            axios.get('/api/communitySearch/commentNum?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
+                    this.commentNum=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
+            });
+            axios.get('/api/communitySearch/likeNum?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
+                    this.likeNum=response.data
+                    }).catch((erro) => {
+                    console.error(erro);
             });
         }
     },
@@ -108,14 +99,10 @@ export default {
     },
     methods: {
         loadPage(){
-            axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
-            .then(response => {
-                this.isjoinMember=response.data
-            });
             if(this.currentPage==1) {
                 this.$router.push({
-                    path: '/project/'+this.$route.params.projectId+'/freeBoard',
-                    query:{page:1}
+                    path: '/communitySearch',
+                    query:{page:1,type:this.$route.query.type,text:this.$route.query.text}
                 }).catch(error => {       //일단 네비게이션 중복 에러 뜨는 부분은 throw해둠..
                     if(error.name != "NavigationDuplicated" ){
                         throw error;
@@ -126,22 +113,22 @@ export default {
             // .then(response => {
             //     this.userType = response.data.userType
             // });
-            axios.get('/api/freeBoard?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/communitySearch?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
                     this.paginatedItems=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/freeListNum?projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/communitySearchListNum'+'?type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
                     this.totalRows=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/freeBoard/commentNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/communitySearch/commentNum?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
                     this.commentNum=response.data
                     }).catch((erro) => {
                     console.error(erro);
             });
-            axios.get('/api/freeBoard/likeNum?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
+            axios.get('/api/communitySearch/likeNum?page='+this.$route.query.page+'&type='+this.$route.query.type+'&text='+this.$route.query.text).then(response => { // 프로젝트 이름 가져오기
                     this.likeNum=response.data
                     }).catch((erro) => {
                     console.error(erro);
@@ -176,8 +163,7 @@ export default {
                 //     formData.append('file[' + i + ']', f);
                 // }
             
-            axios.post('/api/writeFree', {
-                    projectId:this.$route.params.projectId,
+            axios.post('/api/writeCommunity', {
                     title:this.title,
                     content:this.content,
                 }).then(response => {
@@ -245,13 +231,13 @@ export default {
         },
         viewContent(postId) {
             this.$router.push({
-                path: '/project/'+this.$route.params.projectId+'/freeBoard/' + postId
+                path: '/community/'+postId
             })
         },
         paginate (page_size, page_number) {
             this.$router.push({
-                path: '/project/'+this.$route.params.projectId+'/freeBoard',
-                query:{page:page_number+1}
+                path: '/communitySearch',
+                query:{page:page_number+1,type:this.$route.query.type,text:this.$route.query.text}
             }).catch(error => {       //일단 네비게이션 중복 에러 뜨는 부분은 throw해둠..
                 if(error.name != "NavigationDuplicated" ){
                     throw error;
@@ -269,7 +255,20 @@ export default {
             }
             else
                 this.extention = ''
-        }
+        },
+        search() {
+            if(this.selected==null) {
+                alert('셀렉트를 선택해주세요.')
+                return;
+            } else if(this.text.length==0) {
+                alert('내용을 입력하세요')
+                return;
+            }
+            this.$router.push({
+                path: '/communitySearch',
+                query:{page:1,type:this.selected,text:this.text}
+            })
+        },
     }
 }
 </script> 

@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import net.skhu.domain.Comment;
 import net.skhu.domain.Post;
+import net.skhu.domain.PostLike;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
 import net.skhu.domain.Timeline;
@@ -20,7 +23,9 @@ import net.skhu.model.WriteNoticeModel;
 import net.skhu.repository.CommentRepository;
 import net.skhu.repository.DetailRepository;
 import net.skhu.repository.FileRepository;
+import net.skhu.repository.PostLikeRepository;
 import net.skhu.repository.PostRepository;
+import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.TimelineRepository;
@@ -46,6 +51,10 @@ public class PostService {
 	TimelineRepository timelineRepository;
 	@Autowired
 	CommentRepository commentRepository;
+	@Autowired
+	ProjectJoinRepository projectJoinRepository;
+	@Autowired
+	PostLikeRepository postLikeRepository;
 	
 	public List<Post> noticeBoard(int page,int subjectId) {
 		List<Post> posts=postRepository.findBySubject_subjectId(subjectId);
@@ -211,5 +220,209 @@ public class PostService {
 			num=num.subList((page-1)*6,page*6);
 		}
 		return num;
+	}
+	
+	// 내가 쓴 게시글, 댓글 클릭 이동
+	public String userPostUrl(int postId, int loginUserId) {
+		Post post = postRepository.findById(postId).get();
+		
+		if(post.getProject() != null) { // 자유게시판
+			return "/project/"+post.getProject().getProjectId()+"/freeBoard/"+postId;
+			
+		}else if(post.getSubject() != null) { // 공지게시판
+			
+			if(userRepository.findById(loginUserId).get().getUserType() == false) { //학생
+				ProjectJoin pj = projectJoinRepository.findByUser_UserIdAndProject_Subject_SubjectId(loginUserId, post.getSubject().getSubjectId());
+				return "/project/"+pj.getProject().getProjectId()+"/noticeBoard/"+postId;
+			
+			} else //교수
+				return "/subject/"+post.getSubject().getSubjectId()+"/noticeBoard/"+postId;
+				
+		} else { //커뮤니티 게시판
+			return "/community/"+postId;
+		}
+	}
+	public List<Post> community(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		if(posts.size()<page*6) {
+			posts=posts.subList((page-1)*6,posts.size());
+		} else {
+			posts=posts.subList((page-1)*6,page*6);
+		}
+		return posts;
+	}
+	@Transactional
+	public int writeCommunity(WriteNoticeModel notice,int userId) {
+		Post post=new Post();
+		post.setTitle(notice.getTitle());
+		post.setContent(notice.getContent());
+		post.setWriteTime(LocalDateTime.now());
+		post.setUser(userRepository.findById(userId).get());
+		post.setDetail(detailRepository.findById(15).get());
+		return postRepository.save(post).getPostId();
+	}
+	public List<Integer> communityCommentNum(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<Comment> comments=commentRepository.findByPost_PostId(p.getPostId());
+			if(comments==null) {
+				num.add(0);
+			} else {
+				num.add(comments.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+	}
+	public List<Integer> communitylikeNum(int page) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<PostLike> postLikes=postLikeRepository.findByPost_PostId(p.getPostId());
+			if(postLikes==null) {
+				num.add(0);
+			} else {
+				num.add(postLikes.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+
+	}
+	public List<Post> communitySearch(int page,int type,String text) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Set<Post> searchingList=new HashSet<>();
+		if(type==0) { // 제목+내용으로 검색
+			for(Post p:posts) {
+				if(p.getTitle().contains(text) || p.getContent().contains(text))
+					searchingList.add(p);
+			}
+		} else { // 작성자 이름으로 검색
+			for(Post p:posts) {
+				if(p.getUser().getName().contains(text))
+					searchingList.add(p);
+			}
+		}
+		posts= new ArrayList<>(searchingList);
+		Collections.reverse(posts);
+		if(posts.size()<page*6) {
+			posts=posts.subList((page-1)*6,posts.size());
+		} else {
+			posts=posts.subList((page-1)*6,page*6);
+		}
+		return posts;
+	}
+	public int communitySearchListNum(int type,String text) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Set<Post> searchingList=new HashSet<>();
+		if(type==0) { // 제목+내용으로 검색
+			for(Post p:posts) {
+				if(p.getTitle().contains(text) || p.getContent().contains(text))
+					searchingList.add(p);
+			}
+		} else { // 작성자 이름으로 검색
+			for(Post p:posts) {
+				if(p.getUser().getName().contains(text))
+					searchingList.add(p);
+			}
+		}
+		return searchingList.size();
+	}
+	public List<Integer> communitySearchCommentNum(int page,int type,String text) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Set<Post> searchingList=new HashSet<>();
+		if(type==0) { // 제목+내용으로 검색
+			for(Post p:posts) {
+				if(p.getTitle().contains(text) || p.getContent().contains(text))
+					searchingList.add(p);
+			}
+		} else { // 작성자 이름으로 검색
+			for(Post p:posts) {
+				if(p.getUser().getName().contains(text))
+					searchingList.add(p);
+			}
+		}
+		posts= new ArrayList<>(searchingList);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<Comment> comments=commentRepository.findByPost_PostId(p.getPostId());
+			if(comments==null) {
+				num.add(0);
+			} else {
+				num.add(comments.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+	}
+	public List<Integer> communitySearchLikeNum(int page,int type,String text) {
+		List<Post> posts=postRepository.findByDetail_detId(15);
+		Set<Post> searchingList=new HashSet<>();
+		if(type==0) { // 제목+내용으로 검색
+			for(Post p:posts) {
+				if(p.getTitle().contains(text) || p.getContent().contains(text))
+					searchingList.add(p);
+			}
+		} else { // 작성자 이름으로 검색
+			for(Post p:posts) {
+				if(p.getUser().getName().contains(text))
+					searchingList.add(p);
+			}
+		}
+		posts= new ArrayList<>(searchingList);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<PostLike> postLikes=postLikeRepository.findByPost_PostId(p.getPostId());
+			if(postLikes==null) {
+				num.add(0);
+			} else {
+				num.add(postLikes.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+
+	}
+	public List<Integer> freeBoardLikeNum(int page,int projectId) {
+		List<Post> posts=postRepository.findByProject_projectId(projectId);
+		Collections.reverse(posts);
+		List<Integer> num=new ArrayList<>();
+		for(Post p:posts) {
+			List<PostLike> postLikes=postLikeRepository.findByPost_PostId(p.getPostId());
+			if(postLikes==null) {
+				num.add(0);
+			} else {
+				num.add(postLikes.size());
+			}
+		}
+		if(posts.size()<page*6) {
+			num=num.subList((page-1)*6,posts.size());
+		} else {
+			num=num.subList((page-1)*6,page*6);
+		}
+		return num;
+
 	}
 }
