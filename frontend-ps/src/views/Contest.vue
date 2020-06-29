@@ -60,8 +60,13 @@
         <!--본문 영역-->
         <div class="containerStyle">
             <!--프로젝트 목록-->
-            <div class="row" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
-                <div class="column mb-5" :key="index" v-for="(p, index) in projectCard">
+            <div class="row" 
+                v-infinite-scroll="loadMore" 
+                infinite-scroll-disabled="busy" 
+                infinite-scroll-distance="10"
+                infinite-scroll-throttle-delay="50"
+            >
+                <div class="column mb-5" :key="index" v-for="(p, index) in filtered">
                     <div class="wrapper">
                         <b-card class="card" draggable="true">
                             <b-card-title class="cardTitle">
@@ -216,6 +221,7 @@
             <b-icon icon="chevron-double-up" onclick="location.href='#'" class="top-button rounded-circle p-2 shadow" style="display:block; margin:10px auto;"></b-icon>
             <h6>Back to top</h6>
         </div>
+        
     </div>
 </template>
 
@@ -232,18 +238,18 @@ export default {
             next: {},
             allLoaded:false,
 
-            //더미 데이터
+            //임시 연도와 대회
             contests:[
                 { value: null, text: '선택 안함' },
                 { value: '1', text: '대회1' },
                 { value: '2', text: '대회2' },
-                { value: '2', text: '대회3' },
-                { value: '2', text: '대회4' },
+                { value: '3', text: '대회3' },
+                { value: '4', text: '대회4' },
             ],
             years:[
                 { value: null, text: '선택 안함' },
-                { value: '1', text: '2019' },
-                { value: '2', text: '2020' },
+                { value: '2019', text: '2019년도' },
+                { value: '2020', text: '2020년도' },
             ],
 
             //검색 관련
@@ -321,7 +327,7 @@ export default {
         like(index){
             // let y=document.scrollingElement.scrollTop
             // console.log(y)
-            let pc=this.projectCard[index]
+            let pc=this.filtered[index]
             axios.post('/api/changeStar', {projectId:pc.project.projectId})
             .then(function(){
                 axios.get('/api/projectBoard/modal/'+pc.project.projectId)
@@ -389,6 +395,81 @@ export default {
             return false
         },
 
+        // serch(){
+        //     //키워드 검색일때
+        //     if(this.filter==false){
+                
+        //     }
+        //     //필터 검색일때
+        //     else{
+
+        //     }
+        // }
+
+        filtered(){
+            if(!this.filter){
+                //키워드검색란에 무언가 입력되었을 때
+                if(this.keyWord!=''){
+                    //프로젝트가 모두 로드되지 않았을 때 검색하는 경우 여기서 로드시킴
+                    if(this.allLoaded==false){this.getWinners()}
+                    //조건에 맞는 프로젝트 배열 반환
+                    //키워드 공백제거
+                    let keyword=this.keyWord.replace(/ /g,"").toLowerCase();
+                    return this.projectCard.filter(p=>{
+                        // let regex = new RegExp(keyword, "g");
+                        // p.project.projectName.replace(regex, "<span class='highlight'>" + keyword + "</span>");
+                        return (
+                            p.project.projectName.replace(/ /g,"").toLowerCase().includes(keyword)||  //플젝명
+                            p.project.user.name.replace(/ /g,"").toLowerCase().includes(keyword)||  //팀장명
+                            p.project.year==keyword||  //연도
+                            p.project.content.replace(/ /g,"").toLowerCase().includes(keyword)||  //내용
+                            p.project.tag.toLowerCase().includes(keyword)  //태그
+                        )
+                        
+                    })
+                }
+                else return this.projectCard
+            }
+            else{
+                if(this.checkLength){
+                    if(this.allLoaded==false){this.getWinners()}
+                    return this.projectCard.filter(p=>{
+                        if(this.filterYear==null&&this.filterContest==null){
+                            return (
+                                p.project.projectName.replace(/ /g,"").toLowerCase().includes(this.filterTitle.replace(/ /g,"").toLowerCase())&&
+                                p.project.user.name.replace(/ /g,"").toLowerCase().includes(this.filterCaptain.replace(/ /g,"").toLowerCase())
+                            )
+                        }
+                        else if(this.filterYear==null&&this.filterContest!=null){
+                            return (
+                                p.project.projectName.replace(/ /g,"").toLowerCase().includes(this.filterTitle.replace(/ /g,"").toLowerCase())&&
+                                p.project.user.name.replace(/ /g,"").toLowerCase().includes(this.filterCaptain.replace(/ /g,"").toLowerCase())
+                                //대회 데이터 추가 후 아래 코드 주석 해제
+                                //p.project.contest==this.filterContest
+                            )
+                        }
+                        else if(this.filterYear!=null&&this.filterContest==null){
+                            return (
+                                p.project.projectName.replace(/ /g,"").toLowerCase().includes(this.filterTitle.replace(/ /g,"").toLowerCase())&&
+                                p.project.user.name.replace(/ /g,"").toLowerCase().includes(this.filterCaptain.replace(/ /g,"").toLowerCase())&&
+                                p.project.year==this.filterYear
+                            )
+                        }
+                        else{
+                            return (
+                                p.project.projectName.replace(/ /g,"").toLowerCase().includes(this.filterTitle.replace(/ /g,"").toLowerCase())&&
+                                p.project.user.name.replace(/ /g,"").toLowerCase().includes(this.filterCaptain.replace(/ /g,"").toLowerCase())&&
+                                p.project.year==this.filterYear
+                                //대회 데이터 추가 후 아래 코드 주석 해제
+                                //p.project.contest==this.filterContest
+                            )
+                        }
+                    })
+                }
+                else return this.projectCard
+            }
+        }
+
     },
 
     watch:{
@@ -400,7 +481,6 @@ export default {
 </script>
 
 <style scoped>
-
 .top-button{
     background: #f1f1f1;
     color:#555;
