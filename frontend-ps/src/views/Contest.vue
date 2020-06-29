@@ -20,8 +20,7 @@
                         <input v-if="!filter" v-model="keyWord" class="search-box" type="text" placeholder="IT 경진대회 내에서 키워드 검색..."/>
                         <!--필터 설정이 켜진 경우-->
                         <input v-if="filter" class="search-box" placeholder="IT 경진대회 내에서 필터 검색..." disabled/>
-                        <b-icon id="tooltip-search" icon="search" scale="1.4" class="search-box-icon"></b-icon>
-                        <b-tooltip triggers="hover" target="tooltip-search">검색</b-tooltip>
+                        
                     </div>
                     <!--필터 collapse-->
                     <b-collapse id="collapse-2">
@@ -394,17 +393,6 @@ export default {
                 return true;
             return false
         },
-
-        // serch(){
-        //     //키워드 검색일때
-        //     if(this.filter==false){
-                
-        //     }
-        //     //필터 검색일때
-        //     else{
-
-        //     }
-        // }
 
         filtered(){
             if(!this.filter){
