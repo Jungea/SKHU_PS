@@ -11,25 +11,25 @@
                             <tbody>            
                                 <tr>
                                     <th class="th1" style="width: 30%">프로젝트 이름</th>
-                                    <th class="th1" style="width: 13%">팀장</th>
+                                    <th class="th1" style="width: 13%">이름</th>
                                     <th class="th1">제출 파일</th>
                                     <th class="th1" style="width: 12%">점수</th>
-                                    <th class="th1" style="width: 5%">개별</th>
+                                    <th class="th1" style="width: 5%">조별</th>
                                 </tr>
-                                <tr :key="index" v-for="(item, index) in data">
+                                <tr :key="index" v-for="(item, index) in memberList" v-bind:class="{check1: (indexList.indexOf(index)!=-1&&index!=0)}">
                                     <td class="td1" style="vertical-align: middle">{{ item.project.projectName }}</td>
-                                    <td class="td1" style="vertical-align: middle">{{ item.project.user.name }}</td>
+                                    <td class="td1" style="vertical-align: middle">{{ item.user.name }}</td>
                                     <td class="td1" style="vertical-align: middle">
                                         <div v-for="(file, index) in item.files" :key="index" class="fileItem" style="cursor:pointer ; color:blue" @click="download(file)">
                                             <div>{{ file.name }}</div>
                                         </div>
                                     </td>
                                     <td class="td1">
-                                        <center><b-input v-model="scoreList[index]" style="text-align: center ; width:50px"></b-input></center>
+                                        <center><b-input @change="allCheck(indexList.indexOf(index))" v-model="scoreList[index]" style="text-align: center ; width:50px"></b-input></center>
                                     </td>
-                                    <td class="td1" rowspan="99" v-if="index == 0" style="vertical-align: middle">
-                                        <div style="padding-left: 10px ; padding-top: 5px">
-                                            <b-checkbox size="lg" v-model="viewToggle"></b-checkbox>
+                                    <td class="td1" style="vertical-align: middle;" v-bind:class="{check2: (indexList.indexOf(index)==-1)}">
+                                        <div style="padding-left: 10px ; padding-top: 5px" v-if="indexList.indexOf(index)!=-1">
+                                            <b-checkbox @change="info(indexList.indexOf(index))" v-model="checkBox[indexList.indexOf(index)]" size="lg"></b-checkbox>
                                         </div>
                                     </td>
                                 </tr>
@@ -39,22 +39,6 @@
                     </b-form-group>                
                 </form>
             </center>
-            </b-col>
-            <b-col v-if="viewToggle" style="margin-top: 4%; margin-left: -10% ; background" cols="3">
-                <b-collapse id="member"  v-model="viewToggle" style="float: right ; overflow-y: scroll ; max-height: 490px ; border: 1px solid lightgray">
-                <b-card>
-                    <table class="table table-bordered">
-                        <tr v-for="(item, index) in memberList" :key="index">
-                            <td class="th1" style="vertical-align: middle">{{ item.project.projectName }}</td>
-                            <td style="vertical-align: middle ; text-align: center ; width: 30%">{{ item.user.name }}</td>
-                            <td style="width: 25% ; vertical-align: middle"><b-input style="; text-align: center"></b-input></td>
-                        </tr>
-                    </table>
-                    <div style="text-align: right">
-                        <b-button @click="personal()" variant="dark">개별 저장</b-button>
-                    </div>
-                </b-card>
-            </b-collapse>
             </b-col>
         </b-row>
     </div>
@@ -71,18 +55,41 @@ export default {
             title: '',
             viewToggle: false,
             memberList: [],
-            scoreList:[],
+            scoreList: [],
+            indexList: [],
+            checkBox: []
         }
     },
+    updated() {
+        
+    },
      mounted() {
-         axios.get('/api/noticeBoard/submitFiles/' + this.$route.params.subjectId + '/'+this.$route.params.postId)
+        axios.get('/api/noticeBoard/submitFiles/' + this.$route.params.subjectId + '/'+this.$route.params.postId)
         .then(response => {
             this.data=response.data
+
+            axios.get('/api/subject/' + this.$route.params.subjectId + '/member?sort=project')
+            .then(respon => {
+                this.memberList = respon.data
+                var i = 0 ;
+                var j = 0 ;
+                var array1 = [];
+                var array2 = [];
+
+                for(i = 0 ; i < this.memberList.length ; i++)
+                    array1.push(this.memberList[i].project.projectName)
+
+                for(i = 0 ; i < this.data.length ; i++)
+                    array2.push(this.data[i].project.projectName)
+
+                for(; j < this.data.length ; j++) {
+                    this.indexList.push(array1.indexOf(array2[j]))
+                }
+
+                for(j = 0 ; j < this.indexList.length ; j++)
+                    this.checkBox.push(false)
+            })
         }),
-        axios.get('/api/subject/' + this.$route.params.subjectId + '/member?sort=project')
-        .then(respon => {
-            this.memberList = respon.data
-        }) 
         // axios.get('/api/subject/' + this.$route.params.subjectId + '/projects')
         // .then(response => {
         //     this.data = response.data
@@ -129,8 +136,23 @@ export default {
             }
 
         },
-        personal() {
-            alert("개별 점수가 저장 되었습니다.")
+        info(value) {
+            if(!this.checkBox[value])
+                alert("팀장의 점수에 조별 점수를 입력해주세요.")  
+        },
+        allCheck(value) {
+            if(this.checkBox[value]) {
+                let index = 0;
+                if(value == this.indexList.length-1)
+                    index = this.memberList.length - this.indexList[value];
+                else
+                    index = this.indexList[value+1] - this.indexList[value];
+
+                for(let i = 0 ; i < index ; i++)
+                    this.scoreList[this.indexList[value]+i] = this.scoreList[this.indexList[value]]
+                
+                this.$forceUpdate()
+            }
         }
     }
 }
@@ -144,4 +166,8 @@ export default {
         margin: 100px 100px 100px 0;
         min-width: 350px;
     }
+    /* .check1 { border-top: 5px solid RGB(222,226,230) !important} */
+    .check1 { border-top-style: double }
+    .check2 { border-top: hidden !important}
+
 </style>
