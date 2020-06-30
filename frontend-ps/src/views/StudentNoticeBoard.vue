@@ -21,10 +21,7 @@
                             <b-icon-check v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] != '0')" style="color: green" scale="1.5"></b-icon-check>
                             <b-icon-x v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] == '0')" style="color: red" scale="1.5"></b-icon-x>
                         </td>
-                        <td class="td1">
-                            <div v-if="item.deadlineTime!='1000-01-01T00:00:00'">10/10</div>
-                            <div v-else>-</div>
-                        </td>
+                        <td style="width:10%" class="td1"> {{item.score==null || item.score==""?"-":"/"+item.score}}</td>
                     </tr>
                 </table>
                 

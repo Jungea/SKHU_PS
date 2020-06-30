@@ -25,7 +25,7 @@
                                         </div>
                                     </td>
                                     <td class="td1">
-                                        <center><b-input style="text-align: center ; width: 70%"></b-input></center>
+                                        <center><b-input v-model="scoreList[index]" style="text-align: center ; width:50px"></b-input></center>
                                     </td>
                                     <td class="td1" rowspan="99" v-if="index == 0" style="vertical-align: middle">
                                         <div style="padding-left: 10px ; padding-top: 5px">
@@ -70,7 +70,8 @@ export default {
             files: [],
             title: '',
             viewToggle: false,
-            memberList: []
+            memberList: [],
+            scoreList:[],
         }
     },
      mounted() {
@@ -118,8 +119,15 @@ export default {
         },
         save() {
             alert("점수가 저장되었습니다.")
-            // axios.get()
-            // .then()
+            for(let i=0;i<this.scoreList.length();i++) {
+                if(this.scoreList[i]!=null) {
+                    axios.post('/api/project/score', {
+                        score:this.scoreList[i],
+                        projectId:this.data[i].project.projectId
+                    })
+                }
+            }
+
         },
         personal() {
             alert("개별 점수가 저장 되었습니다.")

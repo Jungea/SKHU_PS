@@ -73,6 +73,11 @@ public class PostService {
 		post.setTitle(notice.getTitle());
 		post.setContent(notice.getContent());
 		post.setWriteTime(LocalDateTime.now());
+		if(notice.getScore()==null) {
+			post.setScore("");
+		} else {
+			post.setScore(notice.getScore());
+		}
 		LocalDate date=LocalDate.of(1000, 01, 01);
 		if(notice.getDeadlineTime()==null && notice.getExtensionTime()==null) {
 			post.setDeadlineTime(date.atTime(0, 0, 0));

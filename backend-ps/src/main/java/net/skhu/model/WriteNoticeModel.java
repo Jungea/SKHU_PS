@@ -12,4 +12,5 @@ public class WriteNoticeModel {
 	String content;
 	LocalDate deadlineTime;
 	LocalDate extensionTime;
+	String score;
 }

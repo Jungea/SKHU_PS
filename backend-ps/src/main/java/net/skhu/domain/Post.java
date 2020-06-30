@@ -19,8 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@ToString(exclude = { "comments","files","postLikes" })
-@EqualsAndHashCode(exclude = { "comments","files","postLikes" })
+@ToString(exclude = { "comments","files","postLikes","scores" })
+@EqualsAndHashCode(exclude = { "comments","files","postLikes","scores" })
 @Entity
 public class Post {
 	@Id
@@ -32,6 +32,7 @@ public class Post {
 	LocalDateTime writeTime;
 	LocalDateTime deadlineTime;
 	LocalDateTime extentionTime;
+	String score;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userId")
@@ -60,4 +61,8 @@ public class Post {
 	@JsonIgnore
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	List<PostLike> postLikes;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	List<Score> scores;
 }

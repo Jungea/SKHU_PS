@@ -44,6 +44,7 @@ import net.skhu.model.MyProjectListModel;
 import net.skhu.model.NoticeBoardSubmitModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.ProjectBoardModel;
+import net.skhu.model.ProjectScoreModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.TodoModel;
 import net.skhu.model.UserLoginModel;
@@ -55,6 +56,7 @@ import net.skhu.repository.PostLikeRepository;
 import net.skhu.repository.PostRepository;
 import net.skhu.repository.ProjectJoinRepository;
 import net.skhu.repository.ProjectRepository;
+import net.skhu.repository.ScoreRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.service.CommentService;
@@ -107,6 +109,8 @@ public class APIController {
 	PostLikeService postLikeService;
 	@Autowired
 	PostLikeRepository postLikeRepository;
+	@Autowired
+	ScoreRepository scoreRepository;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -844,5 +848,10 @@ public class APIController {
 	@RequestMapping(value = "freeBoard/likeNum", method = RequestMethod.GET)
 	public List<Integer> freeBoardLikeNum(@RequestParam("page") int page,@RequestParam("projectId") int projectId) {
 		return postService.freeBoardLikeNum(page,projectId);
+	}
+	// 프로젝트별 점수 지정
+	@RequestMapping(value = "project/score", method = RequestMethod.POST)
+	public void  setProjectScore(@RequestBody ProjectScoreModel projectScoreModel) {
+		scoreRepository.setProjectScore(projectScoreModel);
 	}
 }

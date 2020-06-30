@@ -10,12 +10,14 @@
                         <th class="th1">작성일</th>
                         <th class="th1">제출 마감일</th>
                         <th class="th1">제출 연장일</th>
+                        <th class="th1">만점</th>
                     </tr>
                     <tr v-for="(item, index) in paginatedItems" :key="index" @click="viewContent(item.postId)">
                         <td style="width: 40%"> <b> {{ item.title }} [{{commentNum[index]}}] </b> </td>
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
                         <td class="td1"> {{ item.extentionTime=='1000-01-01T00:00:00'?'-':item.extentionTime.substring(0,10)+" "+item.extentionTime.substring(11,16) }} </td>
+                        <td style="width:10%" class="td1"> {{item.score==null || item.score==""?"-":item.score}}</td>
                     </tr>
                 </table>
                 <div style="text-align: right ; margin-right: 5%">
@@ -66,6 +68,12 @@
                             <b-button v-if="deadline.length!=0" variant="danger" @click="deleteTime(2)">삭제</b-button>
                         </td>
                     </tr>
+                    <tr>
+                        <th>만점</th>
+                        <td>
+                             <b-form-input v-model.trim="score"></b-form-input>
+                        </td>
+                    </tr>
                 </table>
             </b-form-group>
         </center>
@@ -98,6 +106,7 @@ export default {
             userType: '',
             files: '',
             commentNum:[],
+            score:''
         } 
     },
     watch: {
@@ -145,11 +154,12 @@ export default {
     },
     methods: {
         resetModal() {
-            this.title = '',
-            this.content = '',
-            this.deadline = '',
-            this.extention = '',
+            this.title = ''
+            this.content = ''
+            this.deadline = ''
+            this.extention = ''
             this.nowDate = ''
+            this.score=''
         },
         checkForm() {
             if(this.title && this.content)
@@ -179,6 +189,7 @@ export default {
                     content:this.content,
                     deadlineTime:this.deadline,
                     extensionTime:this.extention,
+                    score:this.score,
                 }).then(response => {
                 let newPostId=response.data
                 for(let i=0;i<this.files.length;i++) {

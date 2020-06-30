@@ -39,6 +39,10 @@
                         <td v-if="checkFile()">{{list.deadlineTime=='1000-01-01T00:00:00'?'-':checkLength()?'O':'X'}}</td>
                         <td v-if="!checkFile()">{{list.deadlineTime=='1000-01-01T00:00:00'?'-':'X'}}</td>
                     </tr>
+                    <tr>
+                        <th class="th1">점수</th>
+                        <td>{{list.score==null || list.score==""?"-":"/"+list.score}} </td>
+                    </tr>
                 </table>
                  <table class="table table-bordered" style="width: 90%" v-if="!userType">
                     <tr>

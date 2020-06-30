@@ -33,6 +33,10 @@
                         <th class="th1">연장 기한</th>
                         <td>{{ list.extentionTime=='1000-01-01T00:00:00' ? '-' : extentionTime }}</td>
                     </tr>
+                     <tr>
+                        <th class="th1">만점</th>
+                        <td>{{list.score==null || list.score==""?"-":list.score}} </td>
+                    </tr>
                 </table>
                 <div style="text-align: left">
                         <div style="display: inline-block ; margin-left: 5%">
