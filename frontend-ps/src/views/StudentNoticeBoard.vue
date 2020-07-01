@@ -17,11 +17,11 @@
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
                         <td class="td1">
-                            <div v-if="item.deadlineTime=='1000-01-01T00:00:00'"> - </div>
+                             <div v-if="item.deadlineTime=='1000-01-01T00:00:00'"> - </div>
                             <b-icon-check v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] != '0')" style="color: green" scale="1.5"></b-icon-check>
                             <b-icon-x v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] == '0')" style="color: red" scale="1.5"></b-icon-x>
                         </td>
-                        <td style="width:10%" class="td1"> {{item.score==null || item.score==""?"-":"/"+item.score}}</td>
+                        <td style="width:10%" class="td1"> {{item.score==null || item.score==""?"-":myScore2[index]+"/"+item.score}}</td>
                     </tr>
                 </table>
                 
@@ -58,10 +58,14 @@ export default {
            subjectId:null,
            isFile:[],
            commentNum:[],
+           isFile2:[],
+           myScore:[],
+           myScore2:[],
         } 
     },
     watch: {
         '$route'(){
+            
             axios.get('/api/project/projectName/'+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                 this.subjectId = response.data.subject.subjectId
                 console.log('query111:'+this.$route.query.page)
@@ -74,8 +78,15 @@ export default {
                  
                 axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.subjectId).then(response => {
                     this.paginatedItems=response.data
+                    axios.get('/api/project/myScore').then(response => { // 프로젝트 이름 가져오기
+                        this.myScore=response.data
+                        this.score()
+                        }).catch((erro) => {
+                            console.error(erro);
+                    });
                     axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => {
                             this.isFile=response3.data
+                            //this.file()
                         }).catch((erro) => {
                             console.error(erro);
                     });
@@ -88,6 +99,7 @@ export default {
         }
     },
     mounted() {
+        
         axios.get('/api/project/projectName/'+this.$route.params.projectId).then(response => { // 프로젝트 이름 가져오기
                 this.subjectId = response.data.subject.subjectId
                 if(this.currentPage==1) {
@@ -103,8 +115,15 @@ export default {
                  });
                 axios.get('/api/noticeBoard?page='+this.$route.query.page+'&subjectId='+this.subjectId).then(response2 => {
                     this.paginatedItems=response2.data
+                    axios.get('/api/project/myScore').then(response => { // 프로젝트 이름 가져오기
+                        this.myScore=response.data
+                        this.score()
+                        }).catch((erro) => {
+                            console.error(erro);
+                    });
                     axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => { // 프로젝트 이름 가져오기
                         this.isFile=response3.data
+                        //this.file()
                         }).catch((erro) => {
                         console.error(erro);
                     });
@@ -122,6 +141,40 @@ export default {
         
     },
     methods: {
+        file() {
+            this.isFile2=[]
+            for(let i=0;i<this.paginatedItems.length;i++) {
+                let k=0;
+                for(let j=0;j<this.isFile.length;j++) {
+                    if(this.paginatedItems[i].postId==this.isFile[j].post.postId) {
+                        //alert(this.paginatedItems[i].title)
+                         this.isFile2.push("1")
+                        k=1;
+                        break;
+                    } 
+                }
+                if(k!=1) {
+                    this.isFile2.push("0")
+                }
+             }
+        },
+         score() {
+            this.myScore2=[]
+            for(let i=0;i<this.paginatedItems.length;i++) {
+                let k=0;
+                for(let j=0;j<this.myScore.length;j++) {
+                    if(this.paginatedItems[i].postId==this.myScore[j].post.postId) {
+                        // alert(this.paginatedItems[i].title)
+                         this.myScore2.push(this.myScore[j].score)
+                        k=1;
+                        break;
+                    } 
+                }
+                if(k!=1) {
+                    this.myScore2.push("")
+                }
+             }
+        },
         handleFilesUpload(){
             this.files  = this.$refs.files.files;
         },

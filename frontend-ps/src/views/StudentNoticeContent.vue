@@ -41,7 +41,7 @@
                     </tr>
                     <tr>
                         <th class="th1">점수</th>
-                        <td>{{list.score==null || list.score==""?"-":"/"+list.score}} </td>
+                        <td>{{list.score==null || list.score==""?"-":(myScore!=null?myScore:"")+"/"+list.score}} </td>
                     </tr>
                 </table>
                  <table class="table table-bordered" style="width: 90%" v-if="!userType">
@@ -123,7 +123,8 @@ export default {
             removeItem:null,
             submitFilePossible:true, // 파일 제출 가능여부
             deadlineTime: '',
-            extentionTime: ''
+            extentionTime: '',
+            myScore:null,
         }
     },
     watch: {
@@ -148,6 +149,10 @@ export default {
         },
     },
     mounted() { 
+        axios.get('/api/project/getMyScore?postId='+this.$route.params.postId) 
+        .then(response => {
+            this.myScore=response.data
+        });
          axios.get('/api/user/checkJoinMember/'+this.$route.params.projectId) 
         .then(response => {
             this.submitFilePossible=response.data

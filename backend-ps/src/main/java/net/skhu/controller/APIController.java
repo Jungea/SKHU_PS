@@ -29,6 +29,7 @@ import net.skhu.domain.File;
 import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
+import net.skhu.domain.Score;
 import net.skhu.domain.Subject;
 import net.skhu.domain.Timeline;
 import net.skhu.domain.Todo;
@@ -46,6 +47,7 @@ import net.skhu.model.MyProjectListModel;
 import net.skhu.model.NoticeBoardSubmitModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.ProjectBoardModel;
+import net.skhu.model.ProjectScoreModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.TodoModel;
 import net.skhu.model.UserLoginModel;
@@ -69,6 +71,7 @@ import net.skhu.service.PostService;
 import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.ProjectStarService;
+import net.skhu.service.ScoreService;
 import net.skhu.service.SubjectService;
 import net.skhu.service.UserService;
 
@@ -115,7 +118,9 @@ public class APIController {
 	ScoreRepository scoreRepository;
 	@Autowired
 	ContestService contestService;
-	
+	@Autowired
+	ScoreService scoreService;
+
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		int userId = (int) session.getAttribute("userId");
@@ -684,6 +689,7 @@ public class APIController {
 	// 공지사항 게시판에서 제출 여부 리턴 
 	@RequestMapping(value = "/noticeBoard/fileSubmitList", method = RequestMethod.GET)
 	public List<String> fileSubmitList(@RequestParam("page") int page,@RequestParam("projectId") int projectId,@RequestParam("subjectId") int subjectId) {
+//		return fileRepository.findAll();
 		return postService.fileSubmitList(page,projectId,subjectId);
 	}
 	// 공지사항 게시판에서 제출 여부 리턴 
@@ -879,6 +885,44 @@ public class APIController {
 	public Contest contestModal(@PathVariable("contestId") int contestId) {
 		System.out.println("modal:"+contestId);
 		return contestService.getModal(contestId);
+	}
+	@RequestMapping(value = "project/score", method = RequestMethod.POST)
+	public void  setProjectScore(@RequestBody ProjectScoreModel projectScoreModel) {
+		scoreService.setProjectScore(projectScoreModel);
+	}
+	// 프로젝트별 점수 가져오기
+	@RequestMapping(value = "project/getScore", method = RequestMethod.GET)
+	public List<String> getProjectScore(@RequestParam("postId") String postId) {
+		System.out.println("postId");
+		List<Score> scoreList=scoreRepository.findByPost_postId(Integer.parseInt(postId));		
+		if(scoreList!=null) {
+			List<String> r=new ArrayList<>();
+			for(int i=0;i<scoreList.size();i++) {
+				r.add(scoreList.get(i).getScore());
+			}
+			return r;
+		}
+		return new ArrayList<>();
+	}
+	// 내 점수 목록 가져오기
+	@RequestMapping(value = "project/myScore", method = RequestMethod.GET)
+	public List<Score> myScore(HttpServletRequest request) {
+		return scoreRepository.findByUser_userId(getLoginUserId(request));
+	}
+	// 내 점수 하나 가져오기
+	@RequestMapping(value = "project/getMyScore", method = RequestMethod.GET)
+	public String getMyScore(@RequestParam("postId") String postId,HttpServletRequest request) {
+		return scoreRepository.findByUser_userIdAndPost_postId(getLoginUserId(request),Integer.parseInt(postId)).getScore();
+	}
+	// 공지사항별 모든 점수 가져오기
+	@RequestMapping(value = "subject/allScore/{userId}", method = RequestMethod.GET)
+	public List<Score> allScore(@PathVariable("userId") int userId) {
+		return scoreRepository.findByUser_userId(userId);
+	}
+	// 공지사항별 모든 점수 가져오기
+	@RequestMapping(value = "subject/{subjectId}/setScorePost", method = RequestMethod.GET)
+	public List<Post> setScorePost(@PathVariable("subjectId") int subjectId) {
+		return postRepository.findBySubject_subjectId(subjectId);
 	}
 	
 }

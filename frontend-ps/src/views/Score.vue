@@ -4,24 +4,26 @@
             <h3 style="display: inline-block">프로젝트 점수</h3>
             <hr style="width: 50%">
             <form ref="form">
-                <b-form-group label-for="SubjectStudent" style="width: 50%">
+                <b-form-group label-for="SubjectStudent" style="width: 80%">
                     <table v-if="!view" class="table table-bordered" id="SubjectStudent" v-bind="this.data">
                         <tbody>
                             <tr>
+                                <th class="th1">프로젝트 이름</th>
                                 <th class="th1">학번</th>
                                 <th class="th1">학년</th>
                                 <th class="th1">이름</th>
                                 <th class="th1">학과</th>
                             </tr>
-                            <tr @click="studentScore(item.user)" :key="index" v-for="(item, index) in data">
+                            <tr @click="studentScore(item)" :key="index" v-for="(item, index) in data">
+                                <td class="td1"> {{ item.project.projectName }} </td>
                                 <td class="td1"> {{ item.user.userNum }} </td>
                                 <td class="td1"> {{ item.user.grade }} </td>
-                                <td class="td1"> {{ item.user.name }} </td>
+                                <td class="td1"> {{ item.user.name }}{{item.project.user.userId==item.user.userId?"(팀장)":""}}</td>
                                 <td class="td1"> {{ item.user.detDepartment.detName }} </td>
                             </tr>
                         </tbody>
                     </table>
-                    <table v-if="view" class="table table-bordered" id="SubjectStudent" v-bind="this.data">
+                    <!-- <table v-if="view" class="table table-bordered" id="SubjectStudent" v-bind="this.data">
                         <tbody>
                             <tr>
                                 <th class="th1">프로젝트 이름</th>
@@ -32,31 +34,31 @@
                                 <td class="td1"> {{ item.user.name }} </td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table>-->
                     <div style="text-align: right">
                         <b-button v-if="!view" variant="dark" @click="viewTeam()">팀별 제출물 확인</b-button>
                         <b-button v-if="view" variant="dark" @click="viewTeam()">개인별 점수 확인</b-button>
                     </div>
                 </b-form-group>
-            </form>
+            </form> 
         </center>
 
     <b-modal id="modal-score" size="lg" ok-only @show="resetModal" @hidden="resetModal">
         <center>
-            <h3 class="mt-3"> {{ userData.userNum }} | {{ userData.name }} | 점수 </h3>
+            <h3 class="mt-3">{{pName}} | {{ userData.userNum }} | {{ userData.name}} | 점수 </h3>
             <hr style="border: 1px solid black ; width: 60% ; margin-bottom: 30px">
             <b-container style="width: 70%">
                 <b-row>
                     <table class="table table-bordered">
                         <tr>
-                            <th class="th1">제출한 공지 게시글</th>
+                            <th class="th1">제출 공지 게시글</th>
                             <th class="th1">배점</th>
                             <th class="th1">점수</th>
                         </tr>
-                        <tr style="text-align: center" :key="index" v-for="(data, index) in s">
-                            <td style="width: 60% ; text-align: center"> {{ data.name }} </td>
-                            <td class="td1"> {{ data.max }} </td>
-                            <td class="td1" v-if="!editVisible"> {{ data.score }} </td>
+                        <tr style="text-align: center" :key="index" v-for="(data, index) in allPosts" @click="move(data.postId)">
+                            <td style="width: 60% ; text-align: center"> {{ data.title}} </td>
+                            <td class="td1"> {{ data.score }} </td>
+                            <td class="td1" v-if="!editVisible"> {{allScores[index]==null?"":allScores[index].score}} </td>
                             <td class="td1" v-if="editVisible" style="padding: 5px 0 0 0 ; width: 20%">
                                 <center>
                                     <b-input v-model="data.score" style="width: 50% ; text-align: center"></b-input>
@@ -65,10 +67,10 @@
                         </tr>
                     </table>
 
-                    <div style="text-align: right ; width: 100%">
+                    <!-- <div style="text-align: right ; width: 100%">
                         <b-button v-if="!editVisible" variant="dark" @click="editScore()">입력</b-button>
                         <b-button v-if="editVisible" variant="dark" @click="editScore()">저장</b-button>
-                    </div>
+                    </div> -->
                 </b-row>
             </b-container>
         </center>
@@ -89,7 +91,7 @@
                         <tr style="text-align: center" :key="index" v-for="(data, index) in s2">
                             <td style="text-align: center"> {{ data.name }} </td>
                             <td class="td1" style="width: 44%"> {{ data.file }} </td>
-                            <td class="td1" style="width: 12%">{{data.score}}/{{data.max}}</td>
+                            <td class="td1" style="width: 12%"></td>
                         </tr>
                     </table>
                 </b-row>
@@ -109,9 +111,12 @@ export default {
         return {
             data: [],
             userData: [],
-            s: [ { name: '게시글이름1(해당 게시글로 이동?)', max: 20, score: 20 }, { name: '게시글이름2', max: 10, score: 9 }, { name: '3주차 진행상황 제출하세요.', max: 10, score: 9 }, { name: '4주차 진행상황 제출', max: 10, score: 8 },
-            { name: '5주차 진행상황', max: 10, score: 10 }, { name: '6주차 ㅈㅎㅅㅎ', max: 10, score: 9 }, { name: '7주차 ㅈㅎ', max: 10, score: 8 }, { name: '8차 ㅈㅎ', max: 10, score: 9 },
-            { name: '9 ㅈㅊ', max: 10, score: 10 }, { name: '10', max: 15, score: 14 }],
+            pName:'',
+            s: [],
+            allPosts:[],
+            allScores:[],
+            aP:[],
+            aS:[],
             editVisible: false,
             view: false,
             team: [],
@@ -121,9 +126,10 @@ export default {
         }
     },
     mounted() {
-        axios.get('/api/subject/' + this.$route.params.subjectId + '/member?sort=project')
-        .then(response => {
-            this.data = response.data
+        
+         axios.get('/api/subject/' + this.$route.params.subjectId + '/member?sort=project')
+            .then(respon => {
+                this.data = respon.data
         }),
         axios.get('/api/subject/' + this.$route.params.subjectId + '/projects')
         .then(response => {
@@ -144,9 +150,57 @@ export default {
     //   })  
     },
     methods: {
+        move(postId) {
+            this.$router.push({
+                path: '/subject/' + this.$route.params.subjectId+'/noticeBoard/'+postId
+            })
+        },
         studentScore(item) {
-            this.userData = item;
-            alert(this.userData.name)
+            this.userData = item.user;
+            this.pName=item.project.projectName;
+            this.allPosts=[];
+            this.s=[];
+            this.allScores=[];
+            this.aP=[];
+            this.aS=[];
+             axios.get('/api/subject/'+this.$route.params.subjectId+'/setScorePost')
+                .then(respon => {
+                    this.aP = respon.data
+                    axios.get('/api/subject/allScore/'+this.userData.userId)
+                    .then(respon => {
+                        this.aS = respon.data
+                        console.log(this.aP.length)
+                        for(let i=0;i<this.aP.length;i++) {
+                        
+                            if(this.aP[i].deadlineTime!='1000-01-01T00:00:00') {
+                                this.allPosts.push(this.aP[i])
+                                let ok=false;
+                                for(let j=0;j<this.aS.length;j++) {
+                                    // console.log(this.aS[j].post.postId)
+                                    console.log(i)
+                                    if(this.aS[j].post.postId==this.aP[i].postId) {
+                                        ok=true;
+                                        this.allScores.push(this.aS[j])
+                                        break;
+                                    }
+                                    if(ok==false) {
+                                        this.allScores.push(null)
+                                    }
+                                }
+                            }
+                            
+                        }
+                    })
+            })
+            
+            // for(let i=0;i<this.s1.length;i++) {
+            //     alert(i)
+            //     if(this.s1[i].post.subject.subjectId==this.$route.params.subjectId) {
+            //         this.s.push(this.s1[i].post)
+            //         this.ss.push(this.s1[i].score)
+            //     }
+            // }
+            // alert(this.userData.name)
             this.$root.$emit('bv::show::modal', 'modal-score') 
         },
         editScore() {
