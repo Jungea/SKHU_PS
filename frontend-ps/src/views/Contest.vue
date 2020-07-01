@@ -47,7 +47,8 @@
                                 <b-col class="filters">
                                     <b-form-group>
                                         <label for="filter-contest"><b>대회명</b></label>
-                                        <b-form-select class="filter-form" id="filter-contest" v-model="filterContest" :options="contests" style="padding:0px"></b-form-select>
+                                        <b-form-select class="filter-form" id="filter-contest" v-model="filterContest" :options="contests" 
+                                            value-field="detId" text-field="detName" style="padding:0px"></b-form-select>
                                     </b-form-group>
                                 </b-col>
                             </b-row>
@@ -72,7 +73,7 @@
                                 <h4 class="etc"><b>{{p.project.projectName}}</b></h4>
                             </b-card-title>
                             <b-card-text>
-                                <span class="mr-3">{{p.project.year}}</span>
+                                <span class="mr-3">{{p.year}}_{{p.detail.detName}}({{p.prize}})</span>
                                 <span class="mr-3">|</span>
                                 <span>{{p.project.user.name}}</span> <!--팀장명-->
                                 <span v-if="p.project.memNum>1">외 {{p.project.memNum-1}}명</span>
@@ -91,7 +92,7 @@
                             <b-card-text>
                                 <div style="font-size: 2rem;">
                                     <!--모달 띄우기-->
-                                    <b-button v-b-modal.project-modal squared variant="outline-secondary" size="sm" @click="getProjectInfo(p.project.projectId)">자세히</b-button>
+                                    <b-button v-b-modal.project-modal squared variant="outline-secondary" size="sm" @click="getProjectInfo(p.contestId, p.project.projectId)">자세히</b-button>
                                     <!--좋아요-->
                                     <b-icon 
                                         :id="`tooltip-like-${p.project.projectId}`" 
@@ -134,18 +135,18 @@
                 <div style="width:calc(100% - 1px);" v-if="modalLoaded"><!--크롬 너비 내림-->
                     <b-row cols="1" style="margin:0;">
                     <div class="board-header">
-                        <p class="page-title etc">{{projectInfo.project.projectName}}</p>
-                        <p style="margin:20px">{{projectInfo.project.theme}}</p>
+                        <p class="page-title etc">{{projectInfo.contest.project.projectName}}</p>
+                        <p style="margin:20px">{{projectInfo.contest.project.theme}}</p>
                         <b-button squared variant="outline-secondary" class="m-1" size="sm"
-                            @click="moveToProject(projectInfo.project.projectId)"
+                            @click="moveToProject(projectInfo.contest.project.projectId)"
                         >
-                        <!--:onclick="`window.open('/project/'+${projectInfo.project.projectId}+'/summary')`"-->
+                        <!--:onclick="`window.open('/project/'+${projectInfo.contest.projectId}+'/summary')`"-->
                             프로젝트 페이지
                         </b-button>
                         <!--깃허브 리포지토리로 이동-->
                         <b-button 
                             squared variant="outline-secondary" class="m-1" size="sm"
-                            :onclick="`window.open('${projectInfo.project.github}')`"
+                            :onclick="`window.open('${projectInfo.contest.project.github}')`"
                         >
                             <i class="fa fa-github" style="font-size:16pt"></i>&nbsp;github
                         </b-button>
@@ -153,14 +154,18 @@
                     </b-row>
                     <!--모달 내용-->
                     <b-row cols="1" class="modal-sector">
-                        <b-row cols-md="2" cols="1" style="margin:10px 0; text-align:center;">
+                        <b-row cols-md="3" cols="1" style="margin:10px 0; text-align:center;">
                             <b-col style="padding:5px;">
                                 <span style="font-weight:bold;">참여 연도</span>
-                                <h6 class="mt-2">{{projectInfo.project.year}}</h6>
+                                <h6 class="mt-2">{{projectInfo.contest.year}}</h6>
                             </b-col>
                             <b-col style="padding:5px;">
                                 <span style="font-weight:bold;">참여 대회</span>
-                                <h6 class="mt-2">대회 이름</h6>
+                                <h6 class="mt-2">{{projectInfo.contest.detail.detName}}</h6>
+                            </b-col>
+                            <b-col style="padding:5px;">
+                                <span style="font-weight:bold;">수상</span>
+                                <h6 class="mt-2">{{projectInfo.contest.prize}}</h6>
                             </b-col>
                         </b-row>
                     </b-row>
@@ -186,7 +191,7 @@
                         </div>
                         <b-collapse visible id="content-collapse">
                             <div style="margin:20px; padding:20px; background:whitesmoke; height:150px; overflow-y:scroll">
-                                <p>{{projectInfo.project.content}}</p>
+                                <p>{{projectInfo.contest.project.content}}</p>
                             </div>
                         </b-collapse>
                     </b-row>
@@ -195,10 +200,10 @@
                             <span style="font-weight:bold">🔧&nbsp;기술 태그</span>
                             <b-icon v-b-toggle.tag-collapse icon="chevron-down" variant="secondary" style="float:right; cursor:pointer; margin-top:4px"></b-icon>
                         </div>
-                        <b-collapse visible id="tag-collapse" v-if="projectInfo.project.tag">
+                        <b-collapse visible id="tag-collapse" v-if="projectInfo.contest.project.tag">
                             <div style="margin-top:20px">
                                 <h5>
-                                    <span class="badge badge-light mytag" v-for="(tag, index) in projectInfo.project.tag.split(',')" :key="index">
+                                    <span class="badge badge-light mytag" v-for="(tag, index) in projectInfo.contest.project.tag.split(',')" :key="index">
                                         #&nbsp;{{tag}}
                                     </span>
                                 </h5>
@@ -238,18 +243,8 @@ export default {
             allLoaded:false,
 
             //임시 연도와 대회
-            contests:[
-                { value: null, text: '선택 안함' },
-                { value: '1', text: '대회1' },
-                { value: '2', text: '대회2' },
-                { value: '3', text: '대회3' },
-                { value: '4', text: '대회4' },
-            ],
-            years:[
-                { value: null, text: '선택 안함' },
-                { value: '2019', text: '2019년도' },
-                { value: '2020', text: '2020년도' },
-            ],
+            contests:[{ detId: null, detName: '선택 안함' }],
+            years:[{ value: null, text: '선택 안함' }],
 
             //검색 관련
             keyWord:'',
@@ -260,7 +255,7 @@ export default {
             //모달 정보
             modalLoaded:false,
             projectInfo:{
-                project:{},
+                contest:{},
                 member:[]
             },
 
@@ -271,6 +266,19 @@ export default {
 
     mounted(){
         console.log('IT 경진대회')
+
+        axios.get('/api/contestNames').then(response => {
+            this.contests = response.data || [];
+            this.contests.unshift({ detId: null, detName: '선택 안함' })
+        })
+
+        axios.get('/api/contestYears').then(response => {
+            let temp = response.data || [];
+            this.years = [{ value: null, text: '선택 안함' }];
+            temp.forEach(t => {
+                this.years.push({ value: t, text: t+"년도" })
+            })
+        })
 
         //검색창 항상 포커싱
         // setInterval(function(){
@@ -298,22 +306,22 @@ export default {
             //     limit:6,
             //     start:this.next
             // }
-            axios.get('/api/allProjects')
+            axios.get('/api/contestProjects')
             .then(response => {
                 this.busy = false
                 let limit=6;
-                let arr=[];
+                let arr = response.data || [];
                 //let lastOne;
-                for(let i=0;i<response.data.length;i++){
-                    if(response.data[i].project.contest==1){
-                        arr.push(response.data[i])
-                        //lastOne=response.data[i]
-                    }
-                }
+                // for(let i=0;i<response.data.length;i++){
+                //     if(response.data[i].project.contest==1){
+                //         arr.push(response.data[i])
+                //         //lastOne=response.data[i]
+                //     }
+                // }
                 //참가 연도로 정렬
-                arr.sort(function(p1,p2){
-                    return p2.project.year-p1.project.year
-                })
+                // arr.sort(function(p1,p2){
+                //     return p2.project.year-p1.project.year
+                // })
                 let arr2 = arr.slice(this.projectCard.length,this.projectCard.length + limit)
                 if(arr2.length==0)
                     this.allLoaded=true
@@ -338,9 +346,9 @@ export default {
         },
 
         //모달 정보
-        getProjectInfo(pid){
+        getProjectInfo(cid, pid){
             this.getMember(pid)
-            this.getProject(pid)
+            this.getContest(cid)
         },
 
         getMember(pid){
@@ -352,10 +360,10 @@ export default {
             })
         },
 
-        getProject(pid){
-            axios.get('/api/projectBoard/modal/'+pid)
+        getContest(cid){
+            axios.get('/api/contest/modal/'+cid)
             .then(response => {
-                this.projectInfo.project=response.data.project
+                this.projectInfo.contest=response.data
                 this.modalLoaded=true
             })
         },
@@ -363,7 +371,7 @@ export default {
         resetModal(){
             this.projectInfo={
                 member:[],
-                project:{}
+                contest:{}
             }
             this.modalLoaded=false
         },
@@ -389,7 +397,7 @@ export default {
     },
     computed:{
         checkLength(){
-            if(this.filterTitle.length>0||this.filterCaptain.length>0||this.filterYear||this.filterYear)
+            if(this.filterTitle.length>0||this.filterCaptain.length>0||this.filterYear||this.filterContest)
                 return true;
             return false
         },
@@ -431,25 +439,25 @@ export default {
                         else if(this.filterYear==null&&this.filterContest!=null){
                             return (
                                 p.project.projectName.replace(/ /g,"").toLowerCase().includes(this.filterTitle.replace(/ /g,"").toLowerCase())&&
-                                p.project.user.name.replace(/ /g,"").toLowerCase().includes(this.filterCaptain.replace(/ /g,"").toLowerCase())
+                                p.project.user.name.replace(/ /g,"").toLowerCase().includes(this.filterCaptain.replace(/ /g,"").toLowerCase())&&
                                 //대회 데이터 추가 후 아래 코드 주석 해제
-                                //p.project.contest==this.filterContest
+                                p.detail.detId==this.filterContest
                             )
                         }
                         else if(this.filterYear!=null&&this.filterContest==null){
                             return (
                                 p.project.projectName.replace(/ /g,"").toLowerCase().includes(this.filterTitle.replace(/ /g,"").toLowerCase())&&
                                 p.project.user.name.replace(/ /g,"").toLowerCase().includes(this.filterCaptain.replace(/ /g,"").toLowerCase())&&
-                                p.project.year==this.filterYear
+                                p.year==this.filterYear
                             )
                         }
                         else{
                             return (
                                 p.project.projectName.replace(/ /g,"").toLowerCase().includes(this.filterTitle.replace(/ /g,"").toLowerCase())&&
                                 p.project.user.name.replace(/ /g,"").toLowerCase().includes(this.filterCaptain.replace(/ /g,"").toLowerCase())&&
-                                p.project.year==this.filterYear
+                                p.year==this.filterYear&&
                                 //대회 데이터 추가 후 아래 코드 주석 해제
-                                //p.project.contest==this.filterContest
+                                p.detail.detId==this.filterContest
                             )
                         }
                     })

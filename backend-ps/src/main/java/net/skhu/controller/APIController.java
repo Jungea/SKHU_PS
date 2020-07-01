@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import net.skhu.domain.Comment;
+import net.skhu.domain.Contest;
 import net.skhu.domain.Detail;
 import net.skhu.domain.File;
 import net.skhu.domain.Post;
@@ -34,6 +34,7 @@ import net.skhu.domain.Timeline;
 import net.skhu.domain.Todo;
 import net.skhu.domain.User;
 import net.skhu.domain.Weekly;
+import net.skhu.model.ContestProjectModel;
 import net.skhu.model.EditProjectModel;
 import net.skhu.model.FindPassModel;
 import net.skhu.model.ListModel;
@@ -45,7 +46,6 @@ import net.skhu.model.MyProjectListModel;
 import net.skhu.model.NoticeBoardSubmitModel;
 import net.skhu.model.ProfileModel;
 import net.skhu.model.ProjectBoardModel;
-import net.skhu.model.ProjectScoreModel;
 import net.skhu.model.SignUpModel;
 import net.skhu.model.TodoModel;
 import net.skhu.model.UserLoginModel;
@@ -868,6 +868,17 @@ public class APIController {
 	@RequestMapping(value = "contestYears", method = RequestMethod.GET)
 	public Object[] contestYears() {
 		return contestService.contestYears();
+	}
+	// 경진대회 수상 프로젝트들 리턴
+	@RequestMapping(value = "contestProjects", method = RequestMethod.GET)
+	public List<ContestProjectModel> contestProjects(HttpServletRequest request) {
+		return contestService.contestProjects(getLoginUserId(request));
+	}
+	// 경진대회 수상 프로젝트 자세히
+	@RequestMapping(value = "contest/modal/{contestId}", method = RequestMethod.GET)
+	public Contest contestModal(@PathVariable("contestId") int contestId) {
+		System.out.println("modal:"+contestId);
+		return contestService.getModal(contestId);
 	}
 	
 }
