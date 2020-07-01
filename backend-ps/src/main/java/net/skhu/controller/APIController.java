@@ -683,8 +683,9 @@ public class APIController {
     }
 	// 공지사항 게시판에서 제출 여부 리턴 
 	@RequestMapping(value = "/noticeBoard/fileSubmitList", method = RequestMethod.GET)
-	public List<File> fileSubmitList(@RequestParam("page") int page,@RequestParam("projectId") int projectId,@RequestParam("subjectId") int subjectId) {
-		return fileRepository.findAll();
+	public List<String> fileSubmitList(@RequestParam("page") int page,@RequestParam("projectId") int projectId,@RequestParam("subjectId") int subjectId) {
+//		return fileRepository.findAll();
+		return postService.fileSubmitList(page,projectId,subjectId);
 	}
 	// 공지사항 게시판에서 제출 여부 리턴 
 	@RequestMapping(value = "/noticeBoard/submitFiles/{subjectId}/{postId}", method = RequestMethod.GET)
@@ -877,10 +878,24 @@ public class APIController {
 	public List<Score> myScore(HttpServletRequest request) {
 		return scoreRepository.findByUser_userId(getLoginUserId(request));
 	}
-	// 내 점수 가져오기
+	// 내 점수 하나 가져오기
 	@RequestMapping(value = "project/getMyScore", method = RequestMethod.GET)
 	public String getMyScore(@RequestParam("postId") String postId,HttpServletRequest request) {
 		System.out.println("postId:"+postId);
 		return scoreRepository.findByUser_userIdAndPost_postId(getLoginUserId(request),Integer.parseInt(postId)).getScore();
 	}
+	// 공지사항별 모든 점수 가져오기
+	@RequestMapping(value = "subject/allScore/{userId}", method = RequestMethod.GET)
+	public List<Score> allScore(@PathVariable("userId") int userId) {
+		System.out.println("userId~~~~~~~~~~~~"+userId);
+		return scoreRepository.findByUser_userId(userId);
+	}
+	// 공지사항별 모든 점수 가져오기
+	@RequestMapping(value = "subject/{subjectId}/setScorePost", method = RequestMethod.GET)
+	public List<Post> setScorePost(@PathVariable("subjectId") int subjectId) {
+		System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		return postRepository.findBySubject_subjectId(subjectId);
+		
+	}
+	
 }

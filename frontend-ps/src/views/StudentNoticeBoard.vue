@@ -17,10 +17,9 @@
                         <td class="td1" style="width: 20%"> {{ item.writeTime.substring(0,10)+" "+item.writeTime.substring(11,16) }} </td>
                         <td class="td1"> {{ item.deadlineTime=='1000-01-01T00:00:00'?'-':item.deadlineTime.substring(0,10)+" "+item.deadlineTime.substring(11,16)}} </td>
                         <td class="td1">
-                            <div v-if="item.deadlineTime=='1000-01-01T00:00:00'"> - </div>
-                            <b-icon-check v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile2[index] != '0')" style="color: green" scale="1.5"></b-icon-check>
-                            <b-icon-x v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile2[index] == '0')" style="color: red" scale="1.5"></b-icon-x>
-                            
+                             <div v-if="item.deadlineTime=='1000-01-01T00:00:00'"> - </div>
+                            <b-icon-check v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] != '0')" style="color: green" scale="1.5"></b-icon-check>
+                            <b-icon-x v-if="item.deadlineTime!='1000-01-01T00:00:00' && (isFile[index] == '0')" style="color: red" scale="1.5"></b-icon-x>
                         </td>
                         <td style="width:10%" class="td1"> {{item.score==null || item.score==""?"-":myScore2[index]+"/"+item.score}}</td>
                     </tr>
@@ -87,7 +86,7 @@ export default {
                     });
                     axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => {
                             this.isFile=response3.data
-                            this.file()
+                            //this.file()
                         }).catch((erro) => {
                             console.error(erro);
                     });
@@ -124,7 +123,7 @@ export default {
                     });
                     axios.get('/api/noticeBoard/fileSubmitList?page='+this.$route.query.page+'&projectId='+this.$route.params.projectId+'&subjectId='+this.subjectId).then(response3 => { // 프로젝트 이름 가져오기
                         this.isFile=response3.data
-                        this.file()
+                        //this.file()
                         }).catch((erro) => {
                         console.error(erro);
                     });
