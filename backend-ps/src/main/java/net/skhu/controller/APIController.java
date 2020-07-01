@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,6 +61,7 @@ import net.skhu.repository.ScoreRepository;
 import net.skhu.repository.SubjectRepository;
 import net.skhu.repository.UserRepository;
 import net.skhu.service.CommentService;
+import net.skhu.service.ContestService;
 import net.skhu.service.DetailService;
 import net.skhu.service.FileService;
 import net.skhu.service.PostLikeService;
@@ -111,6 +113,8 @@ public class APIController {
 	PostLikeRepository postLikeRepository;
 	@Autowired
 	ScoreRepository scoreRepository;
+	@Autowired
+	ContestService contestService;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -850,8 +854,20 @@ public class APIController {
 		return postService.freeBoardLikeNum(page,projectId);
 	}
 	// 프로젝트별 점수 지정
-	@RequestMapping(value = "project/score", method = RequestMethod.POST)
-	public void  setProjectScore(@RequestBody ProjectScoreModel projectScoreModel) {
-		scoreRepository.setProjectScore(projectScoreModel);
+//	@RequestMapping(value = "project/score", method = RequestMethod.POST)
+//	public void  setProjectScore(@RequestBody ProjectScoreModel projectScoreModel) {
+//		scoreRepository.setProjectScore(projectScoreModel);
+//	}
+	
+	// 경진대회 이름들 리턴
+	@RequestMapping(value = "contestNames", method = RequestMethod.GET)
+	public List<Detail> contestNames() {
+		return contestService.contestNames();
 	}
+	// 경진대회 연도들 리턴
+	@RequestMapping(value = "contestYears", method = RequestMethod.GET)
+	public Object[] contestYears() {
+		return contestService.contestYears();
+	}
+	
 }
