@@ -33,10 +33,10 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div style="text-align: right">
+                    <!-- <div style="text-align: right">
                         <b-button v-if="!view" variant="dark" @click="viewTeam()">팀별 제출물 확인</b-button>
                         <b-button v-if="view" variant="dark" @click="viewTeam()">개인별 점수 확인</b-button>
-                    </div>
+                    </div> -->
                 </b-form-group>
             </form>
         </center>
@@ -146,7 +146,7 @@ export default {
     methods: {
         studentScore(item) {
             this.userData = item;
-            alert(this.userData.name)
+            // alert(this.userData.name)
             this.$root.$emit('bv::show::modal', 'modal-score') 
         },
         editScore() {
@@ -160,12 +160,12 @@ export default {
         resetModal() {
             this.editVisible = false;
         },
-        viewTeam() {
-            if(this.view)
-                this.view = false;
-            else   
-                this.view = true;
-        },
+        // viewTeam() {
+        //     if(this.view)
+        //         this.view = false;
+        //     else   
+        //         this.view = true;
+        // },
         teamReport(item) {
             this.teamData = item;
             alert(this.teamData.projectName)

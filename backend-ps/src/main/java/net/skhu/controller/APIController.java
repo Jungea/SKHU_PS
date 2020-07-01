@@ -28,6 +28,7 @@ import net.skhu.domain.File;
 import net.skhu.domain.Post;
 import net.skhu.domain.Project;
 import net.skhu.domain.ProjectJoin;
+import net.skhu.domain.Score;
 import net.skhu.domain.Subject;
 import net.skhu.domain.Timeline;
 import net.skhu.domain.Todo;
@@ -67,6 +68,7 @@ import net.skhu.service.PostService;
 import net.skhu.service.ProjectJoinService;
 import net.skhu.service.ProjectService;
 import net.skhu.service.ProjectStarService;
+import net.skhu.service.ScoreService;
 import net.skhu.service.SubjectService;
 import net.skhu.service.UserService;
 
@@ -111,6 +113,8 @@ public class APIController {
 	PostLikeRepository postLikeRepository;
 	@Autowired
 	ScoreRepository scoreRepository;
+	@Autowired
+	ScoreService scoreService;
 	
 	public int getLoginUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -679,8 +683,8 @@ public class APIController {
     }
 	// 공지사항 게시판에서 제출 여부 리턴 
 	@RequestMapping(value = "/noticeBoard/fileSubmitList", method = RequestMethod.GET)
-	public List<String> fileSubmitList(@RequestParam("page") int page,@RequestParam("projectId") int projectId,@RequestParam("subjectId") int subjectId) {
-		return postService.fileSubmitList(page,projectId,subjectId);
+	public List<File> fileSubmitList(@RequestParam("page") int page,@RequestParam("projectId") int projectId,@RequestParam("subjectId") int subjectId) {
+		return fileRepository.findAll();
 	}
 	// 공지사항 게시판에서 제출 여부 리턴 
 	@RequestMapping(value = "/noticeBoard/submitFiles/{subjectId}/{postId}", method = RequestMethod.GET)
@@ -852,6 +856,31 @@ public class APIController {
 	// 프로젝트별 점수 지정
 	@RequestMapping(value = "project/score", method = RequestMethod.POST)
 	public void  setProjectScore(@RequestBody ProjectScoreModel projectScoreModel) {
-		scoreRepository.setProjectScore(projectScoreModel);
+		scoreService.setProjectScore(projectScoreModel);
+	}
+	// 프로젝트별 점수 가져오기
+	@RequestMapping(value = "project/getScore", method = RequestMethod.GET)
+	public List<String> getProjectScore(@RequestParam("postId") String postId) {
+		System.out.println("postId");
+		List<Score> scoreList=scoreRepository.findByPost_postId(Integer.parseInt(postId));		
+		if(scoreList!=null) {
+			List<String> r=new ArrayList<>();
+			for(int i=0;i<scoreList.size();i++) {
+				r.add(scoreList.get(i).getScore());
+			}
+			return r;
+		}
+		return new ArrayList<>();
+	}
+	// 내 점수 목록 가져오기
+	@RequestMapping(value = "project/myScore", method = RequestMethod.GET)
+	public List<Score> myScore(HttpServletRequest request) {
+		return scoreRepository.findByUser_userId(getLoginUserId(request));
+	}
+	// 내 점수 가져오기
+	@RequestMapping(value = "project/getMyScore", method = RequestMethod.GET)
+	public String getMyScore(@RequestParam("postId") String postId,HttpServletRequest request) {
+		System.out.println("postId:"+postId);
+		return scoreRepository.findByUser_userIdAndPost_postId(getLoginUserId(request),Integer.parseInt(postId)).getScore();
 	}
 }

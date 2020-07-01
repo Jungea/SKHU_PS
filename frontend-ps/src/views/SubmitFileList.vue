@@ -57,13 +57,23 @@ export default {
             memberList: [],
             scoreList: [],
             indexList: [],
-            checkBox: []
+            checkBox: [],
+            a:[],
         }
     },
     updated() {
         
     },
      mounted() {
+        axios.get('/api/project/getScore?postId='+this.$route.params.postId).then(response => { // 프로젝트 이름 가져오기
+            if(response.data==null) {
+                this.scoreList=[]
+            } else {
+                this.scoreList=response.data
+            }
+            }).catch((erro) => {
+                console.error(erro);
+        });
         axios.get('/api/noticeBoard/submitFiles/' + this.$route.params.subjectId + '/'+this.$route.params.postId)
         .then(response => {
             this.data=response.data
@@ -126,14 +136,12 @@ export default {
         },
         save() {
             alert("점수가 저장되었습니다.")
-            for(let i=0;i<this.scoreList.length();i++) {
-                if(this.scoreList[i]!=null) {
-                    axios.post('/api/project/score', {
-                        score:this.scoreList[i],
-                        projectId:this.data[i].project.projectId
-                    })
-                }
-            }
+            
+            axios.post('/api/project/score', {
+                memberList:this.memberList,
+                scoreList:this.scoreList,
+                postId:this.$route.params.postId,
+            })
 
         },
         info(value) {
