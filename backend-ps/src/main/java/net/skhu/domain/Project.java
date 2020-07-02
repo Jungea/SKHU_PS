@@ -37,8 +37,6 @@ public class Project {
 	String tag;
 	boolean contest;
 	String github;
-	Integer year; // null 허용(경진대회)
-	Integer semester; // null 허용(경진대회)
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "capId")
