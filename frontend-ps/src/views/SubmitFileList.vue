@@ -7,23 +7,26 @@
                 <hr style="width: 60%">
                 <form ref="form">
                     <b-form-group label-for="SubjectStudent">
-                        <table class="table table-bordered" id="SubjectStudent" v-bind="data" style="width: 60%">
+                        <table class="table table-bordered" id="SubjectStudent" v-bind="data" style="width: 80%">
                             <tbody>            
                                 <tr>
-                                    <th class="th1" style="width: 30%">프로젝트 이름</th>
+                                    <th class="th1" style="width: 25%">프로젝트 이름</th>
                                     <th class="th1" style="width: 13%">이름</th>
                                     <th class="th1">제출 파일</th>
+                                    <th class="th1" style="15%">제출 날짜</th>
                                     <th class="th1" style="width: 12%">점수</th>
                                     <th class="th1" style="width: 5%">조별</th>
                                 </tr>
+                                
                                 <tr :key="index" v-for="(item, index) in memberList" v-bind:class="{check1: (indexList.indexOf(index)!=-1&&index!=0)}">
                                     <td class="td1" style="vertical-align: middle">{{ item.project.projectName }}</td>
                                     <td class="td1" style="vertical-align: middle">{{ item.user.name }}</td>
                                     <td class="td1" style="vertical-align: middle">
-                                        <div v-for="(file, index) in item.files" :key="index" class="fileItem" style="cursor:pointer ; color:blue" @click="download(file)">
-                                            <div>{{ file.name }}</div>
+                                        <div class="fileItem" style="cursor:pointer ; color:blue" @click="download(files[index])">
+                                            <div>{{ files[index].name }}</div>
                                         </div>
                                     </td>
+                                    <td class="td1" style="vertical-align: middle">{{timeCheck[index]}}</td>
                                     <td class="td1">
                                         <center><b-input @change="allCheck(indexList.indexOf(index))" v-model="scoreList[index]" style="text-align: center ; width:50px"></b-input></center>
                                     </td>
@@ -35,7 +38,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <div v-if="data" style="text-align: right ; margin-right: 20%"><b-button variant="dark" @click="save()">저장</b-button></div>
+                        <div v-if="data" style="text-align: right ; margin-right: 10%"><b-button variant="dark" @click="save()">저장</b-button></div>
                     </b-form-group>                
                 </form>
             </center>
@@ -50,6 +53,7 @@ export default {
     name: 'score',
     data() {
         return {
+            post:null,
             data: [],
             files: [],
             title: '',
@@ -58,7 +62,7 @@ export default {
             scoreList: [],
             indexList: [],
             checkBox: [],
-            a:[],
+            timeCheck:[],
         }
     },
     updated() {
@@ -77,7 +81,7 @@ export default {
         axios.get('/api/noticeBoard/submitFiles/' + this.$route.params.subjectId + '/'+this.$route.params.postId)
         .then(response => {
             this.data=response.data
-
+            
             axios.get('/api/subject/' + this.$route.params.subjectId + '/member?sort=project')
             .then(respon => {
                 this.memberList = respon.data
@@ -96,31 +100,35 @@ export default {
                     this.indexList.push(array1.indexOf(array2[j]))
                 }
 
-                for(j = 0 ; j < this.indexList.length ; j++)
+                for(j = 0 ; j < this.indexList.length ; j++) {
                     this.checkBox.push(false)
+                }
+                let k=-1
+                for(let j=0;j<this.memberList.length;j++) {
+                    if(this.indexList.indexOf(j)!=-1) {
+                        this.files.push(this.data[this.indexList.indexOf(j)].files[0])
+                        k++
+                    } else { 
+                        // for(let k=0;k<j;k++) 
+                        this.files.push(this.data[k].files[0])
+                    }
+                    
+                }
+                console.log("length:"+this.files.length)
+                for(let q=0;q<this.files.length;q++) {
+                    console.log(this.files[q].submitTime+" "+q)
+                    this.timeCheck.push(this.dateCheck(this.files[q].submitTime))
+                }
             })
         }),
-        // axios.get('/api/subject/' + this.$route.params.subjectId + '/projects')
-        // .then(response => {
-        //     this.data = response.data
-        //     for(let i = 0 ;i < response.data.length ; i++)
-        //         this.files.push('2017320 ' + this.data[i].user.name + '.txt')
-        // }),
         axios.get('/api/noticeBoard/post/'+this.$route.params.postId) // 게시글 정보
         .then(response => {
+            this.post=response.data
             this.title = response.data.title
         });
     },
     methods: {
         download(file) {
-            // axios.get('/api/file1/download/'+file.fileId).then(response => {
-            //     var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-            //     var fileLink = document.createElement('a');
-            //     fileLink.href = fileURL;
-            //     fileLink.setAttribute('download', file.name);
-            //     document.body.appendChild(fileLink);
-            //     fileLink.click();
-            // })
             axios({
                 method: 'GET',
                 url: '/api/file1/download/'+file.fileId,                 
@@ -161,7 +169,65 @@ export default {
                 
                 this.$forceUpdate()
             }
-        }
+        },
+        
+        dateCheck(date) {
+            // 파일 제출 시간
+            let month1=Number(date.substring(5,7))
+            let date1=Number(date.substring(8,10))
+            let hour1=Number(date.substring(11,13))
+            let minute1=Number(date.substring(14,16))
+            let seconds1=Number(date.substring(17,19))
+
+            // 정상 제출 시간
+            let month2=Number(this.post.deadlineTime.substring(5,7))
+            let date2=Number(this.post.deadlineTime.substring(8,10))
+            let hour2=Number(this.post.deadlineTime.substring(11,13))
+            let minute2=Number(this.post.deadlineTime.substring(14,16))
+            let seconds2=Number(this.post.deadlineTime.substring(17,19))
+        
+            if(month1>month2) {
+                     this.submitFilePossible.push(false)
+                    return date.substring(0,10)+" "+date.substring(11,19)+"(지각)"
+            } 
+            else if(month1==month2) {
+                if(date1>date2) {
+                    return date.substring(0,10)+" "+date.substring(11,19)+"(지각)"
+                } 
+                else if(date1==date2) {
+                    if(hour1>hour2) {
+                        return date.substring(0,10)+" "+date.substring(11,19)+"(지각)"
+                    } 
+                    else if(hour1==hour2) {
+                        if(minute1>minute2) {
+                            return date.substring(0,10)+" "+date.substring(11,19)+"(지각)"
+                        } 
+                        else if(minute1==minute2) {
+                            if(seconds1>seconds2) {
+                                return date.substring(0,10)+" "+date.substring(11,19)+"(지각)"
+                            } 
+                            else {
+                                return date.substring(0,10)+" "+date.substring(11,19)
+                            } 
+                        } 
+                        else {
+                            return date.substring(0,10)+" "+date.substring(11,19)
+                        }
+                    } 
+                    else {
+                        return date.substring(0,10)+" "+date.substring(11,19)
+                    }
+                } 
+                else {
+                    return date.substring(0,10)+" "+date.substring(11,19)
+                } 
+            } 
+            else {
+                return date.substring(0,10)+" "+date.substring(11,19)
+            }
+                
+        },
+        
     }
 }
 </script>

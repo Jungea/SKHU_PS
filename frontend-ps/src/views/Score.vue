@@ -35,10 +35,10 @@
                             </tr>
                         </tbody>
                     </table>-->
-                    <div style="text-align: right">
+                    <!-- <div style="text-align: right">
                         <b-button v-if="!view" variant="dark" @click="viewTeam()">팀별 제출물 확인</b-button>
                         <b-button v-if="view" variant="dark" @click="viewTeam()">개인별 점수 확인</b-button>
-                    </div>
+                    </div> -->
                 </b-form-group>
             </form> 
         </center>
@@ -171,24 +171,17 @@ export default {
                         this.aS = respon.data
                         console.log(this.aP.length)
                         for(let i=0;i<this.aP.length;i++) {
-                        
                             if(this.aP[i].deadlineTime!='1000-01-01T00:00:00') {
                                 this.allPosts.push(this.aP[i])
-                                let ok=false;
-                                for(let j=0;j<this.aS.length;j++) {
-                                    // console.log(this.aS[j].post.postId)
-                                    console.log(i)
-                                    if(this.aS[j].post.postId==this.aP[i].postId) {
-                                        ok=true;
-                                        this.allScores.push(this.aS[j])
-                                        break;
-                                    }
-                                    if(ok==false) {
-                                        this.allScores.push(null)
-                                    }
+                            }
+                        }
+                        for(let i=0;i<this.aS.length;i++) {
+                            for(let j=0;j<this.allPosts.length;j++) {
+                                if(this.aS[i].post.postId==this.allPosts[j].postId) {
+                                    this.allScores.push(this.aS[i])
+                                    break
                                 }
                             }
-                            
                         }
                     })
             })
