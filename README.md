@@ -22,7 +22,7 @@
  * vuedraggable
 
 ### 시연 영상
-1차 릴리즈 https://youtu.be/Aca6Epszx5w
-2차 릴리즈 https://youtu.be/FISiBogikag
-3차 릴리즈 https://youtu.be/4-X-1H0WROw
+1차 릴리즈 https://youtu.be/Aca6Epszx5w   
+2차 릴리즈 https://youtu.be/FISiBogikag   
+3차 릴리즈 https://youtu.be/4-X-1H0WROw   
 최종 발표 https://www.youtube.com/watch?v=L9prqr43myU&feature=youtu.be
